@@ -80,11 +80,11 @@ Every day I will:
 
 | Day 1 | AI Prompt Generator | ✅ Completed |
 
-| Day 2 | Coming Soon         | ⏳           |
+| Day 2 | Coming Soon         | ✅ Completed |
 
-| Day 3 | Coming Soon         | ⏳           |
+| Day 3 | Coming Soon         | ✅ Completed |
 
-| Day 4 | Coming Soon         | ⏳           |
+| Day 4 | Coming Soon         | ✅ Completed |
 
 | Day 5 | Coming Soon         | ⏳           |
 
