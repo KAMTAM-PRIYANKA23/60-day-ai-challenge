@@ -1,0 +1,90 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{color}
+
+\definecolor{navy}{RGB}{26, 54, 93}
+\definecolor{charcoal}{RGB}{44, 62, 80}
+
+\urlstyle{same}
+\pagestyle{empty}
+
+\titleformat{\section}{\large\bfseries\color{navy}\uppercase}{}{0em}{}[\color{navy}\titlerule]
+\titlespacing*{\section}{0pt}{8pt}{4pt}
+
+\setlist[itemize]{leftmargin=15pt, noitemsep, topsep=1pt, parseitemsep=1pt}
+
+\begin{document}
+
+\begin{center}
+    {\Huge \bfseries \color{navy} KAMTAM PRIYANKA} \\
+    \vspace{4pt}
+    \small Hyderabad, India $\cdot$ \href{mailto:kamtampriyankareddy@gmail.com}{kamtampriyankareddy@gmail.com} \\
+    \href{https://www.linkedin.com/in/kamtam-priyanka-2682a6364/}{linkedin.com/in/kamtam-priyanka-2682a6364} $\cdot$ \href{https://github.com/KAMTAM-PRIYANKA23}{github.com/KAMTAM-PRIYANKA23}
+\end{center}
+
+\section{Education}
+\textbf{KLH University} \hfill 2025 -- 2029 \\
+\textit{Bachelor of Technology (B.Tech) in Computer Science and Information Technology} \\
+\begin{itemize}
+    \item Academic Performance: Exceptional cumulative grade point average of \textbf{9.93 / 10.00}.
+    \item Core Focus Areas: Advanced Data Structures, Architectural Design Foundations, and Object-Oriented Principles.
+\end{itemize}
+
+\section{Technical Skills}
+\begin{tabular}{@{}p{0.25\textwidth} p{0.75\textwidth}@{}}
+    \textbf{Programming Languages:} & Java (Core \& Fundamentals), C Programming, JavaScript (ES6+), HTML5, CSS3 \\
+    \textbf{Frameworks \& Libraries:} & React.js (Component-driven architecture, state tracking) \\
+    \textbf{CS Fundamentals:} & Data Structures, Algorithms, Object-Oriented Programming (OOP) \\
+    \textbf{Tools \& Platform:} & Git, GitHub, Visual Studio Code (VS Code) \\
+    \textbf{Core Tracks:} & Backend Architecture, Full Stack Engineering, AI Foundations, Machine Learning Logic \\
+\end{tabular}
+
+\section{Technical Projects}
+
+\textbf{Airline Booking System -- React Reservation Platform} \hfill \textit{Ongoing} \\
+\begin{itemize}
+    \item Engineered an engineering roadmap for a multi-module flight reservation architecture, modeling high-concurrency client workflows.
+    \item Developed structured flight search and booking layout flows utilizing a modular, component-based React framework.
+    \item Created a cross-platform responsive user interface optimizing viewports for smooth customer experiences.
+\end{itemize}
+
+\vspace{3pt}
+\textbf{PreSareeFinder -- Local Storage Retail Application} \hfill \textit{Completed} \\
+\begin{itemize}
+    \item Built an interactive product discovery interface optimized for specific niche retail tracking.
+    \item Implemented persistent operational mechanisms using client-side Browser Local Storage structures for lightweight state lifecycle tracking.
+    \item Designed a clean client UX layout to ensure intuitive product browsing transitions across varying viewports.
+\end{itemize}
+
+\vspace{3pt}
+\textbf{NutriScope -- AI-Assisted Nutrition Concepts Dashboard} \hfill \textit{Completed} \\
+\begin{itemize}
+    \item Designed high-fidelity interactive dashboard architectural concepts focused on data-driven physical wellness metrics.
+    \item Mapped analytical flow pipelines integrating foundational artificial intelligence models with visual front-end structures.
+\end{itemize}
+
+\vspace{3pt}
+\textbf{Environmental Health Analyzer -- Analytics Dashboard} \hfill \textit{Completed} \\
+\begin{itemize}
+    \item Constructed a functional metrics visualization framework for parsing regional environmental indices.
+    \item Programmed modular interactive reporting blocks to enable quick extraction of ecological health data trends.
+\end{itemize}
+
+\section{Competitive Programming \& Achievements}
+\begin{itemize}
+    \item \textbf{CodeChef Rank Profile:} Attained a Highest Peak Competitive Rating of \textbf{1325}; established a Peak Data Structures \& Algorithms Score of \textbf{906}.
+    \item \textbf{Model United Nations:} Awarded \textbf{Best Commendable Delegate} representation for the UNDP Madagascar assembly, proving elite executive articulation, consensus-building, and communication competencies.
+\end{itemize}
+
+\section{Certifications}
+\begin{itemize}
+    \item Java Fundamentals Certification -- Scaler Academy
+    \item HTML, CSS, and JavaScript Essentials -- Cisco Networking Academy
+    \item AI Foundations and Beginner AI Projects -- Unlox Academy
+\end{itemize}
+
+\end{document}

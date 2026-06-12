@@ -1,0 +1,353 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .dash { padding: 1.5rem 1rem; max-width: 700px; margin: 0 auto; }
+  .header { background: #0f2147; border-radius: var(--border-radius-lg); padding: 1.5rem; margin-bottom: 1.25rem; color: #fff; position: relative; overflow: hidden; }
+  .header::after { content: ''; position: absolute; right: -30px; top: -30px; width: 160px; height: 160px; border-radius: 50%; background: rgba(55,138,221,0.18); pointer-events: none; }
+  .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 0.75rem; }
+  .avatar { width: 52px; height: 52px; border-radius: 50%; background: #378add; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 500; color: #fff; flex-shrink: 0; }
+  .header-name { font-size: 20px; font-weight: 500; color: #fff; }
+  .header-role { font-size: 13px; color: #90b8e8; margin-top: 2px; }
+  .header-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; background: rgba(55,138,221,0.25); color: #b5d4f4; font-weight: 500; }
+  .pill.gold { background: rgba(239,159,39,0.25); color: #fac775; }
+
+  .score-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .score-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 0.9rem 1rem; text-align: center; }
+  .score-label { font-size: 11px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+  .score-val { font-size: 28px; font-weight: 500; line-height: 1; }
+  .score-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 4px; }
+  .s-blue { color: #185fa5; }
+  .s-teal { color: #0f6e56; }
+  .s-purple { color: #534ab7; }
+  .s-amber { color: #854f0b; }
+  .s-coral { color: #993c1d; }
+  .s-green { color: #3b6d11; }
+
+  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+  .mini-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .mini-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.7rem 0.9rem; }
+  .mini-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+  .mini-val { font-size: 17px; font-weight: 500; }
+
+  .bar-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+  .bar-row { margin-bottom: 12px; }
+  .bar-row:last-child { margin-bottom: 0; }
+  .bar-meta { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+  .bar-name { color: var(--color-text-primary); font-weight: 500; }
+  .bar-pct { color: var(--color-text-secondary); }
+  .bar-track { height: 7px; background: var(--color-background-secondary); border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+  .insight-box { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; }
+  .insight-title { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+  .insight-item { font-size: 12px; color: var(--color-text-primary); padding: 4px 0; border-bottom: 0.5px solid var(--color-border-tertiary); display: flex; align-items: flex-start; gap: 6px; }
+  .insight-item:last-child { border-bottom: none; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .dot-green { background: #3b6d11; }
+  .dot-red { background: #a32d2d; }
+  .dot-amber { background: #854f0b; }
+
+  .radar-wrap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 1.25rem; }
+  .radar-row { display: flex; align-items: center; gap: 12px; }
+  .radar-canvas-wrap { position: relative; width: 240px; height: 220px; flex-shrink: 0; }
+  .radar-legend { flex: 1; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--color-text-primary); margin-bottom: 8px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+  .gap-section { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
+  .gap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .gap-tag { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 5px 10px; font-size: 11px; display: flex; align-items: center; gap: 6px; }
+  .tag-critical { border-left: 3px solid #e24b4a; }
+  .tag-medium { border-left: 3px solid #ef9f27; }
+  .tag-low { border-left: 3px solid #639922; }
+
+  .roadmap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
+  .rm-row { display: grid; grid-template-columns: 80px 1fr; gap: 10px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+  .rm-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .rm-badge { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: var(--border-radius-md); text-align: center; line-height: 1.4; }
+  .rm-30 { background: #e6f1fb; color: #185fa5; }
+  .rm-90 { background: #eaf3de; color: #3b6d11; }
+  .rm-180 { background: #eeedfe; color: #534ab7; }
+  .rm-items { font-size: 12px; color: var(--color-text-primary); }
+  .rm-items span { display: block; padding: 1px 0; }
+
+  .verdict-box { border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+  .verdict-consider { background: #faeeda; border: 0.5px solid #ef9f27; }
+  .verdict-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: #854f0b; margin-bottom: 6px; }
+  .verdict-text { font-size: 12px; color: #633806; line-height: 1.6; }
+
+  .keyword-wrap { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.1rem; margin-bottom: 1.25rem; }
+  .kw-row { display: flex; flex-wrap: wrap; gap: 6px; }
+  .kw-tag { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+  .kw-present { background: #eaf3de; color: #3b6d11; }
+  .kw-missing { background: #fcebeb; color: #a32d2d; }
+
+  .footer-note { text-align: center; font-size: 11px; color: var(--color-text-secondary); padding-top: 0.5rem; }
+</style>
+
+<div class="dash">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="avatar">KP</div>
+      <div>
+        <div class="header-name">Kamtam Priyanka</div>
+        <div class="header-role">Backend / Full Stack / Software Engineer Candidate · KL University · CGPA 9.93</div>
+      </div>
+    </div>
+    <div class="header-pills">
+      <span class="pill">B.Tech CSE 2029</span>
+      <span class="pill">Java · React · JS</span>
+      <span class="pill">5 Projects</span>
+      <span class="pill gold">CGPA 9.93 / 10</span>
+      <span class="pill">DSA · OOP</span>
+      <span class="pill">GitHub Active</span>
+    </div>
+  </div>
+
+  <div class="section-title">Core evaluation scores</div>
+  <div class="score-grid">
+    <div class="score-card">
+      <div class="score-label">ATS Match</div>
+      <div class="score-val s-blue">58</div>
+      <div class="score-sub">out of 100</div>
+    </div>
+    <div class="score-card">
+      <div class="score-label">Recruiter Match</div>
+      <div class="score-val s-teal">64</div>
+      <div class="score-sub">out of 100</div>
+    </div>
+    <div class="score-card">
+      <div class="score-label">Hiring Manager</div>
+      <div class="score-val s-purple">62</div>
+      <div class="score-sub">out of 100</div>
+    </div>
+  </div>
+
+  <div class="section-title">Supplemental scores</div>
+  <div class="mini-scores">
+    <div class="mini-card">
+      <div class="mini-label">Technical Skills Match</div>
+      <div class="mini-val s-blue">55%</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Project Relevance</div>
+      <div class="mini-val s-teal">68/100</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-label">Career Readiness</div>
+      <div class="mini-val s-purple">61/100</div>
+    </div>
+  </div>
+
+  <div class="section-title">Skill dimension breakdown</div>
+  <div class="bar-section">
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">Frontend / UI (HTML, CSS, JS, React)</span><span class="bar-pct">82%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:82%; background:#185fa5;"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">CS Fundamentals (DSA, OOP, Algorithms)</span><span class="bar-pct">72%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:72%; background:#534ab7;"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">Academic Excellence (CGPA, Certifications)</span><span class="bar-pct">95%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:95%; background:#0f6e56;"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">Backend Development (APIs, DB, Server)</span><span class="bar-pct">20%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:20%; background:#e24b4a;"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">DevOps / Cloud / Deployment</span><span class="bar-pct">8%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:8%; background:#ef9f27;"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">Database (SQL, NoSQL)</span><span class="bar-pct">15%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:15%; background:#d85a30;"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">System Design / Architecture</span><span class="bar-pct">10%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:10%; background:#993556;"></div></div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-meta"><span class="bar-name">Competitive Programming (CodeChef)</span><span class="bar-pct">48%</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:48%; background:#ba7517;"></div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Radar — competency profile</div>
+  <div class="radar-wrap">
+    <div class="radar-row">
+      <div class="radar-canvas-wrap">
+        <canvas id="radarChart" role="img" aria-label="Radar chart showing candidate competency across 6 dimensions" style="width:240px;height:220px;"></canvas>
+      </div>
+      <div class="radar-legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#378add;"></span>Frontend / UI — 82</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#534ab7;"></span>DSA / OOP — 72</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#0f6e56;"></span>Academics — 95</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#e24b4a;"></span>Backend Dev — 20</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ef9f27;"></span>DevOps / Cloud — 8</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#d85a30;"></span>Database — 15</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Keyword match analysis (industry standard JD)</div>
+  <div class="keyword-wrap">
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;">Present in profile</div>
+    <div class="kw-row" style="margin-bottom:10px;">
+      <span class="kw-tag kw-present">Java</span>
+      <span class="kw-tag kw-present">JavaScript</span>
+      <span class="kw-tag kw-present">React</span>
+      <span class="kw-tag kw-present">HTML / CSS</span>
+      <span class="kw-tag kw-present">Git / GitHub</span>
+      <span class="kw-tag kw-present">OOP</span>
+      <span class="kw-tag kw-present">DSA</span>
+      <span class="kw-tag kw-present">REST API (learning)</span>
+      <span class="kw-tag kw-present">Responsive Design</span>
+      <span class="kw-tag kw-present">Agile (light)</span>
+    </div>
+    <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:8px;">Missing — gaps to close</div>
+    <div class="kw-row">
+      <span class="kw-tag kw-missing">Node.js / Express</span>
+      <span class="kw-tag kw-missing">Spring Boot</span>
+      <span class="kw-tag kw-missing">SQL / MySQL / PostgreSQL</span>
+      <span class="kw-tag kw-missing">MongoDB / NoSQL</span>
+      <span class="kw-tag kw-missing">REST API (built)</span>
+      <span class="kw-tag kw-missing">Docker</span>
+      <span class="kw-tag kw-missing">CI/CD</span>
+      <span class="kw-tag kw-missing">AWS / GCP / Azure</span>
+      <span class="kw-tag kw-missing">Unit Testing</span>
+      <span class="kw-tag kw-missing">System Design</span>
+      <span class="kw-tag kw-missing">TypeScript</span>
+      <span class="kw-tag kw-missing">Python</span>
+    </div>
+  </div>
+
+  <div class="section-title">Gap analysis — priority matrix</div>
+  <div class="gap-section">
+    <div class="gap-grid">
+      <div class="gap-tag tag-critical"><span style="color:#e24b4a;font-size:10px;font-weight:500;">CRITICAL</span> No backend framework (Spring / Node)</div>
+      <div class="gap-tag tag-critical"><span style="color:#e24b4a;font-size:10px;font-weight:500;">CRITICAL</span> No database (SQL / NoSQL) experience</div>
+      <div class="gap-tag tag-critical"><span style="color:#e24b4a;font-size:10px;font-weight:500;">CRITICAL</span> No deployed REST API project</div>
+      <div class="gap-tag tag-critical"><span style="color:#e24b4a;font-size:10px;font-weight:500;">CRITICAL</span> No unit / integration testing</div>
+      <div class="gap-tag tag-medium"><span style="color:#854f0b;font-size:10px;font-weight:500;">MEDIUM</span> No Docker / containerization</div>
+      <div class="gap-tag tag-medium"><span style="color:#854f0b;font-size:10px;font-weight:500;">MEDIUM</span> No cloud deployment (AWS / GCP)</div>
+      <div class="gap-tag tag-medium"><span style="color:#854f0b;font-size:10px;font-weight:500;">MEDIUM</span> TypeScript knowledge missing</div>
+      <div class="gap-tag tag-medium"><span style="color:#854f0b;font-size:10px;font-weight:500;">MEDIUM</span> System design principles absent</div>
+      <div class="gap-tag tag-low"><span style="color:#3b6d11;font-size:10px;font-weight:500;">LOW</span> Python not listed</div>
+      <div class="gap-tag tag-low"><span style="color:#3b6d11;font-size:10px;font-weight:500;">LOW</span> CodeChef rating sub-1400</div>
+    </div>
+  </div>
+
+  <div class="section-title">Recruiter & engineering manager insights</div>
+  <div class="two-col">
+    <div class="insight-box">
+      <div class="insight-title"><i class="ti ti-user-check" aria-hidden="true"></i> Why shortlist</div>
+      <div class="insight-item"><span class="dot dot-green"></span>Outstanding CGPA 9.93 — academic excellence signal</div>
+      <div class="insight-item"><span class="dot dot-green"></span>5 project portfolio, GitHub active</div>
+      <div class="insight-item"><span class="dot dot-green"></span>Clear upward trajectory — actively learning backend & ML</div>
+      <div class="insight-item"><span class="dot dot-green"></span>React + Java combo suits full-stack entry roles</div>
+    </div>
+    <div class="insight-box">
+      <div class="insight-title"><i class="ti ti-user-x" aria-hidden="true"></i> Why reject</div>
+      <div class="insight-item"><span class="dot dot-red"></span>No production-grade backend built or deployed</div>
+      <div class="insight-item"><span class="dot dot-red"></span>No database work evident in any project</div>
+      <div class="insight-item"><span class="dot dot-red"></span>First-year student — 3+ years from graduation</div>
+      <div class="insight-item"><span class="dot dot-red"></span>Missing server-side / API engineering keywords</div>
+    </div>
+    <div class="insight-box">
+      <div class="insight-title"><i class="ti ti-tool" aria-hidden="true"></i> Engineering manager take</div>
+      <div class="insight-item"><span class="dot dot-amber"></span>Strong learning velocity — rare CGPA + side projects combo</div>
+      <div class="insight-item"><span class="dot dot-amber"></span>Projects show initiative but lack backend depth</div>
+      <div class="insight-item"><span class="dot dot-amber"></span>Competitive programming shows problem-solving aptitude</div>
+    </div>
+    <div class="insight-box">
+      <div class="insight-title"><i class="ti ti-bulb" aria-hidden="true"></i> Competitive advantages</div>
+      <div class="insight-item"><span class="dot dot-green"></span>MUN — Best Commendable Delegate (leadership signal)</div>
+      <div class="insight-item"><span class="dot dot-green"></span>AI / ML learning aligns with market direction</div>
+      <div class="insight-item"><span class="dot dot-green"></span>Portfolio website with voiceover — standout personal brand</div>
+    </div>
+  </div>
+
+  <div class="section-title">Career growth roadmap</div>
+  <div class="roadmap">
+    <div class="rm-row">
+      <div><span class="rm-badge rm-30">30 Days</span></div>
+      <div class="rm-items">
+        <span>Build a REST API using Spring Boot or Node.js + Express</span>
+        <span>Connect it to MySQL — CRUD operations for the Airline Booking project</span>
+        <span>Deploy on Render / Railway (free tier)</span>
+        <span>Add JUnit / Jest unit tests to existing projects</span>
+      </div>
+    </div>
+    <div class="rm-row">
+      <div><span class="rm-badge rm-90">90 Days</span></div>
+      <div class="rm-items">
+        <span>Complete one full-stack project (React frontend + Spring Boot backend + PostgreSQL)</span>
+        <span>Learn Docker basics — containerize one project</span>
+        <span>Study SQL deeply: joins, indexing, normalization</span>
+        <span>Raise CodeChef to 1500+ (Div 2 competitive)</span>
+        <span>Add TypeScript to React projects</span>
+      </div>
+    </div>
+    <div class="rm-row">
+      <div><span class="rm-badge rm-180">180 Days</span></div>
+      <div class="rm-items">
+        <span>Deploy a cloud-hosted project on AWS EC2 / GCP App Engine</span>
+        <span>Implement JWT auth + role-based access in a project</span>
+        <span>Study system design fundamentals (load balancing, caching, DB sharding)</span>
+        <span>Contribute to an open-source Java or React project on GitHub</span>
+        <span>Complete AWS Cloud Practitioner or GCP Associate certification</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Final verdict</div>
+  <div class="verdict-box verdict-consider">
+    <div class="verdict-badge"><i class="ti ti-clipboard-check" aria-hidden="true"></i> Verdict: Consider — Conditional Interview</div>
+    <div class="verdict-text">
+      Strong academic foundation (9.93 CGPA) and an impressive project breadth for a first-year student. The React + Java foundation, active GitHub presence, and clear self-driven learning trajectory are genuine positives. However, the absence of any backend framework usage, database integration, REST API development, or cloud deployment means she cannot yet fill a Backend or Full Stack role without significant onboarding. For internship pipelines or trainee programs, she is a strong candidate. For immediate junior developer roles, the technical gaps are material and she should return in 90–180 days with backend project evidence.
+    </div>
+  </div>
+
+  <div class="footer-note">Evaluated against general industry-standard Backend / Full Stack / Software Engineer JD benchmarks · June 2026 · GitHub Day 11 Documentation</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Frontend', 'DSA/OOP', 'Academics', 'Backend', 'DevOps', 'Database'],
+      datasets: [{
+        label: 'Priyanka',
+        data: [82, 72, 95, 20, 8, 15],
+        fill: true,
+        backgroundColor: 'rgba(55,138,221,0.15)',
+        borderColor: '#378add',
+        borderWidth: 2,
+        pointBackgroundColor: '#185fa5',
+        pointRadius: 4
+      }]
+    },
+    options: {
+      responsive: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { stepSize: 25, font: { size: 9 }, color: '#888' },
+          grid: { color: 'rgba(0,0,0,0.08)' },
+          pointLabels: { font: { size: 10 }, color: '#444' }
+        }
+      }
+    }
+  });
+</script>
