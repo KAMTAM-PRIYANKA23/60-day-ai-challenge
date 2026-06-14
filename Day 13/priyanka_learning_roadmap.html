@@ -1,0 +1,247 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); }
+  .roadmap { padding: 1.5rem 0; }
+  .year-section { margin-bottom: 2rem; }
+  .year-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1rem;
+  }
+  .year-badge {
+    font-size: 12px; font-weight: 500; padding: 4px 14px;
+    border-radius: 20px; white-space: nowrap;
+    border: 0.5px solid;
+  }
+  .y1 { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+  .y2 { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
+  .y3 { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .y4 { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+  .year-title { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .year-subtitle { font-size: 13px; color: var(--color-text-secondary); margin-left: 4px; }
+  .semesters { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .sem-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem;
+  }
+  .sem-label {
+    font-size: 11px; font-weight: 500; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--color-text-tertiary);
+    margin-bottom: 10px;
+  }
+  .focus-tag {
+    display: inline-block; font-size: 12px; font-weight: 500;
+    padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+    border: 0.5px solid;
+  }
+  .skill-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .skill-list li {
+    font-size: 13px; color: var(--color-text-secondary);
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .skill-list li::before {
+    content: ''; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--color-border-secondary); margin-top: 6px; flex-shrink: 0;
+  }
+  .milestone-row {
+    display: flex; gap: 8px; align-items: flex-start;
+    margin-top: 12px; padding-top: 12px;
+    border-top: 0.5px solid var(--color-border-tertiary);
+    flex-wrap: wrap;
+  }
+  .milestone-tag {
+    font-size: 11px; padding: 3px 8px; border-radius: 20px;
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    border: 0.5px solid var(--color-border-tertiary);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .milestone-tag:hover { background: var(--color-background-tertiary); }
+  .year-goal {
+    margin-top: 10px; padding: 10px 14px;
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    font-size: 13px; color: var(--color-text-secondary);
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .year-goal i { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.5rem 0; }
+  @media (max-width: 520px) {
+    .semesters { grid-template-columns: 1fr; }
+  }
+</style>
+<h2 class="sr-only">Priyanka Kamtam — 4-year B.Tech learning roadmap for software development and AI/ML</h2>
+<div class="roadmap">
+
+  <!-- YEAR 1 -->
+  <div class="year-section">
+    <div class="year-header">
+      <span class="year-badge y1">Year 1 — Now</span>
+      <span class="year-title">Foundation & Exploration</span>
+    </div>
+    <div class="semesters">
+      <div class="sem-card">
+        <div class="sem-label">Semester 1 · Current</div>
+        <span class="focus-tag" style="background:#E1F5EE;color:#085041;border-color:#5DCAA5">Web Fundamentals</span>
+        <ul class="skill-list">
+          <li>Complete JavaScript (ES6+) — arrays, functions, async</li>
+          <li>Finish React.js basics — components, hooks, state</li>
+          <li>Polish portfolio website with real projects</li>
+          <li>Continue daily AI learning challenges</li>
+          <li>Master Git branching and pull requests</li>
+        </ul>
+      </div>
+      <div class="sem-card">
+        <div class="sem-label">Semester 2</div>
+        <span class="focus-tag" style="background:#E1F5EE;color:#085041;border-color:#5DCAA5">Projects & Python</span>
+        <ul class="skill-list">
+          <li>Build 2–3 full React projects with APIs</li>
+          <li>Python intermediate — OOP, file I/O, libraries</li>
+          <li>Start DSA — arrays, strings, linked lists (LeetCode Easy)</li>
+          <li>First open source contribution (good first issue)</li>
+          <li>Set up LinkedIn + professional GitHub README</li>
+        </ul>
+      </div>
+    </div>
+    <div class="year-goal">
+      <i class="ti ti-flag" aria-hidden="true"></i>
+      <span><strong style="color:var(--color-text-primary)">Year 1 goal:</strong> Have 3 deployed projects on GitHub, a live portfolio site, and basic DSA confidence.</span>
+    </div>
+    <div class="milestone-row">
+      <span class="milestone-tag" onclick="sendPrompt('What are the best React projects for a first-year student to build?')">React project ideas ↗</span>
+      <span class="milestone-tag" onclick="sendPrompt('Recommend a Python learning path for a CSIT student')">Python roadmap ↗</span>
+      <span class="milestone-tag" onclick="sendPrompt('How do I make my first open source contribution on GitHub?')">Open source guide ↗</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- YEAR 2 -->
+  <div class="year-section">
+    <div class="year-header">
+      <span class="year-badge y2">Year 2</span>
+      <span class="year-title">Specialise & Go Deeper</span>
+    </div>
+    <div class="semesters">
+      <div class="sem-card">
+        <div class="sem-label">Semester 3</div>
+        <span class="focus-tag" style="background:#E6F1FB;color:#0C447C;border-color:#85B7EB">Full Stack</span>
+        <ul class="skill-list">
+          <li>Node.js + Express.js — REST APIs</li>
+          <li>Databases — SQL basics + MongoDB</li>
+          <li>Build full-stack app (React + Node + DB)</li>
+          <li>DSA — trees, stacks, queues (LeetCode Medium)</li>
+          <li>Apply for summer internships early (Nov–Jan cycle)</li>
+        </ul>
+      </div>
+      <div class="sem-card">
+        <div class="sem-label">Semester 4</div>
+        <span class="focus-tag" style="background:#E6F1FB;color:#0C447C;border-color:#85B7EB">AI/ML Intro</span>
+        <ul class="skill-list">
+          <li>Python ML libraries — NumPy, Pandas, Matplotlib</li>
+          <li>Scikit-learn — classification, regression basics</li>
+          <li>Deploy a mini ML model (Streamlit or Hugging Face)</li>
+          <li>Participate in a Kaggle beginner competition</li>
+          <li>Target your first internship (remote or Hyderabad)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="year-goal">
+      <i class="ti ti-briefcase" aria-hidden="true"></i>
+      <span><strong style="color:var(--color-text-primary)">Year 2 goal:</strong> Complete your first internship or freelance project. Have a full-stack and an ML project live.</span>
+    </div>
+    <div class="milestone-row">
+      <span class="milestone-tag" onclick="sendPrompt('What full stack projects are impressive for internship applications in India?')">Internship-worthy projects ↗</span>
+      <span class="milestone-tag" onclick="sendPrompt('Best beginner Kaggle competitions for a CSIT student')">Kaggle for beginners ↗</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- YEAR 3 -->
+  <div class="year-section">
+    <div class="year-header">
+      <span class="year-badge y3">Year 3</span>
+      <span class="year-title">Build, Compete & Get Noticed</span>
+    </div>
+    <div class="semesters">
+      <div class="sem-card">
+        <div class="sem-label">Semester 5</div>
+        <span class="focus-tag" style="background:#EEEDFE;color:#3C3489;border-color:#AFA9EC">Deep ML + System Design</span>
+        <ul class="skill-list">
+          <li>Deep learning — TensorFlow or PyTorch basics</li>
+          <li>System design fundamentals (HLD/LLD)</li>
+          <li>Advanced DSA — graphs, DP (LeetCode Medium/Hard)</li>
+          <li>Participate in hackathons (Smart India, MLH)</li>
+          <li>Take on a meaningful open source role</li>
+        </ul>
+      </div>
+      <div class="sem-card">
+        <div class="sem-label">Semester 6</div>
+        <span class="focus-tag" style="background:#EEEDFE;color:#3C3489;border-color:#AFA9EC">Capstone Project</span>
+        <ul class="skill-list">
+          <li>Build a significant AI/Full Stack capstone project</li>
+          <li>Cloud basics — AWS or GCP free tier</li>
+          <li>Docker fundamentals + CI/CD basics</li>
+          <li>Start competitive programming consistency</li>
+          <li>Apply for top-tier internships (TCS, Infosys, startups)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="year-goal">
+      <i class="ti ti-trophy" aria-hidden="true"></i>
+      <span><strong style="color:var(--color-text-primary)">Year 3 goal:</strong> Win or place in a hackathon. Have a standout capstone project. Secure a strong pre-placement internship.</span>
+    </div>
+    <div class="milestone-row">
+      <span class="milestone-tag" onclick="sendPrompt('Best hackathons to participate in as a CSIT student in India')">Hackathon list ↗</span>
+      <span class="milestone-tag" onclick="sendPrompt('How to learn system design as a student')">System design guide ↗</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- YEAR 4 -->
+  <div class="year-section">
+    <div class="year-header">
+      <span class="year-badge y4">Year 4</span>
+      <span class="year-title">Land Your First Role</span>
+    </div>
+    <div class="semesters">
+      <div class="sem-card">
+        <div class="sem-label">Semester 7</div>
+        <span class="focus-tag" style="background:#FAEEDA;color:#633806;border-color:#EF9F27">Interview Prep</span>
+        <ul class="skill-list">
+          <li>Mock interviews — DSA + system design</li>
+          <li>Refine resume, GitHub, and LinkedIn</li>
+          <li>Apply to on-campus + off-campus placements</li>
+          <li>Target product companies in Hyderabad</li>
+          <li>Network actively with alumni and communities</li>
+        </ul>
+      </div>
+      <div class="sem-card">
+        <div class="sem-label">Semester 8</div>
+        <span class="focus-tag" style="background:#FAEEDA;color:#633806;border-color:#EF9F27">Placement & Offers</span>
+        <ul class="skill-list">
+          <li>Complete final-year project (publishable quality)</li>
+          <li>Negotiate and evaluate job offers</li>
+          <li>Consider GATE/higher studies if interested</li>
+          <li>Build a strong referral network</li>
+          <li>Contribute to tech communities (GDG, WTM)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="year-goal">
+      <i class="ti ti-rocket" aria-hidden="true"></i>
+      <span><strong style="color:var(--color-text-primary)">Year 4 goal:</strong> Secure a Software Engineer, Full Stack, or AI/ML role at a company you're excited about.</span>
+    </div>
+    <div class="milestone-row">
+      <span class="milestone-tag" onclick="sendPrompt('Top tech companies hiring freshers in Hyderabad')">Companies in Hyderabad ↗</span>
+      <span class="milestone-tag" onclick="sendPrompt('How to prepare for software engineering interviews as a fresher in India')">Interview prep guide ↗</span>
+      <span class="milestone-tag" onclick="sendPrompt('Should I consider GATE or higher studies after B.Tech CSIT?')">GATE vs industry ↗</span>
+    </div>
+  </div>
+
+</div>

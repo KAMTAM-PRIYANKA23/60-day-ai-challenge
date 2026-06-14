@@ -1,0 +1,317 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .board { padding: 1rem 0 2rem; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .filter-btn {
+    font-size: 12px; padding: 5px 14px; border-radius: 20px; cursor: pointer;
+    border: 0.5px solid var(--color-border-secondary);
+    background: var(--color-background-primary);
+    color: var(--color-text-secondary);
+    transition: all 0.15s; font-family: var(--font-sans);
+  }
+  .filter-btn.active, .filter-btn:hover {
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border-primary);
+  }
+  .job-grid { display: flex; flex-direction: column; gap: 12px; }
+  .job-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+    transition: border-color 0.15s;
+  }
+  .job-card:hover { border-color: var(--color-border-secondary); }
+  .job-card.top-pick { border-color: #5DCAA5; border-width: 1px; }
+  .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .card-left { flex: 1; min-width: 0; }
+  .job-title {
+    font-size: 15px; font-weight: 500; color: var(--color-text-primary);
+    text-decoration: none; display: block; margin-bottom: 3px;
+  }
+  .job-title:hover { color: var(--color-text-info); }
+  .company { font-size: 13px; color: var(--color-text-secondary); }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .badge {
+    font-size: 11px; padding: 3px 9px; border-radius: 20px;
+    border: 0.5px solid; white-space: nowrap;
+  }
+  .b-role { background: #E6F1FB; color: #0C447C; border-color: #85B7EB; }
+  .b-loc  { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .b-pay  { background: #E1F5EE; color: #085041; border-color: #5DCAA5; }
+  .b-hot  { background: #FAEEDA; color: #633806; border-color: #EF9F27; }
+  .b-pick { background: #E1F5EE; color: #085041; border-color: #1D9E75; font-weight: 500; }
+  .b-warn { background: #FCEBEB; color: #791F1F; border-color: #F09595; }
+  .card-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; flex-wrap: wrap; gap: 8px; }
+  .posted { font-size: 12px; color: var(--color-text-tertiary); }
+  .fit-bar { display: flex; align-items: center; gap: 6px; }
+  .fit-label { font-size: 11px; color: var(--color-text-tertiary); }
+  .fit-dots { display: flex; gap: 3px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.fill { background: #1D9E75; }
+  .dot.empty { background: var(--color-border-tertiary); }
+  .apply-btn {
+    font-size: 12px; padding: 5px 14px; border-radius: 20px; cursor: pointer;
+    border: 0.5px solid var(--color-border-secondary);
+    background: transparent; color: var(--color-text-secondary);
+    font-family: var(--font-sans); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 4px;
+    transition: background 0.15s;
+  }
+  .apply-btn:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+  .skills-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+  .skill-tag { font-size: 11px; color: var(--color-text-tertiary); background: var(--color-background-secondary); padding: 2px 8px; border-radius: 12px; }
+  .hidden { display: none; }
+  .count { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 12px; }
+  .section-divider { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-tertiary); padding: 8px 0 4px; border-top: 0.5px solid var(--color-border-tertiary); margin-top: 8px; }
+</style>
+<h2 class="sr-only">Curated internship opportunities for Priyanka Kamtam, first-year CSIT student</h2>
+<div class="board">
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterJobs('all', this)">All opportunities</button>
+    <button class="filter-btn" onclick="filterJobs('hyderabad', this)">Hyderabad</button>
+    <button class="filter-btn" onclick="filterJobs('bengaluru', this)">Bengaluru</button>
+    <button class="filter-btn" onclick="filterJobs('frontend', this)">Frontend / React</button>
+    <button class="filter-btn" onclick="filterJobs('fullstack', this)">Full Stack</button>
+    <button class="filter-btn" onclick="filterJobs('toppick', this)">Top picks</button>
+  </div>
+  <div class="count" id="count">Showing 6 opportunities</div>
+  <div class="job-grid" id="grid">
+
+    <!-- CARD 1 - TOP PICK -->
+    <div class="job-card top-pick" data-tags="hyderabad fullstack toppick">
+      <div class="card-top">
+        <div class="card-left">
+          <a class="job-title" href="https://to.indeed.com/aahxjzg8jgg4" target="_blank">Full Stack Developer Intern</a>
+          <div class="company">Placemein · Hyderabad, Telangana</div>
+          <div class="badges">
+            <span class="badge b-pick">⭐ Top Pick</span>
+            <span class="badge b-role">Full Stack</span>
+            <span class="badge b-loc">On-site · Hyderabad</span>
+            <span class="badge b-pay">₹18,000–20,000/mo</span>
+          </div>
+          <div class="skills-row">
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">REST APIs</span>
+            <span class="skill-tag">MongoDB</span>
+            <span class="skill-tag">Git</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div>
+          <div class="posted">Posted June 4, 2026 · 10 days ago</div>
+          <div class="fit-bar" style="margin-top:4px">
+            <span class="fit-label">Profile fit</span>
+            <div class="fit-dots">
+              <div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot empty"></div>
+            </div>
+          </div>
+        </div>
+        <a class="apply-btn" href="https://to.indeed.com/aahxjzg8jgg4" target="_blank">Apply now ↗</a>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;">
+        💡 <strong style="color:var(--color-text-primary)">Why apply:</strong> Highest stipend found (₹20K/mo), real product work, Hyderabad location — perfect for your first paid internship.
+      </div>
+    </div>
+
+    <!-- CARD 2 - TOP PICK -->
+    <div class="job-card top-pick" data-tags="hyderabad fullstack toppick">
+      <div class="card-top">
+        <div class="card-left">
+          <a class="job-title" href="https://to.indeed.com/aary2ykt2stn" target="_blank">Full Stack Developer Intern (3-Month)</a>
+          <div class="company">Cliquelog IT Solutions · Madhapur, Hyderabad</div>
+          <div class="badges">
+            <span class="badge b-pick">⭐ Top Pick</span>
+            <span class="badge b-role">Full Stack</span>
+            <span class="badge b-loc">Hybrid · Hyderabad</span>
+            <span class="badge b-hot">Certificate provided</span>
+          </div>
+          <div class="skills-row">
+            <span class="skill-tag">HTML/CSS/JS</span>
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">Node.js</span>
+            <span class="skill-tag">MongoDB</span>
+            <span class="skill-tag">GitHub</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div>
+          <div class="posted">Posted May 25, 2026 · 20 days ago</div>
+          <div class="fit-bar" style="margin-top:4px">
+            <span class="fit-label">Profile fit</span>
+            <div class="fit-dots">
+              <div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div>
+            </div>
+          </div>
+        </div>
+        <a class="apply-btn" href="https://to.indeed.com/aary2ykt2stn" target="_blank">Apply now ↗</a>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;">
+        💡 <strong style="color:var(--color-text-primary)">Why apply:</strong> Perfect skill match (HTML, CSS, JS, React, Git), live client projects, mentorship, certificate — your strongest fit overall.
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="job-card" data-tags="hyderabad frontend">
+      <div class="card-top">
+        <div class="card-left">
+          <a class="job-title" href="https://to.indeed.com/aam4wvnwgpdl" target="_blank">Frontend Developer Intern</a>
+          <div class="company">Dridha Technologies (via Tamada Media) · Hyderabad</div>
+          <div class="badges">
+            <span class="badge b-role">Frontend</span>
+            <span class="badge b-loc">In-person · Hyderabad</span>
+            <span class="badge b-pay">₹6,000–8,000/mo</span>
+            <span class="badge b-hot">Posted June 10 🔥</span>
+          </div>
+          <div class="skills-row">
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">React Native</span>
+            <span class="skill-tag">HTML/CSS</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">REST APIs</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div>
+          <div class="posted">Posted June 10, 2026 · 4 days ago — Very fresh</div>
+          <div class="fit-bar" style="margin-top:4px">
+            <span class="fit-label">Profile fit</span>
+            <div class="fit-dots">
+              <div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot empty"></div>
+            </div>
+          </div>
+        </div>
+        <a class="apply-btn" href="https://to.indeed.com/aam4wvnwgpdl" target="_blank">Apply now ↗</a>
+      </div>
+    </div>
+
+    <!-- CARD 4 -->
+    <div class="job-card" data-tags="bengaluru frontend toppick">
+      <div class="card-top">
+        <div class="card-left">
+          <a class="job-title" href="https://to.indeed.com/aa66nlkwg6hr" target="_blank">React Developer Intern</a>
+          <div class="company">NexaBurst · Singasandra, Bengaluru (Hybrid)</div>
+          <div class="badges">
+            <span class="badge b-role">Frontend · React</span>
+            <span class="badge b-loc">Hybrid · Bengaluru</span>
+            <span class="badge b-pay">₹4,000–5,000/mo</span>
+            <span class="badge b-hot">Posted June 9 🔥</span>
+          </div>
+          <div class="skills-row">
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">HTML/CSS/JS</span>
+            <span class="skill-tag">Tailwind CSS</span>
+            <span class="skill-tag">Git/GitHub</span>
+            <span class="skill-tag">REST APIs</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div>
+          <div class="posted">Posted June 9, 2026 · 5 days ago — Very fresh</div>
+          <div class="fit-bar" style="margin-top:4px">
+            <span class="fit-label">Profile fit</span>
+            <div class="fit-dots">
+              <div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div>
+            </div>
+          </div>
+        </div>
+        <a class="apply-btn" href="https://to.indeed.com/aa66nlkwg6hr" target="_blank">Apply now ↗</a>
+      </div>
+    </div>
+
+    <!-- CARD 5 -->
+    <div class="job-card" data-tags="bengaluru frontend">
+      <div class="card-top">
+        <div class="card-left">
+          <a class="job-title" href="https://to.indeed.com/aa2fdtvjnhdn" target="_blank">React Developer Intern</a>
+          <div class="company">NexaBurst (via Unipix listing) · Bengaluru / Hybrid</div>
+          <div class="badges">
+            <span class="badge b-role">Frontend · React</span>
+            <span class="badge b-loc">Hybrid · Bengaluru</span>
+            <span class="badge b-pay">₹5,000–8,000/mo</span>
+          </div>
+          <div class="skills-row">
+            <span class="skill-tag">React.js</span>
+            <span class="skill-tag">JavaScript</span>
+            <span class="skill-tag">Responsive Design</span>
+            <span class="skill-tag">REST APIs</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div>
+          <div class="posted">Posted May 21, 2026 · 24 days ago</div>
+          <div class="fit-bar" style="margin-top:4px">
+            <span class="fit-label">Profile fit</span>
+            <div class="fit-dots">
+              <div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot fill"></div><div class="dot empty"></div>
+            </div>
+          </div>
+        </div>
+        <a class="apply-btn" href="https://to.indeed.com/aa2fdtvjnhdn" target="_blank">Apply now ↗</a>
+      </div>
+    </div>
+
+    <!-- CARD 6 -->
+    <div class="job-card" data-tags="hyderabad fullstack">
+      <div class="card-top">
+        <div class="card-left">
+          <a class="job-title" href="https://to.indeed.com/aaj6gzbl2f4m" target="_blank">Flutter Developer Intern</a>
+          <div class="company">Aapthi Tech · Hyderabad, Telangana</div>
+          <div class="badges">
+            <span class="badge b-role">Mobile / Frontend</span>
+            <span class="badge b-loc">In-person · Hyderabad</span>
+            <span class="badge b-warn">Flutter — stretch role</span>
+          </div>
+          <div class="skills-row">
+            <span class="skill-tag">Flutter</span>
+            <span class="skill-tag">Dart</span>
+            <span class="skill-tag">Mobile Dev</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-meta">
+        <div>
+          <div class="posted">Posted May 15, 2026 · 30 days ago</div>
+          <div class="fit-bar" style="margin-top:4px">
+            <span class="fit-label">Profile fit</span>
+            <div class="fit-dots">
+              <div class="dot fill"></div><div class="dot fill"></div><div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div>
+            </div>
+          </div>
+        </div>
+        <a class="apply-btn" href="https://to.indeed.com/aaj6gzbl2f4m" target="_blank">View & Apply ↗</a>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;">
+        ⚠️ Flutter/Dart not in your current skill set — only apply if you can do a quick 1–2 week Flutter crash course first.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function filterJobs(tag, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cards = document.querySelectorAll('.job-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const tags = card.dataset.tags || '';
+    if (tag === 'all' || tags.includes(tag)) {
+      card.classList.remove('hidden');
+      visible++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+  document.getElementById('count').textContent = 'Showing ' + visible + ' opportunit' + (visible === 1 ? 'y' : 'ies');
+}
+</script>
