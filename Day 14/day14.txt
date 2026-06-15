@@ -1,0 +1,211 @@
+# Day 14 – AI Job Red Flag Detector
+
+## Objective
+
+Explore how Artificial Intelligence can help job seekers evaluate opportunities by identifying potential risks, analyzing company information, and making informed career decisions.
+
+This activity focused on understanding how to assess job descriptions beyond salary and brand value by using AI-powered risk analysis.
+
+---
+
+## Tools Used
+
+* Claude AI
+* AI Job Red Flag Detector Prompt
+* GitHub
+* LinkedIn
+* HTML/CSS Poster Design
+
+---
+
+## Student Profile
+
+* First-Year B.Tech CSIT Student
+* Telangana, India
+* Interested in:
+
+  * Software Development
+  * Full Stack Development
+  * Artificial Intelligence
+  * Machine Learning
+
+### Current Skills
+
+* Python (Basics)
+* C Programming
+* HTML
+* CSS
+* JavaScript (Learning)
+* React.js (Learning)
+* Git & GitHub
+* Prompt Engineering
+* Basic DSA
+
+---
+
+## Generated Job Description
+
+### Role
+
+**Full Stack Developer Intern**
+
+### Location
+
+Hyderabad, Telangana
+
+### Work Mode
+
+Hybrid
+
+### Duration
+
+6 Months Internship
+
+### Expected Stipend
+
+₹25,000 – ₹40,000 per month
+
+### Required Skills
+
+* HTML
+* CSS
+* JavaScript (ES6+)
+* React.js
+* Node.js
+* Express.js
+* REST APIs
+* MongoDB
+* Git & GitHub
+* Basic Data Structures and Algorithms
+
+### Responsibilities
+
+* Build responsive web applications
+* Develop and integrate REST APIs
+* Collaborate with frontend and backend teams
+* Write clean, scalable code
+* Participate in code reviews
+* Debug and optimize applications
+
+---
+
+## Company Information
+
+### Company
+
+Microsoft India
+
+### Industry
+
+Technology and Software Development
+
+### Headquarters
+
+Redmond, Washington, USA
+
+### India Presence
+
+Hyderabad, Telangana
+
+### Employee Count
+
+220,000+ employees globally
+
+### Work Culture
+
+* Learning-focused environment
+* Strong mentorship opportunities
+* Inclusive and collaborative culture
+* Emphasis on innovation and growth
+
+### Hiring Reputation
+
+Microsoft is known for structured hiring processes, competitive compensation, and strong career development programs.
+
+---
+
+# Overall Risk Score
+
+**28 / 100 – Low Risk**
+
+---
+
+## Top Red Flags
+
+| Red Flag                                    | Severity |
+| ------------------------------------------- | -------- |
+| High competition due to company brand value | 5/10     |
+| Multiple technologies expected for interns  | 6/10     |
+| Hybrid work may require office presence     | 4/10     |
+| Fast-paced environment during deadlines     | 4/10     |
+| Short internship duration                   | 3/10     |
+
+---
+
+## Positive Signals
+
+* Clear job responsibilities
+* Defined technology stack
+* Transparent stipend range
+* Reputable company
+* Strong learning opportunities
+* Structured mentorship programs
+* Industry-relevant experience
+
+---
+
+## Risk Breakdown
+
+| Category     | Risk Level |
+| ------------ | ---------- |
+| Requirements | Moderate   |
+| Culture      | Moderate   |
+| Remote       | Moderate   |
+| Hiring       | Low        |
+| Company      | Low        |
+
+---
+
+## Final Verdict
+
+✅ **Apply**
+
+The opportunity offers strong learning potential, industry exposure, and career growth despite moderate competition and skill expectations.
+
+---
+
+## Smart Interview Questions
+
+1. What projects will interns contribute to during the internship?
+
+2. How does the company support intern mentorship and learning?
+
+3. What technologies are used most frequently in day-to-day development?
+
+4. How is work-life balance maintained during project deadlines?
+
+5. Are there opportunities for internship extension or Pre-Placement Offers (PPOs)?
+
+---
+
+## Key Learnings
+
+* Analyze opportunities beyond salary and company reputation.
+* Carefully review job requirements and responsibilities.
+* Identify hidden risks before applying.
+* Research company culture and growth trends.
+* Ask targeted interview questions to validate expectations.
+* AI tools can simplify career research and decision-making.
+
+---
+
+## Conclusion
+
+This activity helped me understand how to evaluate job opportunities critically using AI. Instead of applying blindly, I learned to analyze job descriptions, identify potential red flags, understand market expectations, and make informed career decisions.
+
+Starting career preparation from the first year provides a long-term advantage and helps build confidence for future internships and placements.
+
+> "Don't wait until final year to prepare for your career. Start building today, and opportunities will find you tomorrow."
+
+---
+#Day14 #AIJobRedFlagDetector #CareerPlanning #SoftwareDevelopment #FullStackDevelopment #StudentDeveloper #GitHub #LearningInPublic
