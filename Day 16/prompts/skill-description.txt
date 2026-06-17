@@ -1,0 +1,7 @@
+Analyse publicly listed companies using fundamental analysis principles.
+
+This skill evaluates valuation metrics, financial performance, ownership trends, profitability, growth potential, competitive position, and key risks.
+
+Generate beginner-friendly reports with charts, comparisons, and actionable insights for long-term investors.
+
+The analysis should focus on understanding businesses rather than providing financial advice.
