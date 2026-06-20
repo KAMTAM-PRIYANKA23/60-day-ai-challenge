@@ -1,0 +1,246 @@
+
+<style>
+  .wrap { padding: 1rem 0 2rem; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: 0.6px; text-transform: uppercase; margin: 0 0 1.25rem; }
+  .progress-row { display: flex; align-items: center; gap: 10px; margin-bottom: 1.5rem; }
+  .prog-bg { flex: 1; height: 4px; background: var(--color-background-secondary); border-radius: 2px; }
+  .prog-fill { height: 100%; border-radius: 2px; background: #7F77DD; width: 0%; transition: width 0.3s; }
+  .prog-text { font-size: 12px; color: var(--color-text-secondary); min-width: 70px; text-align: right; }
+  .q-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .q-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .q-num { width: 28px; height: 28px; border-radius: 50%; background: #EEEDFE; color: #3C3489; font-size: 13px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .q-trait { font-size: 11px; color: var(--color-text-secondary); background: var(--color-background-secondary); border-radius: 20px; padding: 2px 9px; }
+  .q-text { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 1rem; line-height: 1.5; }
+  .opts { display: flex; flex-direction: column; gap: 7px; }
+  .opt { display: flex; align-items: center; gap: 10px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 9px 13px; cursor: pointer; font-size: 13px; color: var(--color-text-primary); text-align: left; transition: all 0.15s; }
+  .opt:hover { border-color: #AFA9EC; background: #EEEDFE; color: #3C3489; }
+  .opt.selected { border-color: #AFA9EC; background: #EEEDFE; color: #3C3489; }
+  .opt-letter { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); min-width: 16px; }
+  .opt.selected .opt-letter { color: #534AB7; }
+  .rating-q { margin-bottom: 1rem; }
+  .rating-label-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--color-text-secondary); margin-bottom: 6px; }
+  .rating-row { display: flex; gap: 8px; }
+  .rating-btn { flex: 1; padding: 8px 0; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 13px; font-weight: 500; color: var(--color-text-secondary); cursor: pointer; text-align: center; transition: all 0.15s; }
+  .rating-btn:hover { border-color: #AFA9EC; background: #EEEDFE; color: #3C3489; }
+  .rating-btn.selected { border-color: #AFA9EC; background: #EEEDFE; color: #3C3489; font-weight: 500; }
+  .submit-area { text-align: center; margin-top: 1.5rem; }
+  .submit-btn { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 11px 28px; font-size: 14px; color: var(--color-text-primary); cursor: pointer; }
+  .submit-btn:hover { background: #EEEDFE; color: #3C3489; border-color: #AFA9EC; }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .note { font-size: 12px; color: var(--color-text-secondary); text-align: center; margin-top: 8px; }
+</style>
+
+<div class="wrap">
+  <p class="section-label"><i class="ti ti-star" aria-hidden="true"></i> Stage 3 — Personality Match Quiz</p>
+
+  <div class="progress-row">
+    <div class="prog-bg"><div class="prog-fill" id="prog"></div></div>
+    <span class="prog-text" id="prog-text">0 / 12 answered</span>
+  </div>
+
+  <!-- Q1 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">1</div><span class="q-trait">Ambition</span></div>
+    <p class="q-text">When you set a goal for yourself, which best describes your approach?</p>
+    <div class="opts" id="q1">
+      <button class="opt" onclick="pick('q1','A')"><span class="opt-letter">A</span> I set one clear target and pursue it with everything I have</button>
+      <button class="opt" onclick="pick('q1','B')"><span class="opt-letter">B</span> I focus on enjoying the journey — the goal comes naturally</button>
+      <button class="opt" onclick="pick('q1','C')"><span class="opt-letter">C</span> I set multiple goals and adapt as I go</button>
+      <button class="opt" onclick="pick('q1','D')"><span class="opt-letter">D</span> I prefer others to set the direction; I execute</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">2</div><span class="q-trait">Work ethic</span></div>
+    <p class="q-text">Rate how much you agree: "I am willing to sacrifice comfort today for success tomorrow."</p>
+    <div class="rating-q">
+      <div class="rating-label-row"><span>Strongly disagree</span><span>Strongly agree</span></div>
+      <div class="rating-row" id="q2">
+        <button class="rating-btn" onclick="pickRating('q2','1')">1</button>
+        <button class="rating-btn" onclick="pickRating('q2','2')">2</button>
+        <button class="rating-btn" onclick="pickRating('q2','3')">3</button>
+        <button class="rating-btn" onclick="pickRating('q2','4')">4</button>
+        <button class="rating-btn" onclick="pickRating('q2','5')">5</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">3</div><span class="q-trait">Leadership</span></div>
+    <p class="q-text">In a team situation, what role do you naturally take?</p>
+    <div class="opts" id="q3">
+      <button class="opt" onclick="pick('q3','A')"><span class="opt-letter">A</span> I step up and lead — I want the responsibility</button>
+      <button class="opt" onclick="pick('q3','B')"><span class="opt-letter">B</span> I lead quietly through my actions, not words</button>
+      <button class="opt" onclick="pick('q3','C')"><span class="opt-letter">C</span> I support the leader and keep the team together</button>
+      <button class="opt" onclick="pick('q3','D')"><span class="opt-letter">D</span> I prefer to focus on my own contribution</button>
+    </div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">4</div><span class="q-trait">Creativity</span></div>
+    <p class="q-text">When facing a difficult problem, how do you usually solve it?</p>
+    <div class="opts" id="q4">
+      <button class="opt" onclick="pick('q4','A')"><span class="opt-letter">A</span> I try something unexpected — instinct and improvisation</button>
+      <button class="opt" onclick="pick('q4','B')"><span class="opt-letter">B</span> I stick to what I know works best</button>
+      <button class="opt" onclick="pick('q4','C')"><span class="opt-letter">C</span> I analyse the situation carefully before acting</button>
+      <button class="opt" onclick="pick('q4','D')"><span class="opt-letter">D</span> I ask others for input and collaborate</button>
+    </div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">5</div><span class="q-trait">Competitiveness</span></div>
+    <p class="q-text">Rate how much you agree: "Losing motivates me far more than winning does."</p>
+    <div class="rating-q">
+      <div class="rating-label-row"><span>Strongly disagree</span><span>Strongly agree</span></div>
+      <div class="rating-row" id="q5">
+        <button class="rating-btn" onclick="pickRating('q5','1')">1</button>
+        <button class="rating-btn" onclick="pickRating('q5','2')">2</button>
+        <button class="rating-btn" onclick="pickRating('q5','3')">3</button>
+        <button class="rating-btn" onclick="pickRating('q5','4')">4</button>
+        <button class="rating-btn" onclick="pickRating('q5','5')">5</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">6</div><span class="q-trait">Teamwork</span></div>
+    <p class="q-text">Which statement feels most like you?</p>
+    <div class="opts" id="q6">
+      <button class="opt" onclick="pick('q6','A')"><span class="opt-letter">A</span> I perform best when I lift those around me</button>
+      <button class="opt" onclick="pick('q6','B')"><span class="opt-letter">B</span> I perform best when I'm the standout individual</button>
+      <button class="opt" onclick="pick('q6','C')"><span class="opt-letter">C</span> Both — I can switch between team and individual mode</button>
+      <button class="opt" onclick="pick('q6','D')"><span class="opt-letter">D</span> I'm most comfortable in a supporting role</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">7</div><span class="q-trait">Confidence</span></div>
+    <p class="q-text">Rate how much you agree: "I believe I am capable of achieving things most people would consider impossible."</p>
+    <div class="rating-q">
+      <div class="rating-label-row"><span>Strongly disagree</span><span>Strongly agree</span></div>
+      <div class="rating-row" id="q7">
+        <button class="rating-btn" onclick="pickRating('q7','1')">1</button>
+        <button class="rating-btn" onclick="pickRating('q7','2')">2</button>
+        <button class="rating-btn" onclick="pickRating('q7','3')">3</button>
+        <button class="rating-btn" onclick="pickRating('q7','4')">4</button>
+        <button class="rating-btn" onclick="pickRating('q7','5')">5</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">8</div><span class="q-trait">Discipline</span></div>
+    <p class="q-text">How do you typically approach personal routines and habits?</p>
+    <div class="opts" id="q8">
+      <button class="opt" onclick="pick('q8','A')"><span class="opt-letter">A</span> Highly structured — I follow routines religiously</button>
+      <button class="opt" onclick="pick('q8','B')"><span class="opt-letter">B</span> Mostly structured but I allow flexibility</button>
+      <button class="opt" onclick="pick('q8','C')"><span class="opt-letter">C</span> Fairly relaxed — I go with how I feel</button>
+      <button class="opt" onclick="pick('q8','D')"><span class="opt-letter">D</span> Spontaneous — structure feels limiting to me</button>
+    </div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">9</div><span class="q-trait">Decision-making</span></div>
+    <p class="q-text">When the pressure is highest, how do you make big decisions?</p>
+    <div class="opts" id="q9">
+      <button class="opt" onclick="pick('q9','A')"><span class="opt-letter">A</span> Pure instinct — I trust my gut completely</button>
+      <button class="opt" onclick="pick('q9','B')"><span class="opt-letter">B</span> A mix of instinct and calculated thinking</button>
+      <button class="opt" onclick="pick('q9','C')"><span class="opt-letter">C</span> Careful analysis — I think before I act</button>
+      <button class="opt" onclick="pick('q9','D')"><span class="opt-letter">D</span> I look to others for guidance before deciding</button>
+    </div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">10</div><span class="q-trait">Learning style</span></div>
+    <p class="q-text">How do you prefer to improve at something you care about?</p>
+    <div class="opts" id="q10">
+      <button class="opt" onclick="pick('q10','A')"><span class="opt-letter">A</span> Repetition and drilling until it's perfect</button>
+      <button class="opt" onclick="pick('q10','B')"><span class="opt-letter">B</span> Experimenting and learning from mistakes</button>
+      <button class="opt" onclick="pick('q10','C')"><span class="opt-letter">C</span> Watching others and absorbing their techniques</button>
+      <button class="opt" onclick="pick('q10','D')"><span class="opt-letter">D</span> Being coached and given direct feedback</button>
+    </div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">11</div><span class="q-trait">Risk taking</span></div>
+    <p class="q-text">Rate how much you agree: "I would rather take a bold risk and fail than play it safe and wonder what could have been."</p>
+    <div class="rating-q">
+      <div class="rating-label-row"><span>Strongly disagree</span><span>Strongly agree</span></div>
+      <div class="rating-row" id="q11">
+        <button class="rating-btn" onclick="pickRating('q11','1')">1</button>
+        <button class="rating-btn" onclick="pickRating('q11','2')">2</button>
+        <button class="rating-btn" onclick="pickRating('q11','3')">3</button>
+        <button class="rating-btn" onclick="pickRating('q11','4')">4</button>
+        <button class="rating-btn" onclick="pickRating('q11','5')">5</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 -->
+  <div class="q-card">
+    <div class="q-header"><div class="q-num">12</div><span class="q-trait">Legacy</span></div>
+    <p class="q-text">What matters most to you when you look back on your achievements?</p>
+    <div class="opts" id="q12">
+      <button class="opt" onclick="pick('q12','A')"><span class="opt-letter">A</span> The records and numbers — proof of what I achieved</button>
+      <button class="opt" onclick="pick('q12','B')"><span class="opt-letter">B</span> The memories and moments — how it felt</button>
+      <button class="opt" onclick="pick('q12','C')"><span class="opt-letter">C</span> The impact on others — who I inspired</button>
+      <button class="opt" onclick="pick('q12','D')"><span class="opt-letter">D</span> Simply knowing I gave everything I had</button>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <button class="submit-btn" id="submit-btn" disabled onclick="submitQuiz()">Reveal my personality match ↗</button>
+    <p class="note" id="note">Answer all 12 questions to reveal your match</p>
+  </div>
+</div>
+
+<script>
+  const answers = {};
+  const total = 12;
+
+  function pick(qId, letter) {
+    answers[qId] = letter;
+    const btns = document.querySelectorAll('#' + qId + ' .opt');
+    btns.forEach(b => b.classList.remove('selected'));
+    const idx = ['A','B','C','D'].indexOf(letter);
+    if (idx >= 0) btns[idx].classList.add('selected');
+    updateProgress();
+  }
+
+  function pickRating(qId, val) {
+    answers[qId] = val;
+    const btns = document.querySelectorAll('#' + qId + ' .rating-btn');
+    btns.forEach(b => b.classList.remove('selected'));
+    btns[parseInt(val)-1].classList.add('selected');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const count = Object.keys(answers).length;
+    const pct = Math.round((count / total) * 100);
+    document.getElementById('prog').style.width = pct + '%';
+    document.getElementById('prog-text').textContent = count + ' / ' + total + ' answered';
+    if (count === total) {
+      document.getElementById('submit-btn').disabled = false;
+      document.getElementById('note').textContent = 'All done — ready to reveal your match!';
+    }
+  }
+
+  function submitQuiz() {
+    const parts = Object.keys(answers).sort((a,b) => {
+      const n = s => parseInt(s.replace('q',''));
+      return n(a) - n(b);
+    }).map(k => k.toUpperCase() + '=' + answers[k]);
+    sendPrompt('My Stage 3 personality quiz answers: ' + parts.join(', ') + '. Please calculate my Messi vs Ronaldo compatibility percentages, assign my personality archetype, and generate my full Football Intelligence Profile.');
+  }
+</script>

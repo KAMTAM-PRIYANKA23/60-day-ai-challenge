@@ -1,0 +1,171 @@
+
+<style>
+  .report-wrap { padding: 1rem 0 2rem; }
+  .section-label { font-size: 12px; font-weight: 500; color: var(--color-text-secondary); letter-spacing: 0.6px; text-transform: uppercase; margin: 0 0 1rem; }
+  .pred-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+  .pred-card.featured { border: 2px solid var(--color-border-info); }
+  .pred-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 1rem; }
+  .flag-circle { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; background: var(--color-background-secondary); }
+  .pred-meta { flex: 1; }
+  .pred-tag { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-bottom: 4px; }
+  .tag-winner { background: #E6F1FB; color: #0C447C; }
+  .tag-runner { background: #EAF3DE; color: #27500A; }
+  .tag-dark { background: #FAEEDA; color: #633806; }
+  .tag-watch { background: #EEEDFE; color: #3C3489; }
+  .pred-name { font-size: 17px; font-weight: 500; color: var(--color-text-primary); margin: 0; }
+  .confidence-row { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+  .conf-label { font-size: 12px; color: var(--color-text-secondary); min-width: 80px; }
+  .conf-bar-bg { flex: 1; height: 6px; background: var(--color-background-secondary); border-radius: 3px; overflow: hidden; }
+  .conf-bar { height: 100%; border-radius: 3px; }
+  .conf-pct { font-size: 13px; font-weight: 500; color: var(--color-text-primary); min-width: 36px; text-align: right; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .detail-box { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px; }
+  .detail-box-title { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 5px; font-weight: 500; }
+  .detail-box-text { font-size: 12px; color: var(--color-text-primary); line-height: 1.5; }
+  .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .player-card { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .player-init { width: 34px; height: 34px; border-radius: 50%; background: var(--color-background-info); color: var(--color-text-info); font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .player-info { flex: 1; min-width: 0; }
+  .player-name { font-size: 13px; font-weight: 500; color: var(--color-text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .player-sub { font-size: 11px; color: var(--color-text-secondary); }
+  .player-rating { font-size: 13px; font-weight: 500; color: var(--color-text-info); }
+  .divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 1.5rem 0; }
+  .quiz-cta { background: var(--color-background-secondary); border-radius: var(--border-radius-lg); padding: 1.25rem; text-align: center; margin-top: 1.5rem; }
+  .quiz-cta p { font-size: 14px; color: var(--color-text-secondary); margin: 0 0 12px; }
+  .cta-btn { background: var(--color-background-primary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 10px 20px; font-size: 14px; color: var(--color-text-primary); cursor: pointer; }
+  .cta-btn:hover { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+  .live-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; background: #FCEBEB; color: #A32D2D; border-radius: 20px; padding: 3px 10px; margin-bottom: 1.5rem; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: #E24B4A; }
+</style>
+
+<div class="report-wrap">
+  <p class="section-label"><i class="ti ti-trophy" aria-hidden="true"></i> Stage 1 — FIFA World Cup 2026 Prediction Report</p>
+  <div class="live-badge"><span class="dot"></span> Data updated through June 17, 2026 — Group stage in progress</div>
+
+  <!-- WINNER -->
+  <p class="section-label">Most likely winner</p>
+  <div class="pred-card featured">
+    <div class="pred-header">
+      <div class="flag-circle">🇦🇷</div>
+      <div class="pred-meta">
+        <span class="pred-tag tag-winner">🥇 Predicted winner</span>
+        <p class="pred-name">Argentina</p>
+      </div>
+    </div>
+    <div class="confidence-row">
+      <span class="conf-label">Confidence</span>
+      <div class="conf-bar-bg"><div class="conf-bar" style="width:72%; background:#378ADD;"></div></div>
+      <span class="conf-pct">72%</span>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="detail-box-title"><i class="ti ti-check" aria-hidden="true"></i> Evidence</div>
+        <div class="detail-box-text">FIFA rank #1. Highest historical win rate (68%). Current form score of 92/100. Reigning champions — opened 2026 with a dominant 3-0 win over Algeria. Messi rating: 96.</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-box-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Key risks</div>
+        <div class="detail-box-text">Messi's age (now 38) means fatigue in later rounds is a real concern. Defending champions historically struggle to repeat. Squad depth thinner than France or Spain.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RUNNER UP -->
+  <p class="section-label" style="margin-top:1.25rem;">Runner-up</p>
+  <div class="pred-card">
+    <div class="pred-header">
+      <div class="flag-circle">🇫🇷</div>
+      <div class="pred-meta">
+        <span class="pred-tag tag-runner">🥈 Runner-up</span>
+        <p class="pred-name">France</p>
+      </div>
+    </div>
+    <div class="confidence-row">
+      <span class="conf-label">Confidence</span>
+      <div class="conf-bar-bg"><div class="conf-bar" style="width:61%; background:#639922;"></div></div>
+      <span class="conf-pct">61%</span>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="detail-box-title"><i class="ti ti-check" aria-hidden="true"></i> Evidence</div>
+        <div class="detail-box-text">FIFA rank #3. Form score 90/100. Strong opening — 2-0 win vs Senegal. Mbappe at 95 rating, 22 recent goals. Last two WC finals both featured France.</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-box-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Key risks</div>
+        <div class="detail-box-text">Have lost the last two finals (2018 won, 2022 lost to Argentina). Injury vulnerability in key positions. Spain could intercept them in semi-finals.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK HORSE -->
+  <p class="section-label" style="margin-top:1.25rem;">Dark horse — the surprise package</p>
+  <div class="pred-card">
+    <div class="pred-header">
+      <div class="flag-circle">🇩🇪</div>
+      <div class="pred-meta">
+        <span class="pred-tag tag-dark">⚡ Dark horse</span>
+        <p class="pred-name">Germany</p>
+      </div>
+    </div>
+    <div class="confidence-row">
+      <span class="conf-label">Confidence</span>
+      <div class="conf-bar-bg"><div class="conf-bar" style="width:38%; background:#EF9F27;"></div></div>
+      <span class="conf-pct">38%</span>
+    </div>
+    <div class="detail-grid">
+      <div class="detail-box">
+        <div class="detail-box-title"><i class="ti ti-check" aria-hidden="true"></i> Why they could</div>
+        <div class="detail-box-text">Opened with a stunning 7-1 demolition — most emphatic result of round 1. FIFA rank #9 understates their quality. Germany always perform at World Cups (4 titles). Form score: 87.</div>
+      </div>
+      <div class="detail-box">
+        <div class="detail-box-title"><i class="ti ti-alert-triangle" aria-hidden="true"></i> Why they might not</div>
+        <div class="detail-box-text">Lower ranked than the top 3 contenders. No superstar to match Messi or Mbappe. Their early opposition (Curaçao) was very weak — tougher tests ahead.</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- PLAYERS TO WATCH -->
+  <p class="section-label">Players to watch</p>
+  <div class="players-grid">
+    <div class="player-card">
+      <div class="player-init">LM</div>
+      <div class="player-info">
+        <div class="player-name">Lionel Messi</div>
+        <div class="player-sub">Argentina · Forward</div>
+      </div>
+      <div class="player-rating">96</div>
+    </div>
+    <div class="player-card">
+      <div class="player-init" style="background: var(--color-background-success); color: var(--color-text-success);">KM</div>
+      <div class="player-info">
+        <div class="player-name">Kylian Mbappé</div>
+        <div class="player-sub">France · Forward</div>
+      </div>
+      <div class="player-rating">95</div>
+    </div>
+    <div class="player-card">
+      <div class="player-init" style="background: var(--color-background-warning); color: var(--color-text-warning);">CR</div>
+      <div class="player-info">
+        <div class="player-name">Cristiano Ronaldo</div>
+        <div class="player-sub">Portugal · Forward</div>
+      </div>
+      <div class="player-rating">94</div>
+    </div>
+    <div class="player-card">
+      <div class="player-init" style="background: var(--color-background-danger); color: var(--color-text-danger);">JB</div>
+      <div class="player-info">
+        <div class="player-name">Jude Bellingham</div>
+        <div class="player-sub">England · Midfielder</div>
+      </div>
+      <div class="player-rating">91</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="quiz-cta">
+    <p>Predictions are in! Ready to test your Football IQ?</p>
+    <button class="cta-btn" onclick="sendPrompt('Yes, start my Football IQ Quiz — Stage 2!')">Start Football IQ Quiz ↗</button>
+  </div>
+</div>
