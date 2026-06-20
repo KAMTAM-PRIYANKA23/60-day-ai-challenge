@@ -1,0 +1,86 @@
+1. Class Notes Example
+Topic: React.js Fundamentals
+
+```
+
+```
+
+
+```
+React basics revision for upcoming lab exam.
+
+Covered components, props, state, and hooks.
+
+Need to revise:
+- useState
+- useEffect
+- Event handling
+- Conditional rendering
+- Lists and keys
+
+Practice tasks:
+- Build a counter app
+- Create a simple calculator
+- Fetch data from an API
+
+Questions:
+- Difference between props and state?
+- When should useEffect be used?
+
+Exam date: Next week.
+Goal: Score above 9 CGPA.
+```
+
+2. Brainstorming Notes Example
+Topic: Portfolio Website Ideas
+
+```
+
+```
+
+
+```
+Ideas for improving my portfolio website:
+
+Add dark and light mode.
+
+Create separate pages for:
+- Projects
+- Certifications
+- AI challenge journey
+
+Include GitHub contribution graph.
+
+Add deployed project links.
+
+Add resume download button.
+
+Need to learn:
+- Framer Motion
+- Tailwind CSS
+- Responsive design
+
+Target completion date: End of this month.
+```
+
+3. Voice Memo Transcript Example
+Topic: Career Planning
+
+```
+
+```
+
+
+```
+I want to become a full stack developer with AI skills.
+
+My priorities are maintaining a 9+ CGPA, improving JavaScript, learning React, and starting DSA.
+
+I need to complete at least three projects this year and contribute to open source.
+
+I should spend one hour daily on coding practice and thirty minutes on AI learning.
+
+Need to update my LinkedIn profile and GitHub regularly.
+
+Potential blockers include exams, time management, and inconsistency.
+```

@@ -1,0 +1,305 @@
+Intro
+in this video i want to introduce you to
+react and go over the core concepts i
+think every react developer should aim
+to learn and master when it came to
+putting these concepts together i
+selected them based on things you'll
+need to build out most of the
+functionality that you see in websites
+today and things somebody interviewing
+you would probably expect you to know
+but before we get started i want to
+quickly mention my react crash course
+that's linked to the video description
+in this course you will learn more about
+the concepts i mentioned here while
+building a fun notes application
+so what is react
+react is a javascript library for
+building out user interfaces when you
+look at websites like facebook netflix
+and airbnb you're looking at uis built
+in react react provides us with a set of
+tools and structure for building out
+these user interfaces and makes this
+process much faster and easier
+What is React
+single page applications with react it's
+very common to build out single page
+applications so before we get into the
+react concepts i want to quickly recap
+single page applications and how they
+work for anybody that's not familiar
+with this concept yet so in traditional
+websites we have a template for each
+page on our website and return that
+template back to the user whenever they
+request it with single page applications
+however we are working with one single
+template and are simply updating all the
+components within the dom
+personally i think the term single page
+application is a bit misleading as it
+makes me think there is only one page in
+our application when really we're just
+using one single template and modifying
+all the contents within it
+Components
+components are what make up the visual
+layer of our application and let us
+split up our ui into independent
+reusable pieces while how you build and
+structure your application is completely
+up to you traditionally each part of our
+ui would be built out separately as its
+own component and then added into a
+parent component making up the ui for a
+specific page a component is a
+javascript class or function that
+returns back some html well this is
+actually something called jsx but more
+on that in a second one thing to note
+about components is that they can be
+nested as deep as you want a component
+can hold another component and that
+component can hold more components
+while i do think you should learn both
+class-based components and function
+based components at some point with the
+addition of react hooks the trend is
+shifting more towards using functional
+components so if you're trying to decide
+which to learn first you can probably
+start with functional components
+JSX
+jsx instead of writing traditional html
+tags we're going to be using something
+called jsx which stands for javascript
+xml jsx actually looks a lot like html
+with some slight syntax differences and
+also gives us some added functionality
+take a look at this example and you'll
+see how you can use the curly braces to
+pass in variables and adding javascript
+logic directly into your html
+jsx tags are actually very similar to
+html tags some notable differences are
+things like class declarations which are
+written as class name and how event
+handlers are added browsers can't
+actually read jsx so this code will
+actually be run through a compiler and
+convert it into traditional html and
+javascript code once it's output in the
+browser
+Router
+react router
+using a react router is how we can have
+multiple pages in a single page
+application with react we typically
+handle url routing with something called
+a router that keeps our ui in sync with
+a url because we're not actually
+changing pages the router will take care
+of rendering out components into the dom
+based on the current url
+Prop
+props
+when you need to pass data down from one
+component to another you can pass it
+down as a prop a prop can be passed down
+like a function parameter once a prop is
+passed down into a component you can now
+use that prop anywhere in the child
+component
+props can be passed down multiple layers
+if needed the term for this is called
+prop drilling prop drilling can get
+messy so we'll talk about some solutions
+to this in a minute
+State
+state
+state is simply a javascript object used
+to represent information in or about a
+particular component traditionally we
+use class based components to set our
+state and its values but more modernly
+we use react hooks like use state to
+create a component state
+so let's imagine for a second that we
+have a list of notes that we want to
+render out in our app we can set an
+initial state and then map through that
+state and output all that data in our
+component we can also update our state
+in this example we can set our initial
+state as an empty array then we request
+some data from our api and update that
+state with new data this state update
+will trigger our component life cycle
+effect which we'll talk about next
+Component Life Cycle
+the component life cycle
+understanding the component life cycle
+is a must for every react developer and
+is probably one of the most common
+interview question for junior developers
+a react component has a life cycle that
+it goes through and there are three main
+phases that we need to know about in
+this life cycle each component has a
+mounting phase for when it's first being
+added to the dom an updating phase for
+when we are modifying something and that
+component needs to update and an
+unmounting phase for when this component
+will be removed from the dom with class
+components we have these three methods
+to take care of these life cycle methods
+we have component did mount component
+did update and component will unmount
+with functional components however we
+have a method called use effect that
+allows us to work with each part of a
+component life cycle react hooks
+React Hooks
+react hooks only apply to functional
+components but due to the popularity of
+using function based components hooks
+have become essential to learn in this
+process
+hooks let us add state and other
+features without using class based
+components before hooks functional
+components could not hold any state
+hooks are simply functions that allow us
+to hook into and manage state
+the two most common hooks that you'll
+probably use when you first start are
+going to be used which lets us set and
+update our state in a component and use
+effect that is simply a function that
+allows us to manage our component life
+cycle react gives us a whole list of
+built-in hooks along with the ability to
+create our own custom hooks
+Global State
+state management
+while we can create and manage state
+inside of our components there will
+likely be a time when we need to create
+some form of global state to make data
+available across multiple components
+think of something like holding data for
+a logged in user you may need this user
+across multiple components like your
+header bar or a profile component and
+passing this data down through props may
+not be practical especially when this
+information is updated somewhere inside
+of those components we have several
+options to handle this like using the
+built-in context api or using a
+third-party package like redux and many
+others out there with these we are able
+to create some form of global state and
+use it across multiple components in our
+component tree without having to deal
+with prop drilling
+Virtual DOM
+the virtual dom
+at some point in the process of learning
+react you will want to have an
+understanding of how the virtual dom
+works understanding this will help you
+understand and make sense of how react
+builds and updates our dom and the
+complete life cycle of a react component
+in short react creates something called
+a virtual dom which is a virtual
+representation of the real dom when
+we're updating our components we're
+actually updating the virtual dom and
+not the real dom using this method react
+can find the most efficient way to
+update the real dom by updating only
+areas where changes have been made
+without having to update the entire dom
+Key Prop
+the key prop
+when it comes to rendering out a list of
+data in your components there is one
+thing you should be aware of and that is
+the key prop each item in a dynamically
+rendered list should contain the key
+prop or else you'll get this annoying
+air in the console
+this prop should be unique and helps
+react identify which items have been
+changed added or removed so react knows
+which part of the virtual dom to update
+Handling Events
+event listeners
+handling events with react is very
+similar to how we would do this in
+traditional javascript with a few
+differences in react we camelcase event
+names and we pass in the function we
+want to call directly in line between
+two curly braces so there is no need for
+methods like add eventlistener because
+our javascript code and html are mixed
+Handling Forms
+together
+handling forms with react how we handle
+forms is a little bit different from the
+traditional method because we are trying
+to keep all our information in some form
+of state inside of our component
+html elements such as input text area
+and select typically maintain their own
+state and update based on a user's input
+with react however we typically add in
+event listeners to each field and update
+our component state whenever any one of
+these inputs change so methods like on
+change and on submit would directly
+update our state and would be controlled
+by our own functions instead of letting
+the form handle all of this on its own
+Conditional Rendering
+conditional rendering there is always a
+chance that you will need to render out
+some content conditionally depending on
+other values inside of your application
+think of something like a user's name
+inside of a navigation bar depending on
+the user's authentication status you
+will either display the user's name or
+display nothing one way we can go about
+handling this is using the logical and
+operator we can also use the inline if
+else conditional operator if we want to
+add in some extra logic in both of these
+examples the rendered output will depend
+on the conditions we provide
+Common Commands
+common commands there are three main
+commands i want to mention here because
+these are commands you will use in every
+project we have the create react app
+command which creates the boilerplate
+files for a react application we have
+the start command that starts up our
+development server so we can view our
+project right away and we have the run
+build command that builds a directory
+for a production build of our app for
+deployment alright so that's my list of
+core concepts every react developer
+should master don't forget to subscribe
+if you enjoyed this video and make sure
+to check out the react crash course
+linked in the video description if you
+want to learn more

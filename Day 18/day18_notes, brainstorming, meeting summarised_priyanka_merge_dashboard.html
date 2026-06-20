@@ -1,0 +1,308 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);font-size:14px;line-height:1.6}
+.wrap{padding:1.25rem 0}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.section-header{font-size:11px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.65rem;padding-bottom:5px;border-bottom:.5px solid var(--color-border-tertiary)}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:.9rem 1.1rem;margin-bottom:.65rem}
+.card-title{font-size:14px;font-weight:500;margin-bottom:.35rem}
+.card-sub{font-size:12px;color:var(--color-text-secondary)}
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:2px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.b-purple{background:#EEEDFE;color:#3C3489}
+.b-teal{background:#E1F5EE;color:#0F6E56}
+.b-blue{background:#E6F1FB;color:#185FA5}
+.b-amber{background:#FAEEDA;color:#854F0B}
+.b-red{background:#FCEBEB;color:#A32D2D}
+.b-green{background:#EAF3DE;color:#3B6D11}
+.b-gray{background:#F1EFE8;color:#5F5E5A}
+.b-coral{background:#FAECE7;color:#993C1D}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1.1rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem .9rem}
+.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:3px}
+.metric-value{font-size:20px;font-weight:500}
+.metric-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:.65rem;margin-bottom:1.1rem}
+.row{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.row:last-child{border-bottom:none}
+.dot{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;margin-top:1px}
+.dot-red{background:#FCEBEB;color:#A32D2D}
+.dot-amber{background:#FAEEDA;color:#854F0B}
+.dot-blue{background:#E6F1FB;color:#185FA5}
+.dot-green{background:#EAF3DE;color:#3B6D11}
+.dot-purple{background:#EEEDFE;color:#3C3489}
+.dot-gray{background:#F1EFE8;color:#5F5E5A}
+.dot-coral{background:#FAECE7;color:#993C1D}
+.row-text{font-size:13px;flex:1}
+.row-meta{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.source-chip{display:inline-flex;align-items:center;font-size:10px;padding:1px 7px;border-radius:10px;border:.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);margin-left:5px;vertical-align:middle}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+th{text-align:left;font-weight:500;font-size:11px;color:var(--color-text-secondary);padding:5px 7px;border-bottom:.5px solid var(--color-border-tertiary)}
+td{padding:7px;border-bottom:.5px solid var(--color-border-tertiary);vertical-align:top;word-break:break-word}
+tr:last-child td{border-bottom:none}
+.conflict-card{border:.5px solid #F09595;border-radius:var(--border-radius-lg);padding:.9rem 1.1rem;margin-bottom:.65rem;background:#FCEBEB}
+.conflict-title{font-size:13px;font-weight:500;color:#791F1F;margin-bottom:.3rem}
+.conflict-body{font-size:12px;color:#A32D2D}
+.dup-card{border:.5px solid #EF9F27;border-radius:var(--border-radius-lg);padding:.75rem 1rem;margin-bottom:.5rem;background:#FAEEDA}
+.dup-title{font-size:12px;font-weight:500;color:#633806;margin-bottom:.25rem}
+.dup-body{font-size:12px;color:#854F0B}
+.section{margin-bottom:1.25rem}
+.source-legend{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+</style>
+
+<div class="wrap">
+<h2 class="sr-only">Merged brain-dump dashboard — class notes, portfolio brainstorm, and voice memo for Priyanka</h2>
+
+<div class="section-header" style="margin-bottom:.75rem">Source index</div>
+<div class="source-legend">
+  <span class="badge b-purple"><i class="ti ti-book" style="font-size:13px" aria-hidden="true"></i> S1 — Class notes · React.js fundamentals</span>
+  <span class="badge b-teal"><i class="ti ti-bulb" style="font-size:13px" aria-hidden="true"></i> S2 — Brainstorm · Portfolio website ideas</span>
+  <span class="badge b-blue"><i class="ti ti-microphone" style="font-size:13px" aria-hidden="true"></i> S3 — Voice memo · Career planning</span>
+</div>
+
+<div class="metric-grid">
+  <div class="metric">
+    <div class="metric-label">Action items</div>
+    <div class="metric-value">18</div>
+    <div class="metric-sub">Across all 3 sources</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Open questions</div>
+    <div class="metric-value">2</div>
+    <div class="metric-sub">From class notes</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Skills to learn</div>
+    <div class="metric-value">7</div>
+    <div class="metric-sub">Mentioned across sources</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Conflicts found</div>
+    <div class="metric-value">2</div>
+    <div class="metric-sub">Require manual review</div>
+  </div>
+  <div class="metric">
+    <div class="metric-label">Deadlines</div>
+    <div class="metric-value">2</div>
+    <div class="metric-sub">Next week · End of month</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Summary</div>
+  <div class="card">
+    Three inputs from Priyanka cover: (1) class notes on React.js fundamentals ahead of a lab exam next week, (2) a brainstorm for improving her portfolio website with a target completion by end of this month, and (3) a voice memo outlining her full-stack + AI career plan with daily time commitments. All three are interconnected — skills she is studying (React, JavaScript) feed directly into both the portfolio build and the career goal.
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Key takeaways by source</div>
+  <div class="grid2">
+    <div class="card" style="margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:.5rem">
+        <span class="badge b-purple">S1</span>
+        <span style="font-size:13px;font-weight:500">React.js class notes</span>
+      </div>
+      <div class="row"><div class="dot dot-purple">·</div><div class="row-text">Revision scope: components, props, state, hooks</div></div>
+      <div class="row"><div class="dot dot-purple">·</div><div class="row-text">5 sub-topics flagged for re-revision: useState, useEffect, event handling, conditional rendering, lists &amp; keys</div></div>
+      <div class="row"><div class="dot dot-purple">·</div><div class="row-text">3 practice tasks assigned to self</div></div>
+      <div class="row"><div class="dot dot-red">!</div><div class="row-text">Exam date: next week<span class="source-chip">deadline</span></div></div>
+      <div class="row"><div class="dot dot-purple">·</div><div class="row-text">Goal: score above 9 CGPA</div></div>
+    </div>
+    <div class="card" style="margin-bottom:0">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:.5rem">
+        <span class="badge b-teal">S2</span>
+        <span style="font-size:13px;font-weight:500">Portfolio brainstorm</span>
+      </div>
+      <div class="row"><div class="dot dot-teal">·</div><div class="row-text">6 feature additions planned: dark/light mode, Projects page, Certifications page, AI challenge journey page, GitHub graph, deployed links, resume download button</div></div>
+      <div class="row"><div class="dot dot-teal">·</div><div class="row-text">3 new skills to learn: Framer Motion, Tailwind CSS, responsive design</div></div>
+      <div class="row"><div class="dot dot-red">!</div><div class="row-text">Target completion: end of this month<span class="source-chip">deadline</span></div></div>
+    </div>
+    <div class="card" style="margin-bottom:0;grid-column:1/-1">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:.5rem">
+        <span class="badge b-blue">S3</span>
+        <span style="font-size:13px;font-weight:500">Voice memo — career planning</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:4px">
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">Goal: full-stack developer with AI skills</div></div>
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">Maintain 9+ CGPA</div></div>
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">Improve JavaScript, learn React, start DSA</div></div>
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">Complete at least 3 projects this year</div></div>
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">Contribute to open source</div></div>
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">1 hour daily coding practice</div></div>
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">30 minutes daily AI learning</div></div>
+        <div class="row"><div class="dot dot-blue">·</div><div class="row-text">Update LinkedIn and GitHub regularly</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">All action items</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:40%">Task</th>
+          <th style="width:12%">Source</th>
+          <th style="width:18%">Deadline</th>
+          <th style="width:15%">Status</th>
+          <th style="width:15%">Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Revise useState and useEffect</td><td><span class="badge b-purple">S1</span></td><td>Next week</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Revise event handling</td><td><span class="badge b-purple">S1</span></td><td>Next week</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Revise conditional rendering</td><td><span class="badge b-purple">S1</span></td><td>Next week</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Revise lists and keys</td><td><span class="badge b-purple">S1</span></td><td>Next week</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Build a counter app (practice task)</td><td><span class="badge b-purple">S1</span></td><td>Before exam</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Create a simple calculator (practice task)</td><td><span class="badge b-purple">S1</span></td><td>Before exam</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Fetch data from an API (practice task)</td><td><span class="badge b-purple">S1</span></td><td>Before exam</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Add dark and light mode to portfolio</td><td><span class="badge b-teal">S2</span></td><td>End of month</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Create Projects page on portfolio</td><td><span class="badge b-teal">S2</span></td><td>End of month</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Create Certifications page on portfolio</td><td><span class="badge b-teal">S2</span></td><td>End of month</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Create AI challenge journey page on portfolio</td><td><span class="badge b-teal">S2</span></td><td>End of month</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Include GitHub contribution graph on portfolio</td><td><span class="badge b-teal">S2</span></td><td>End of month</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Add deployed project links to portfolio</td><td><span class="badge b-teal">S2</span></td><td>End of month</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Add resume download button to portfolio</td><td><span class="badge b-teal">S2</span></td><td>End of month</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Complete at least 3 projects this year</td><td><span class="badge b-blue">S3</span></td><td>This year</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-red">🔴 High</span></td></tr>
+        <tr><td>Contribute to open source</td><td><span class="badge b-blue">S3</span></td><td>Not specified</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Update LinkedIn profile regularly</td><td><span class="badge b-blue">S3</span></td><td>Ongoing</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+        <tr><td>Update GitHub regularly</td><td><span class="badge b-blue">S3</span></td><td>Ongoing</td><td><span class="badge b-amber">⏳ Pending</span></td><td><span class="badge b-amber">🟠 Medium</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Skills to learn — merged</div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <table>
+      <thead>
+        <tr><th style="width:30%">Skill</th><th style="width:15%">Source</th><th style="width:55%">Context</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>React (deeper)</td><td><span class="badge b-blue">S3</span></td><td>Listed as priority in career planning voice memo</td></tr>
+        <tr><td>JavaScript (improve)</td><td><span class="badge b-blue">S3</span></td><td>Stated priority alongside React in voice memo</td></tr>
+        <tr><td>DSA (start)</td><td><span class="badge b-blue">S3</span></td><td>Explicitly stated as a priority to start</td></tr>
+        <tr><td>Framer Motion</td><td><span class="badge b-teal">S2</span></td><td>For portfolio animations and transitions</td></tr>
+        <tr><td>Tailwind CSS</td><td><span class="badge b-teal">S2</span></td><td>For portfolio redesign and styling</td></tr>
+        <tr><td>Responsive design</td><td><span class="badge b-teal">S2</span></td><td>For portfolio, listed as a skill to learn</td></tr>
+        <tr><td>AI tools / learning</td><td><span class="badge b-blue">S3</span></td><td>30 minutes daily allocated in voice memo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Open questions</div>
+  <div class="card">
+    <div class="row">
+      <div class="dot dot-blue">?</div>
+      <div>
+        <div class="row-text">Difference between props and state?<span class="source-chip">S1</span></div>
+        <div class="row-meta">From class notes — unresolved conceptual question, needs clarification before exam</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="dot dot-blue">?</div>
+      <div>
+        <div class="row-text">When should useEffect be used?<span class="source-chip">S1</span></div>
+        <div class="row-meta">From class notes — unresolved, needs clarification before exam</div>
+      </div>
+    </div>
+  </div>
+  <button onclick="sendPrompt('Can you explain the difference between props and state in React, and when to use useEffect? I have a lab exam next week.')" style="font-size:13px;margin-top:.25rem">Answer my React questions for the exam ↗</button>
+</div>
+
+<div class="section">
+  <div class="section-header">Risks / blockers</div>
+  <div class="card">
+    <div class="row">
+      <div class="dot dot-red">!</div>
+      <div>
+        <div class="row-text">Exams<span class="source-chip">S3</span></div>
+        <div class="row-meta">Explicitly named as a potential blocker in voice memo</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="dot dot-red">!</div>
+      <div>
+        <div class="row-text">Time management<span class="source-chip">S3</span></div>
+        <div class="row-meta">Explicitly named as a potential blocker in voice memo</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="dot dot-red">!</div>
+      <div>
+        <div class="row-text">Inconsistency<span class="source-chip">S3</span></div>
+        <div class="row-meta">Explicitly named as a potential blocker in voice memo</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="dot dot-amber">!</div>
+      <div>
+        <div class="row-text">Portfolio completion during exam week<span class="source-chip">S1 + S2</span></div>
+        <div class="row-meta">Exam is next week; portfolio deadline is end of month — overlap likely. See conflicts section.</div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="dot dot-amber">!</div>
+      <div>
+        <div class="row-text">3 new portfolio skills to learn before month-end<span class="source-chip">S2</span></div>
+        <div class="row-meta">Framer Motion, Tailwind CSS, and responsive design — all new — within the same month as exam</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Conflicts — require manual review</div>
+  <div class="conflict-card">
+    <div class="conflict-title"><i class="ti ti-alert-triangle" style="font-size:15px;vertical-align:-2px;margin-right:5px" aria-hidden="true"></i>Conflict 1 — Deadline collision: exam vs portfolio</div>
+    <div class="conflict-body">
+      S1 states a lab exam is next week. S2 sets portfolio completion for end of this month. These windows overlap significantly. Both require focused React/JS work simultaneously. Resolution not automatic — Priyanka must decide which takes priority in the overlap window.
+    </div>
+  </div>
+  <div class="conflict-card">
+    <div class="conflict-title"><i class="ti ti-alert-triangle" style="font-size:15px;vertical-align:-2px;margin-right:5px" aria-hidden="true"></i>Conflict 2 — Scope vs time: learning 3 new tools + exam + portfolio in one month</div>
+    <div class="conflict-body">
+      S2 requires learning Framer Motion, Tailwind CSS, and responsive design and completing all 6+ portfolio features by end of month. S1 requires exam revision this week. S3 adds 90 min/day of structured coding and AI practice. Cumulative scope may not be achievable within one month. No resolution specified in any source — manual prioritisation required.
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Duplicate items across sources</div>
+  <div class="dup-card">
+    <div class="dup-title">React / JavaScript — mentioned in S1 and S3</div>
+    <div class="dup-body">S1 focuses on React fundamentals for the lab exam. S3 lists "learning React" and "improving JavaScript" as career priorities. These are the same skills — exam prep and career upskilling are aligned here.</div>
+  </div>
+  <div class="dup-card">
+    <div class="dup-title">GitHub activity — mentioned in S2 and S3</div>
+    <div class="dup-body">S2 includes adding a GitHub contribution graph to the portfolio. S3 states "update GitHub regularly." Both reference GitHub visibility — consistent goal across sources.</div>
+  </div>
+  <div class="dup-card">
+    <div class="dup-title">Projects — mentioned in S2 and S3</div>
+    <div class="dup-body">S2 plans to add deployed project links to the portfolio. S3 targets completing at least 3 projects this year. Portfolio showcasing and project completion are the same underlying goal expressed differently.</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Daily time commitments (S3 only)</div>
+  <div class="card">
+    <div class="row"><div class="dot dot-blue">1h</div><div class="row-text">Coding practice — daily</div></div>
+    <div class="row"><div class="dot dot-blue">30m</div><div class="row-text">AI learning — daily</div></div>
+    <div class="row"><div class="dot dot-gray">—</div><div class="row-text">Frequency of LinkedIn and GitHub updates — not specified</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-header">Additional notes</div>
+  <div class="card">
+    <div class="row"><div class="dot dot-gray">·</div><div class="row-text" style="font-size:12px">S1 notes state "React basics revision for upcoming lab exam" — this is an exam revision session, not a first introduction to the topic.</div></div>
+    <div class="row"><div class="dot dot-gray">·</div><div class="row-text" style="font-size:12px">S2 does not mention a specific tool or framework for the portfolio build (e.g. Next.js, plain React, or static HTML) — stack is not specified.</div></div>
+    <div class="row"><div class="dot dot-gray">·</div><div class="row-text" style="font-size:12px">S3 is a voice memo transcript — some specificity (exact month for project count, exact platform for DSA) is absent and marked as not specified.</div></div>
+    <div class="row"><div class="dot dot-gray">·</div><div class="row-text" style="font-size:12px">Open-source contribution (S3) has no associated timeline, platform, or project type mentioned.</div></div>
+  </div>
+</div>
+</div>

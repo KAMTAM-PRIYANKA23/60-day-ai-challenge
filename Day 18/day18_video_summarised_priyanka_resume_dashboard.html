@@ -1,0 +1,458 @@
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary);font-size:15px;line-height:1.6}
+.wrap{padding:1.5rem 0}
+.page-title{font-size:22px;font-weight:500;margin-bottom:4px}
+.page-sub{font-size:14px;color:var(--color-text-secondary);margin-bottom:1.5rem}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.badge-red{background:#FCEBEB;color:#A32D2D}
+.badge-amber{background:#FAEEDA;color:#854F0B}
+.badge-green{background:#EAF3DE;color:#3B6D11}
+.badge-blue{background:#E6F1FB;color:#185FA5}
+.badge-purple{background:#EEEDFE;color:#3C3489}
+.badge-teal{background:#E1F5EE;color:#0F6E56}
+.badge-gray{background:#F1EFE8;color:#5F5E5A}
+.section{margin-bottom:1.5rem}
+.section-header{font-size:13px;font-weight:500;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;padding-bottom:6px;border-bottom:.5px solid var(--color-border-tertiary)}
+.card{background:var(--color-background-primary);border:.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:.75rem}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.85rem 1rem}
+.metric-label{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.metric-value{font-size:22px;font-weight:500}
+.metric-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.skill-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:.5rem}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-weight:500;font-size:12px;color:var(--color-text-secondary);padding:6px 8px;border-bottom:.5px solid var(--color-border-tertiary)}
+td{padding:8px;border-bottom:.5px solid var(--color-border-tertiary);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.row-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:.5px solid var(--color-border-tertiary)}
+.row-item:last-child{border-bottom:none}
+.row-dot{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;margin-top:1px}
+.dot-red{background:#FCEBEB;color:#A32D2D}
+.dot-amber{background:#FAEEDA;color:#854F0B}
+.dot-blue{background:#E6F1FB;color:#185FA5}
+.dot-green{background:#EAF3DE;color:#3B6D11}
+.row-text{font-size:13px;color:var(--color-text-primary);flex:1}
+.row-meta{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.timeline{position:relative;padding-left:20px}
+.timeline::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:.5px;background:var(--color-border-tertiary)}
+.t-item{position:relative;margin-bottom:1rem}
+.t-dot{position:absolute;left:-17px;top:3px;width:10px;height:10px;border-radius:50%;border:.5px solid var(--color-border-tertiary);background:var(--color-background-primary)}
+.t-dot-purple{border-color:#534AB7;background:#EEEDFE}
+.t-dot-teal{border-color:#0F6E56;background:#E1F5EE}
+.t-dot-blue{border-color:#185FA5;background:#E6F1FB}
+.t-dot-amber{border-color:#854F0B;background:#FAEEDA}
+.t-dot-green{border-color:#3B6D11;background:#EAF3DE}
+.t-dot-coral{border-color:#993C1D;background:#FAECE7}
+.t-month{font-size:11px;color:var(--color-text-secondary);margin-bottom:2px}
+.t-title{font-size:14px;font-weight:500;margin-bottom:2px}
+.t-desc{font-size:12px;color:var(--color-text-secondary)}
+.profile-row{display:flex;align-items:center;gap:14px;margin-bottom:1.5rem}
+.avatar{width:48px;height:48px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:16px;color:#3C3489;flex-shrink:0}
+.profile-info{}
+.profile-name{font-size:18px;font-weight:500}
+.profile-role{font-size:13px;color:var(--color-text-secondary)}
+.progress-wrap{margin-top:.5rem}
+.progress-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.progress-label{font-size:12px;color:var(--color-text-secondary);width:90px;flex-shrink:0}
+.progress-bar{flex:1;height:6px;background:var(--color-background-secondary);border-radius:20px;overflow:hidden}
+.progress-fill{height:100%;border-radius:20px}
+.fill-purple{background:#7F77DD}
+.fill-teal{background:#1D9E75}
+.fill-blue{background:#378ADD}
+.fill-amber{background:#BA7517}
+.progress-pct{font-size:11px;color:var(--color-text-secondary);width:32px;text-align:right;flex-shrink:0}
+details>summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;padding:4px 0}
+details>summary::after{content:'▸';font-size:12px;color:var(--color-text-secondary);transition:transform .2s}
+details[open]>summary::after{content:'▾'}
+details>div{margin-top:.75rem}
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only">Career dashboard for Kamtam Priyanka — video resume analysis</h2>
+
+  <div class="profile-row">
+    <div class="avatar">KP</div>
+    <div class="profile-info">
+      <div class="profile-name">Kamtam Priyanka</div>
+      <div class="profile-role">First-year B.Tech · Computer Science & Information Technology · KL University</div>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric">
+      <div class="metric-label">Current CGPA</div>
+      <div class="metric-value">9.93</div>
+      <div class="metric-sub">First year, B.Tech CS&IT</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Projects Built</div>
+      <div class="metric-value">4</div>
+      <div class="metric-sub">Real-world applications</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Technical Skills</div>
+      <div class="metric-value">11</div>
+      <div class="metric-sub">Languages, tools & frameworks</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">AI Learning</div>
+      <div class="metric-value">60-day</div>
+      <div class="metric-sub">Active challenge underway</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Executive summary</div>
+    <div class="card">
+      Kamtam Priyanka is a first-year B.Tech Computer Science & Information Technology student at KL University with an exceptional CGPA of 9.93. She has demonstrated strong initiative by independently building four real-world projects and actively participating in a 60-day AI learning challenge. Her interests span full-stack engineering, software development, and artificial intelligence, and she is targeting impactful internship opportunities to grow into an innovative, user-centric software engineer.
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="section" style="margin-bottom:0">
+      <div class="section-header">Technical skills</div>
+      <div class="card">
+        <div style="margin-bottom:.75rem">
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Languages</div>
+          <div class="skill-wrap">
+            <span class="badge badge-purple">Java</span>
+            <span class="badge badge-purple">Python</span>
+            <span class="badge badge-purple">JavaScript</span>
+            <span class="badge badge-purple">HTML</span>
+            <span class="badge badge-purple">CSS</span>
+          </div>
+        </div>
+        <div style="margin-bottom:.75rem">
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Frameworks & tools</div>
+          <div class="skill-wrap">
+            <span class="badge badge-teal">React.js</span>
+            <span class="badge badge-teal">Git</span>
+            <span class="badge badge-teal">GitHub</span>
+          </div>
+        </div>
+        <div style="margin-bottom:.75rem">
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">CS fundamentals</div>
+          <div class="skill-wrap">
+            <span class="badge badge-blue">Data Structures & Algorithms</span>
+            <span class="badge badge-blue">Object-Oriented Programming</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">AI tools</div>
+          <div class="skill-wrap">
+            <span class="badge badge-amber">Prompt engineering</span>
+            <span class="badge badge-amber">Claude</span>
+            <span class="badge badge-amber">ChatGPT</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-bottom:0">
+      <div class="section-header">Projects</div>
+      <div class="card">
+        <div class="row-item">
+          <div class="row-dot dot-purple">✈</div>
+          <div>
+            <div class="row-text">Airline Booking System</div>
+            <div class="row-meta">Real-world application</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-teal">👗</div>
+          <div>
+            <div class="row-text">PreSareeFinder</div>
+            <div class="row-meta">Real-world application</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-green">🥗</div>
+          <div>
+            <div class="row-text">NutriScope</div>
+            <div class="row-meta">Real-world application</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-blue">🌿</div>
+          <div>
+            <div class="row-text">Environmental Health Analyzer</div>
+            <div class="row-meta">Real-world application</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Key strengths</div>
+    <div class="grid2" style="margin-bottom:0">
+      <div class="card" style="margin-bottom:0">
+        <div style="font-weight:500;font-size:14px;margin-bottom:4px"><i class="ti ti-chart-bar" style="font-size:16px;vertical-align:-2px;margin-right:6px" aria-hidden="true"></i>Academic excellence</div>
+        <div style="font-size:13px;color:var(--color-text-secondary)">9.93 CGPA in first year — demonstrates strong foundational learning and discipline</div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="font-weight:500;font-size:14px;margin-bottom:4px"><i class="ti ti-rocket" style="font-size:16px;vertical-align:-2px;margin-right:6px" aria-hidden="true"></i>Self-driven initiative</div>
+        <div style="font-size:13px;color:var(--color-text-secondary)">Built 4 practical projects and launched a 60-day AI learning challenge independently</div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="font-weight:500;font-size:14px;margin-bottom:4px"><i class="ti ti-brand-github" style="font-size:16px;vertical-align:-2px;margin-right:6px" aria-hidden="true"></i>Public sharing & visibility</div>
+        <div style="font-size:13px;color:var(--color-text-secondary)">Actively sharing learnings on GitHub and LinkedIn — builds real professional presence early</div>
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div style="font-weight:500;font-size:14px;margin-bottom:4px"><i class="ti ti-device-laptop" style="font-size:16px;vertical-align:-2px;margin-right:6px" aria-hidden="true"></i>Breadth of stack</div>
+        <div style="font-size:13px;color:var(--color-text-secondary)">Covers front-end (React, HTML, CSS), back-end concepts, DSA, OOP, and AI tooling</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Career goals</div>
+    <div class="card">
+      <div class="row-item">
+        <div class="row-dot dot-purple">1</div>
+        <div class="row-text">Strengthen full-stack development skills</div>
+      </div>
+      <div class="row-item">
+        <div class="row-dot dot-blue">2</div>
+        <div class="row-text">Improve problem-solving abilities through DSA</div>
+      </div>
+      <div class="row-item">
+        <div class="row-dot dot-teal">3</div>
+        <div class="row-text">Explore AI and machine learning</div>
+      </div>
+      <div class="row-item">
+        <div class="row-dot dot-amber">4</div>
+        <div class="row-text">Secure impactful internship opportunities</div>
+      </div>
+      <div class="row-item">
+        <div class="row-dot dot-green">5</div>
+        <div class="row-text">Contribute to meaningful projects</div>
+      </div>
+      <div class="row-item">
+        <div class="row-dot dot-red">6</div>
+        <div class="row-text">Grow into a software engineer building innovative, user-centric solutions</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Action items — next 6 months</div>
+    <div class="card" style="padding:0">
+      <table>
+        <thead>
+          <tr>
+            <th style="padding:10px 12px">Task</th>
+            <th>Owner</th>
+            <th>Deadline</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:10px 12px">Complete 60-day AI challenge and publish all outputs to GitHub</td>
+            <td>Priyanka</td>
+            <td>~Month 2</td>
+            <td><span class="badge badge-red">🔴 High</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px">Begin structured DSA practice (daily problem-solving)</td>
+            <td>Priyanka</td>
+            <td>Month 1–6</td>
+            <td><span class="badge badge-red">🔴 High</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px">Build and deploy at least one full-stack project (front-end + back-end + DB)</td>
+            <td>Priyanka</td>
+            <td>Month 3–4</td>
+            <td><span class="badge badge-red">🔴 High</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px">Start applying to software development / AI internships</td>
+            <td>Priyanka</td>
+            <td>Month 4–5</td>
+            <td><span class="badge badge-red">🔴 High</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px">Learn a back-end technology (e.g. Node.js, Spring Boot, or FastAPI)</td>
+            <td>Priyanka</td>
+            <td>Month 2–3</td>
+            <td><span class="badge badge-amber">🟠 Medium</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px">Begin foundational ML/AI coursework (e.g. ML basics, neural nets)</td>
+            <td>Priyanka</td>
+            <td>Month 3–5</td>
+            <td><span class="badge badge-amber">🟠 Medium</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px">Optimize LinkedIn profile with projects, skills, and certifications</td>
+            <td>Priyanka</td>
+            <td>Month 1</td>
+            <td><span class="badge badge-amber">🟠 Medium</span></td>
+          </tr>
+          <tr>
+            <td style="padding:10px 12px">Explore and document existing projects (add README, live demos)</td>
+            <td>Priyanka</td>
+            <td>Month 1–2</td>
+            <td><span class="badge badge-green">🟢 Low</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="section" style="margin-bottom:0">
+      <div class="section-header">Potential risks / skill gaps</div>
+      <div class="card">
+        <div class="row-item">
+          <div class="row-dot dot-red">!</div>
+          <div>
+            <div class="row-text" style="font-size:13px">No back-end or database skills mentioned</div>
+            <div class="row-meta">Limits ability to build full-stack products independently</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-red">!</div>
+          <div>
+            <div class="row-text" style="font-size:13px">No internship or work experience yet</div>
+            <div class="row-meta">First year — expected, but needs to be addressed soon</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-amber">!</div>
+          <div>
+            <div class="row-text" style="font-size:13px">ML/AI exploration still early-stage</div>
+            <div class="row-meta">Prompt engineering is a starting point; deeper ML knowledge needed</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-amber">!</div>
+          <div>
+            <div class="row-text" style="font-size:13px">Project depth not specified</div>
+            <div class="row-meta">No detail on complexity, stack, or deployed status of the 4 projects</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-amber">!</div>
+          <div>
+            <div class="row-text" style="font-size:13px">DSA proficiency level not stated</div>
+            <div class="row-meta">Listed as a skill and a goal — current depth is unclear</div>
+          </div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-blue">!</div>
+          <div>
+            <div class="row-text" style="font-size:13px">No mention of cloud, DevOps, or testing</div>
+            <div class="row-meta">Common internship requirements not yet in the skill set</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-bottom:0">
+      <div class="section-header">Open questions</div>
+      <div class="card">
+        <div class="row-item">
+          <div class="row-dot dot-blue">?</div>
+          <div class="row-text" style="font-size:13px">What is the current status and tech stack of each of the 4 projects?</div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-blue">?</div>
+          <div class="row-text" style="font-size:13px">Are any projects live / deployed with public URLs?</div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-blue">?</div>
+          <div class="row-text" style="font-size:13px">What specific type of internship is targeted — full-stack, AI/ML, or open?</div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-blue">?</div>
+          <div class="row-text" style="font-size:13px">What is the current DSA practice level and platform (LeetCode, HackerRank, etc.)?</div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-blue">?</div>
+          <div class="row-text" style="font-size:13px">Has any formal ML or AI coursework been started beyond prompt engineering?</div>
+        </div>
+        <div class="row-item">
+          <div class="row-dot dot-blue">?</div>
+          <div class="row-text" style="font-size:13px">What is the preferred internship timeline — summer, part-time, or remote year-round?</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="margin-top:.75rem">
+    <div class="section-header">Priority roadmap — next 6 months</div>
+    <div class="card">
+      <div class="timeline">
+        <div class="t-item">
+          <div class="t-dot t-dot-purple"></div>
+          <div class="t-month">Month 1</div>
+          <div class="t-title">Foundation & visibility</div>
+          <div class="t-desc">Polish LinkedIn profile · Document existing projects with READMEs · Begin daily DSA practice</div>
+        </div>
+        <div class="t-item">
+          <div class="t-dot t-dot-teal"></div>
+          <div class="t-month">Month 2</div>
+          <div class="t-title">Complete AI challenge + back-end learning</div>
+          <div class="t-desc">Finish and publish 60-day AI challenge · Start learning a back-end framework</div>
+        </div>
+        <div class="t-item">
+          <div class="t-dot t-dot-blue"></div>
+          <div class="t-month">Month 3</div>
+          <div class="t-title">Full-stack project + ML basics</div>
+          <div class="t-desc">Start building a full-stack project · Begin foundational ML coursework</div>
+        </div>
+        <div class="t-item">
+          <div class="t-dot t-dot-amber"></div>
+          <div class="t-month">Month 4</div>
+          <div class="t-title">Deploy + internship applications</div>
+          <div class="t-desc">Deploy full-stack project · Begin applying to software / AI internships</div>
+        </div>
+        <div class="t-item">
+          <div class="t-dot t-dot-green"></div>
+          <div class="t-month">Month 5</div>
+          <div class="t-title">Interview prep & ML deepening</div>
+          <div class="t-desc">Accelerate DSA interview prep · Continue ML learning · Follow up on applications</div>
+        </div>
+        <div class="t-item" style="margin-bottom:0">
+          <div class="t-dot t-dot-coral"></div>
+          <div class="t-month">Month 6</div>
+          <div class="t-title">Secure internship + review progress</div>
+          <div class="t-desc">Aim to have internship confirmed · Review skill gaps · Plan next 6-month cycle</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">Skill readiness overview</div>
+    <div class="card">
+      <div class="progress-wrap">
+        <div class="progress-row">
+          <div class="progress-label">Front-end</div>
+          <div class="progress-bar"><div class="progress-fill fill-purple" style="width:75%"></div></div>
+          <div class="progress-pct">Strong</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label">DSA</div>
+          <div class="progress-bar"><div class="progress-fill fill-blue" style="width:50%"></div></div>
+          <div class="progress-pct">Growing</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label">Back-end</div>
+          <div class="progress-bar"><div class="progress-fill fill-amber" style="width:20%"></div></div>
+          <div class="progress-pct">Gap</div>
+        </div>
+        <div class="progress-row">
+          <div class="progress-label">AI / ML</div>
+          <div class="progress-bar"><div class="progress-fill fill-teal" style="width:30%"></div></div>
+          <div class="progress-pct">Early</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--color-text-secondary);margin-top:.75rem">Based only on information provided in the transcript. Levels are relative estimates derived from stated skills and goals — not assessed scores.</div>
+    </div>
+  </div>
+</div>
