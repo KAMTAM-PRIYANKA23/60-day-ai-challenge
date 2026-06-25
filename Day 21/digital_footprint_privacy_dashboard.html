@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Footprint Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0c10;
+    --bg2: #0f1117;
+    --surface: #141720;
+    --surface2: #1a1e2e;
+    --border: #1f2437;
+    --border2: #252a3d;
+    --text: #e8eaf2;
+    --text2: #8b92b3;
+    --text3: #555d7a;
+    --accent: #6366f1;
+    --accent2: #818cf8;
+    --accent-glow: rgba(99,102,241,0.15);
+    --red: #ef4444;
+    --orange: #f97316;
+    --amber: #f59e0b;
+    --green: #22c55e;
+    --cyan: #06b6d4;
+    --purple: #a855f7;
+    --pink: #ec4899;
+    --red-dim: rgba(239,68,68,0.12);
+    --orange-dim: rgba(249,115,22,0.12);
+    --amber-dim: rgba(245,158,11,0.12);
+    --green-dim: rgba(34,197,94,0.12);
+    --cyan-dim: rgba(6,182,212,0.12);
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* LAYOUT */
+  .shell { max-width: 1140px; margin: 0 auto; padding: 0 20px 80px; }
+
+  /* HEADER */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 0; border-bottom: 1px solid var(--border);
+    margin-bottom: 36px; position: sticky; top: 0; z-index: 100;
+    background: rgba(10,12,16,0.92); backdrop-filter: blur(16px);
+  }
+  .topbar-logo { display: flex; align-items: center; gap: 10px; }
+  .topbar-logo .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent); box-shadow: 0 0 12px var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .topbar-logo span { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text2); }
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .badge-fact { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; font-family: var(--mono); }
+  .badge-est { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.3); border-radius: 4px; padding: 3px 8px; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; font-family: var(--mono); }
+
+  /* HERO */
+  .hero { margin-bottom: 32px; }
+  .hero-label { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent2); margin-bottom: 8px; }
+  .hero-title { font-size: 28px; font-weight: 800; color: var(--text); line-height: 1.2; }
+  .hero-sub { color: var(--text2); font-size: 14px; margin-top: 6px; }
+
+  /* GRID */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 16px; }
+  .full { margin-bottom: 16px; }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 22px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--border2); }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent);
+  }
+  .card-label {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 12px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .card-label .icon { opacity: 0.7; }
+
+  /* SCORE RINGS */
+  .score-wrap { display: flex; align-items: center; gap: 20px; }
+  .ring-wrap { position: relative; width: 90px; height: 90px; flex-shrink: 0; }
+  .ring-wrap svg { transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 6; }
+  .ring-fg { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dasharray 1.2s cubic-bezier(0.4,0,0.2,1); }
+  .ring-val {
+    position: absolute; inset: 0; display: flex;
+    flex-direction: column; align-items: center; justify-content: center;
+  }
+  .ring-num { font-size: 20px; font-weight: 800; font-family: var(--mono); line-height: 1; }
+  .ring-tag { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; color: var(--text3); margin-top: 2px; }
+  .score-info h3 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .score-info p { font-size: 12px; color: var(--text2); line-height: 1.5; }
+  .score-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 600;
+    margin-top: 8px;
+  }
+
+  /* STAT CARDS */
+  .stat-val { font-size: 30px; font-weight: 800; font-family: var(--mono); line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--text2); margin-top: 6px; }
+  .stat-sub { font-size: 10px; color: var(--text3); margin-top: 3px; font-family: var(--mono); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text3);
+    margin: 28px 0 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background: var(--border); }
+
+  /* HEATMAP */
+  .heatmap-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .heatmap-cell {
+    border-radius: 7px; padding: 10px 8px;
+    display: flex; flex-direction: column; gap: 3px;
+    transition: transform 0.15s;
+    cursor: default;
+  }
+  .heatmap-cell:hover { transform: scale(1.04); }
+  .heatmap-app { font-size: 11px; font-weight: 600; }
+  .heatmap-co { font-size: 9px; opacity: 0.7; }
+  .heatmap-bar { height: 2px; border-radius: 1px; margin-top: 4px; }
+  .heat-5 { background: rgba(239,68,68,0.18); border: 1px solid rgba(239,68,68,0.35); }
+  .heat-5 .heatmap-bar { background: var(--red); }
+  .heat-4 { background: rgba(249,115,22,0.15); border: 1px solid rgba(249,115,22,0.3); }
+  .heat-4 .heatmap-bar { background: var(--orange); }
+  .heat-3 { background: rgba(245,158,11,0.13); border: 1px solid rgba(245,158,11,0.28); }
+  .heat-3 .heatmap-bar { background: var(--amber); }
+  .heat-2 { background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.22); }
+  .heat-2 .heatmap-bar { background: var(--accent); }
+  .heat-1 { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.18); }
+  .heat-1 .heatmap-bar { background: var(--green); }
+
+  /* COMPANY RANKING */
+  .rank-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .rank-row:last-child { border-bottom: none; }
+  .rank-num { font-family: var(--mono); font-size: 11px; color: var(--text3); width: 18px; }
+  .rank-name { font-weight: 600; font-size: 13px; flex: 1; }
+  .rank-apps { font-size: 11px; color: var(--text2); }
+  .rank-bar-wrap { width: 100px; height: 4px; background: var(--surface2); border-radius: 2px; }
+  .rank-bar { height: 4px; border-radius: 2px; }
+  .rank-score { font-family: var(--mono); font-size: 12px; font-weight: 600; width: 34px; text-align: right; }
+
+  /* MATRIX */
+  .matrix-wrap { overflow-x: auto; }
+  table.matrix {
+    width: 100%; border-collapse: collapse; font-size: 12px;
+  }
+  .matrix th {
+    padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text3); border-bottom: 1px solid var(--border);
+  }
+  .matrix td { padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .matrix tr:last-child td { border-bottom: none; }
+  .matrix tr:hover td { background: rgba(255,255,255,0.02); }
+  .matrix .app-name { font-weight: 600; font-size: 12px; }
+  .dot-yes { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-no { width: 8px; height: 8px; border-radius: 50%; background: var(--surface2); display: inline-block; }
+  .risk-tag {
+    font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px;
+    font-family: var(--mono);
+  }
+
+  /* RADAR */
+  .radar-wrap { display: flex; align-items: center; gap: 28px; }
+  .radar-legend { display: flex; flex-direction: column; gap: 10px; }
+  .rl-row { display: flex; align-items: center; gap: 9px; }
+  .rl-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+  .rl-label { font-size: 12px; color: var(--text2); }
+  .rl-val { font-family: var(--mono); font-size: 12px; font-weight: 600; margin-left: auto; }
+
+  /* DIGITAL TWIN */
+  .twin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .twin-item {
+    background: var(--surface2); border-radius: 8px; padding: 12px 14px;
+    border: 1px solid var(--border2);
+  }
+  .twin-key { font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 5px; }
+  .twin-val { font-size: 13px; font-weight: 500; color: var(--text); }
+  .twin-note { font-size: 10px; color: var(--text3); margin-top: 3px; font-style: italic; }
+
+  /* DATA ASSETS */
+  .asset-row {
+    display: flex; align-items: center; gap: 14px; padding: 11px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .asset-row:last-child { border-bottom: none; }
+  .asset-icon { font-size: 18px; width: 32px; text-align: center; }
+  .asset-info { flex: 1; }
+  .asset-name { font-weight: 600; font-size: 13px; }
+  .asset-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .asset-value {
+    font-family: var(--mono); font-size: 12px; font-weight: 700;
+    background: rgba(99,102,241,0.12); color: var(--accent2);
+    border: 1px solid rgba(99,102,241,0.25); border-radius: 5px; padding: 3px 8px;
+  }
+
+  /* INSIGHT CARDS */
+  .wow-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .wow-card {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .wow-emoji { font-size: 20px; margin-bottom: 8px; }
+  .wow-title { font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+  .wow-body { font-size: 11px; color: var(--text2); line-height: 1.5; }
+  .wow-tag { font-size: 9px; font-family: var(--mono); font-weight: 600; letter-spacing: 0.06em; margin-top: 8px; }
+
+  /* PRIVACY PLAN */
+  .plan-item {
+    display: flex; gap: 16px; padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .plan-item:last-child { border-bottom: none; }
+  .plan-step {
+    width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center;
+    justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0;
+    font-family: var(--mono);
+  }
+  .plan-body { flex: 1; }
+  .plan-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+  .plan-desc { font-size: 11px; color: var(--text2); line-height: 1.5; }
+  .plan-impact {
+    font-size: 10px; font-family: var(--mono); font-weight: 600;
+    margin-top: 6px; display: flex; gap: 8px;
+  }
+
+  /* FINAL VERDICT */
+  .verdict-wrap {
+    background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(168,85,247,0.04));
+    border: 1px solid rgba(99,102,241,0.25); border-radius: 12px; padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .verdict-title { font-size: 16px; font-weight: 800; margin-bottom: 10px; }
+  .verdict-body { font-size: 13px; color: var(--text2); line-height: 1.7; }
+  .verdict-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .verdict-tag {
+    font-size: 11px; font-weight: 600; padding: 4px 11px; border-radius: 20px;
+    background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.25);
+    color: var(--accent2);
+  }
+
+  /* DISCLAIMER */
+  .disclaimer {
+    background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
+    border-radius: 8px; padding: 12px 16px; margin-top: 14px;
+    font-size: 11px; color: var(--amber); line-height: 1.6;
+  }
+
+  /* TABS */
+  .tab-row { display: flex; gap: 2px; margin-bottom: 16px; background: var(--surface2); border-radius: 8px; padding: 3px; width: fit-content; }
+  .tab-btn {
+    padding: 6px 14px; border-radius: 6px; border: none; background: transparent;
+    color: var(--text2); font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: var(--sans); transition: all 0.15s;
+  }
+  .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.4); }
+
+  /* PROGRESS BAR */
+  .prog-wrap { height: 5px; background: var(--surface2); border-radius: 3px; margin-top: 8px; }
+  .prog-bar { height: 5px; border-radius: 3px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); }
+
+  /* LEGEND */
+  .legend-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin-bottom: 12px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text2); }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  @media (max-width: 700px) {
+    .grid2,.grid3,.grid4 { grid-template-columns: 1fr; }
+    .twin-grid { grid-template-columns: 1fr; }
+    .wow-grid { grid-template-columns: 1fr; }
+    .heatmap-grid { grid-template-columns: repeat(3,1fr); }
+    .radar-wrap { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="dot"></div>
+      <span>PrivacyLens · Digital Footprint Report</span>
+    </div>
+    <div class="topbar-right">
+      <span class="badge-fact">● FACT</span>
+      <span class="badge-est">◈ ESTIMATE</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Digital Privacy Intelligence</div>
+    <div class="hero-title">Your Digital Footprint Analysis</div>
+    <div class="hero-sub">Based on 15 confirmed services across your reported digital ecosystem · All inferences labeled as estimates</div>
+  </div>
+
+  <!-- TOP SCORES -->
+  <div class="grid2">
+    <!-- Digital Footprint Score -->
+    <div class="card">
+      <div class="card-label"><span class="icon">📡</span> Digital Footprint Score</div>
+      <div class="score-wrap">
+        <div class="ring-wrap">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle class="ring-bg" cx="45" cy="45" r="38"/>
+            <circle class="ring-fg" cx="45" cy="45" r="38"
+              stroke="#f97316"
+              stroke-dasharray="210 239"
+              stroke-dashoffset="0"/>
+          </svg>
+          <div class="ring-val">
+            <span class="ring-num" style="color:#f97316">74</span>
+            <span class="ring-tag">/ 100</span>
+          </div>
+        </div>
+        <div class="score-info">
+          <h3 style="color:#f97316">Significant</h3>
+          <p>Your digital presence spans 15 services generating substantial data across 7 parent companies.</p>
+          <div class="score-pill" style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.3);color:#f97316">
+            🟠 61–80 Significant Range
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+          <span>Footprint Intensity</span><span style="color:#f97316;font-family:var(--mono)">74 / 100</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:74%;background:linear-gradient(90deg,#f59e0b,#f97316)"></div></div>
+      </div>
+    </div>
+
+    <!-- Privacy Score -->
+    <div class="card">
+      <div class="card-label"><span class="icon">🔒</span> Privacy Score</div>
+      <div class="score-wrap">
+        <div class="ring-wrap">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle class="ring-bg" cx="45" cy="45" r="38"/>
+            <circle class="ring-fg" cx="45" cy="45" r="38"
+              stroke="#f97316"
+              stroke-dasharray="117 239"
+              stroke-dashoffset="0"/>
+          </svg>
+          <div class="ring-val">
+            <span class="ring-num" style="color:#f97316">31</span>
+            <span class="ring-tag">/ 100</span>
+          </div>
+        </div>
+        <div class="score-info">
+          <h3 style="color:#f97316">Fair</h3>
+          <p>Multiple high-data-collection apps reduce your privacy posture. Social + gaming + payments combine into a rich profile.</p>
+          <div class="score-pill" style="background:rgba(249,115,22,0.12);border:1px solid rgba(249,115,22,0.3);color:#f97316">
+            🟠 31–60 Fair Range
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+          <span>Privacy Strength</span><span style="color:#f97316;font-family:var(--mono)">31 / 100</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-bar" style="width:31%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="grid4">
+    <div class="card">
+      <div class="card-label">Total Services <span class="badge-fact" style="font-size:9px;padding:1px 5px">FACT</span></div>
+      <div class="stat-val" style="color:var(--accent2)">15</div>
+      <div class="stat-label">Active applications</div>
+      <div class="stat-sub">across 7 parent companies</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Ecosystem Concentration <span class="badge-fact" style="font-size:9px;padding:1px 5px">FACT</span></div>
+      <div class="stat-val" style="color:var(--amber)">67%</div>
+      <div class="stat-label">Google + Meta share</div>
+      <div class="stat-sub">4 of 6 dominant platforms</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Tracking Surface <span class="badge-est" style="font-size:9px;padding:1px 5px">EST.</span></div>
+      <div class="stat-val" style="color:var(--red)">High</div>
+      <div class="stat-label">Estimated exposure level</div>
+      <div class="stat-sub">behavior + location + finance</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Data Broker Risk <span class="badge-est" style="font-size:9px;padding:1px 5px">EST.</span></div>
+      <div class="stat-val" style="color:var(--orange)">8/10</div>
+      <div class="stat-label">Inferred profile richness</div>
+      <div class="stat-sub">multi-platform correlation risk</div>
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="section-title">Exposure Heatmap</div>
+  <div class="card full">
+    <div class="card-label">Risk Intensity by App <span class="badge-fact" style="font-size:9px;padding:1px 5px">APPS = FACT</span> <span class="badge-est" style="font-size:9px;padding:1px 5px">RISK = EST.</span></div>
+    <div class="legend-row" style="margin-bottom:16px">
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(239,68,68,0.4)"></div> Critical</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(249,115,22,0.4)"></div> High</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(245,158,11,0.4)"></div> Medium</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(99,102,241,0.3)"></div> Low</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:rgba(34,197,94,0.25)"></div> Minimal</div>
+    </div>
+    <div class="heatmap-grid">
+      <div class="heatmap-cell heat-5"><div class="heatmap-app">TikTok</div><div class="heatmap-co">ByteDance</div><div class="heatmap-bar" style="width:100%"></div></div>
+      <div class="heatmap-cell heat-5"><div class="heatmap-app">Instagram</div><div class="heatmap-co">Meta</div><div class="heatmap-bar" style="width:96%"></div></div>
+      <div class="heatmap-cell heat-5"><div class="heatmap-app">Google Search</div><div class="heatmap-co">Alphabet</div><div class="heatmap-bar" style="width:98%"></div></div>
+      <div class="heatmap-cell heat-4"><div class="heatmap-app">YouTube</div><div class="heatmap-co">Alphabet</div><div class="heatmap-bar" style="width:85%"></div></div>
+      <div class="heatmap-cell heat-4"><div class="heatmap-app">Snapchat</div><div class="heatmap-co">Snap Inc.</div><div class="heatmap-bar" style="width:80%"></div></div>
+      <div class="heatmap-cell heat-4"><div class="heatmap-app">Google Pay</div><div class="heatmap-co">Alphabet</div><div class="heatmap-bar" style="width:82%"></div></div>
+      <div class="heatmap-cell heat-4"><div class="heatmap-app">PUBG Mobile</div><div class="heatmap-co">Krafton / Tencent</div><div class="heatmap-bar" style="width:75%"></div></div>
+      <div class="heatmap-cell heat-3"><div class="heatmap-app">Amazon</div><div class="heatmap-co">Amazon</div><div class="heatmap-bar" style="width:68%"></div></div>
+      <div class="heatmap-cell heat-3"><div class="heatmap-app">WhatsApp</div><div class="heatmap-co">Meta</div><div class="heatmap-bar" style="width:65%"></div></div>
+      <div class="heatmap-cell heat-3"><div class="heatmap-app">Meesho</div><div class="heatmap-co">Meesho Inc.</div><div class="heatmap-bar" style="width:60%"></div></div>
+      <div class="heatmap-cell heat-3"><div class="heatmap-app">Google Photos</div><div class="heatmap-co">Alphabet</div><div class="heatmap-bar" style="width:62%"></div></div>
+      <div class="heatmap-cell heat-2"><div class="heatmap-app">Discord</div><div class="heatmap-co">Discord Inc.</div><div class="heatmap-bar" style="width:50%"></div></div>
+      <div class="heatmap-cell heat-2"><div class="heatmap-app">Roblox</div><div class="heatmap-co">Roblox Corp.</div><div class="heatmap-bar" style="width:48%"></div></div>
+      <div class="heatmap-cell heat-2"><div class="heatmap-app">Spotify</div><div class="heatmap-co">Spotify AB</div><div class="heatmap-bar" style="width:45%"></div></div>
+      <div class="heatmap-cell heat-1"><div class="heatmap-app">iMessage</div><div class="heatmap-co">Apple</div><div class="heatmap-bar" style="width:25%"></div></div>
+    </div>
+  </div>
+
+  <!-- COMPANY RANKING -->
+  <div class="section-title">Company Exposure Ranking</div>
+  <div class="card full">
+    <div class="card-label">Parent Companies by Data Collection Power <span class="badge-est" style="font-size:9px;padding:1px 5px">RISK = EST.</span></div>
+    <div class="rank-row">
+      <span class="rank-num">01</span>
+      <span class="rank-name" style="color:var(--red)">Alphabet (Google)</span>
+      <span class="rank-apps" style="color:var(--text3)">Search · YouTube · Pay · Photos</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:98%;background:var(--red)"></div></div>
+      <span class="rank-score" style="color:var(--red)">98</span>
+    </div>
+    <div class="rank-row">
+      <span class="rank-num">02</span>
+      <span class="rank-name" style="color:var(--orange)">Meta</span>
+      <span class="rank-apps" style="color:var(--text3)">Instagram · WhatsApp</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:90%;background:var(--orange)"></div></div>
+      <span class="rank-score" style="color:var(--orange)">90</span>
+    </div>
+    <div class="rank-row">
+      <span class="rank-num">03</span>
+      <span class="rank-name" style="color:var(--amber)">ByteDance</span>
+      <span class="rank-apps" style="color:var(--text3)">TikTok</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:85%;background:var(--amber)"></div></div>
+      <span class="rank-score" style="color:var(--amber)">85</span>
+    </div>
+    <div class="rank-row">
+      <span class="rank-num">04</span>
+      <span class="rank-name" style="color:var(--amber)">Amazon</span>
+      <span class="rank-apps" style="color:var(--text3)">Amazon Shopping</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:72%;background:var(--amber)"></div></div>
+      <span class="rank-score" style="color:var(--amber)">72</span>
+    </div>
+    <div class="rank-row">
+      <span class="rank-num">05</span>
+      <span class="rank-name" style="color:var(--accent2)">Snap Inc.</span>
+      <span class="rank-apps" style="color:var(--text3)">Snapchat</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:65%;background:var(--accent)"></div></div>
+      <span class="rank-score" style="color:var(--accent2)">65</span>
+    </div>
+    <div class="rank-row">
+      <span class="rank-num">06</span>
+      <span class="rank-name" style="color:var(--accent2)">Krafton / Tencent</span>
+      <span class="rank-apps" style="color:var(--text3)">PUBG Mobile</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:58%;background:var(--accent)"></div></div>
+      <span class="rank-score" style="color:var(--accent2)">58</span>
+    </div>
+    <div class="rank-row">
+      <span class="rank-num">07</span>
+      <span class="rank-name" style="color:var(--green)">Others</span>
+      <span class="rank-apps" style="color:var(--text3)">Spotify · Discord · Roblox · Meesho · Apple</span>
+      <div class="rank-bar-wrap"><div class="rank-bar" style="width:38%;background:var(--green)"></div></div>
+      <span class="rank-score" style="color:var(--green)">38</span>
+    </div>
+  </div>
+
+  <!-- DATA COLLECTION MATRIX -->
+  <div class="section-title">Data Collection Matrix</div>
+  <div class="card full">
+    <div class="card-label">Estimated Data Types Collected Per App <span class="badge-est" style="font-size:9px;padding:1px 5px">ALL ESTIMATES</span></div>
+    <div class="matrix-wrap">
+      <table class="matrix">
+        <thead>
+          <tr>
+            <th>App</th>
+            <th>Location</th>
+            <th>Biometric</th>
+            <th>Contacts</th>
+            <th>Behavioural</th>
+            <th>Financial</th>
+            <th>Media</th>
+            <th>Comms</th>
+            <th>Risk</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="app-name">TikTok</td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--red-dim);color:var(--red)">CRITICAL</span></td></tr>
+          <tr><td class="app-name">Instagram</td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--red-dim);color:var(--red)">CRITICAL</span></td></tr>
+          <tr><td class="app-name">Google Search</td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--red-dim);color:var(--red)">CRITICAL</span></td></tr>
+          <tr><td class="app-name">YouTube</td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--orange-dim);color:var(--orange)">HIGH</span></td></tr>
+          <tr><td class="app-name">Snapchat</td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--orange-dim);color:var(--orange)">HIGH</span></td></tr>
+          <tr><td class="app-name">Google Pay</td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--orange-dim);color:var(--orange)">HIGH</span></td></tr>
+          <tr><td class="app-name">PUBG Mobile</td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#f59e0b"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--orange-dim);color:var(--orange)">HIGH</span></td></tr>
+          <tr><td class="app-name">WhatsApp</td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#f59e0b"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="risk-tag" style="background:var(--amber-dim);color:var(--amber)">MEDIUM</span></td></tr>
+          <tr><td class="app-name">Amazon</td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--amber-dim);color:var(--amber)">MEDIUM</span></td></tr>
+          <tr><td class="app-name">Google Photos</td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#f59e0b"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#ef4444"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--amber-dim);color:var(--amber)">MEDIUM</span></td></tr>
+          <tr><td class="app-name">Meesho</td><td><span class="dot-yes" style="background:#f59e0b"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#f59e0b"></span></td><td><span class="dot-yes" style="background:#f97316"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:var(--amber-dim);color:var(--amber)">MEDIUM</span></td></tr>
+          <tr><td class="app-name">Discord</td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#6366f1"></span></td><td><span class="dot-yes" style="background:#6366f1"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#6366f1"></span></td><td><span class="risk-tag" style="background:rgba(99,102,241,0.12);color:var(--accent2)">LOW</span></td></tr>
+          <tr><td class="app-name">Roblox</td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#6366f1"></span></td><td><span class="dot-yes" style="background:#6366f1"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:rgba(99,102,241,0.12);color:var(--accent2)">LOW</span></td></tr>
+          <tr><td class="app-name">Spotify</td><td><span class="dot-yes" style="background:#6366f1"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#6366f1"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="risk-tag" style="background:rgba(99,102,241,0.12);color:var(--accent2)">LOW</span></td></tr>
+          <tr><td class="app-name">iMessage</td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#22c55e"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-no"></span></td><td><span class="dot-yes" style="background:#22c55e"></span></td><td><span class="risk-tag" style="background:var(--green-dim);color:var(--green)">MINIMAL</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RISK RADAR + DIGITAL TWIN -->
+  <div class="grid2">
+    <!-- Radar -->
+    <div class="card">
+      <div class="card-label"><span class="icon">🎯</span> Risk Radar <span class="badge-est" style="font-size:9px;padding:1px 5px;margin-left:4px">ESTIMATES</span></div>
+      <div class="radar-wrap">
+        <svg viewBox="0 0 200 200" width="190" height="190" style="flex-shrink:0">
+          <!-- Grid circles -->
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#1f2437" stroke-width="1"/>
+          <circle cx="100" cy="100" r="60" fill="none" stroke="#1f2437" stroke-width="1"/>
+          <circle cx="100" cy="100" r="40" fill="none" stroke="#1f2437" stroke-width="1"/>
+          <circle cx="100" cy="100" r="20" fill="none" stroke="#1f2437" stroke-width="1"/>
+          <!-- Axes -->
+          <line x1="100" y1="20" x2="100" y2="180" stroke="#1f2437" stroke-width="1"/>
+          <line x1="20" y1="100" x2="180" y2="100" stroke="#1f2437" stroke-width="1"/>
+          <line x1="34" y1="34" x2="166" y2="166" stroke="#1f2437" stroke-width="1"/>
+          <line x1="166" y1="34" x2="34" y2="166" stroke="#1f2437" stroke-width="1"/>
+          <!-- Data polygon - Social:88, Location:75, Finance:70, Identity:82, Behavioural:92, Comms:55 -->
+          <polygon
+            points="100,12 168,62 162,180 38,180 34,62 100,12"
+            fill="rgba(239,68,68,0.12)" stroke="#ef4444" stroke-width="1.5" stroke-linejoin="round"
+            style="transform-origin:100px 100px"
+          />
+          <!-- Approximate scaled polygon for data -->
+          <polygon
+            points="100,30 160,71 155,164 44,164 41,70 100,30"
+            fill="rgba(239,68,68,0.15)" stroke="#ef4444" stroke-width="2" stroke-linejoin="round"
+          />
+          <!-- Axis labels -->
+          <text x="100" y="14" text-anchor="middle" fill="#8b92b3" font-size="9" font-family="Inter">Social</text>
+          <text x="184" y="104" text-anchor="start" fill="#8b92b3" font-size="9" font-family="Inter">Behav.</text>
+          <text x="100" y="195" text-anchor="middle" fill="#8b92b3" font-size="9" font-family="Inter">Finance</text>
+          <text x="16" y="104" text-anchor="end" fill="#8b92b3" font-size="9" font-family="Inter">Comms</text>
+          <text x="170" y="34" text-anchor="start" fill="#8b92b3" font-size="9" font-family="Inter">Location</text>
+          <text x="30" y="34" text-anchor="end" fill="#8b92b3" font-size="9" font-family="Inter">Identity</text>
+        </svg>
+        <div class="radar-legend">
+          <div class="rl-row"><div class="rl-dot" style="background:var(--red)"></div><span class="rl-label">Social Media</span><span class="rl-val" style="color:var(--red)">88</span></div>
+          <div class="rl-row"><div class="rl-dot" style="background:var(--orange)"></div><span class="rl-label">Behavioural</span><span class="rl-val" style="color:var(--orange)">92</span></div>
+          <div class="rl-row"><div class="rl-dot" style="background:var(--amber)"></div><span class="rl-label">Identity</span><span class="rl-val" style="color:var(--amber)">82</span></div>
+          <div class="rl-row"><div class="rl-dot" style="background:var(--amber)"></div><span class="rl-label">Location</span><span class="rl-val" style="color:var(--amber)">75</span></div>
+          <div class="rl-row"><div class="rl-dot" style="background:var(--accent)"></div><span class="rl-label">Financial</span><span class="rl-val" style="color:var(--accent2)">70</span></div>
+          <div class="rl-row"><div class="rl-dot" style="background:var(--green)"></div><span class="rl-label">Comms</span><span class="rl-val" style="color:var(--green)">55</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Digital Twin -->
+    <div class="card">
+      <div class="card-label"><span class="icon">🪞</span> Digital Twin Profile <span class="badge-est" style="font-size:9px;padding:1px 5px;margin-left:4px">ALL ESTIMATES</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px;padding:8px 10px;background:var(--surface2);border-radius:6px;border-left:2px solid var(--amber)">
+        ⚠️ Inferred from app usage patterns only. No private data accessed. Labels marked as estimates.
+      </div>
+      <div class="twin-grid">
+        <div class="twin-item">
+          <div class="twin-key">Age Range</div>
+          <div class="twin-val">~16–28 yrs</div>
+          <div class="twin-note">Est. from TikTok, Snapchat, Roblox usage</div>
+        </div>
+        <div class="twin-item">
+          <div class="twin-key">Device Ecosystem</div>
+          <div class="twin-val">iOS + Android</div>
+          <div class="twin-note">Est. from iMessage + Google Pay</div>
+        </div>
+        <div class="twin-item">
+          <div class="twin-key">Social Activity</div>
+          <div class="twin-val">Very Active</div>
+          <div class="twin-note">Est. from 4 social platforms</div>
+        </div>
+        <div class="twin-item">
+          <div class="twin-key">Gaming Profile</div>
+          <div class="twin-val">Casual–Mid</div>
+          <div class="twin-note">Est. from PUBG + Roblox combo</div>
+        </div>
+        <div class="twin-item">
+          <div class="twin-key">Shopping Behavior</div>
+          <div class="twin-val">Online-first</div>
+          <div class="twin-note">Est. from Amazon + Meesho</div>
+        </div>
+        <div class="twin-item">
+          <div class="twin-key">Payment Method</div>
+          <div class="twin-val">Digital Wallet</div>
+          <div class="twin-note">Est. from Google Pay usage</div>
+        </div>
+        <div class="twin-item">
+          <div class="twin-key">Music Interest</div>
+          <div class="twin-val">Diverse</div>
+          <div class="twin-note">Est. from Spotify + TikTok</div>
+        </div>
+        <div class="twin-item">
+          <div class="twin-key">Language / Region</div>
+          <div class="twin-val">India (EN/HI)</div>
+          <div class="twin-note">Est. from Meesho + Google Pay</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOST VALUABLE DATA ASSETS -->
+  <div class="section-title">Most Valuable Data Assets</div>
+  <div class="card full">
+    <div class="card-label">What corporations likely value most about your data <span class="badge-est" style="font-size:9px;padding:1px 5px">ESTIMATES</span></div>
+    <div class="asset-row">
+      <div class="asset-icon">🔍</div>
+      <div class="asset-info">
+        <div class="asset-name">Search Intent Graph</div>
+        <div class="asset-desc">Every Google Search query reveals intent, health concerns, purchases planned, and curiosity — the most commercially valuable data type estimated to exist.</div>
+      </div>
+      <div class="asset-value">★★★★★</div>
+    </div>
+    <div class="asset-row">
+      <div class="asset-icon">🎬</div>
+      <div class="asset-info">
+        <div class="asset-name">Behavioural Engagement Profile</div>
+        <div class="asset-desc">TikTok + Instagram + YouTube watch patterns likely map your interests, emotions, attention span, and psychological triggers with high precision.</div>
+      </div>
+      <div class="asset-value">★★★★★</div>
+    </div>
+    <div class="asset-row">
+      <div class="asset-icon">💳</div>
+      <div class="asset-info">
+        <div class="asset-name">Financial Transaction Map</div>
+        <div class="asset-desc">Google Pay + Amazon + Meesho purchases can reveal income bracket, spending habits, brand loyalty, and economic vulnerability — estimated high value to advertisers.</div>
+      </div>
+      <div class="asset-value">★★★★☆</div>
+    </div>
+    <div class="asset-row">
+      <div class="asset-icon">📍</div>
+      <div class="asset-info">
+        <div class="asset-name">Location & Movement History</div>
+        <div class="asset-desc">Google ecosystem (Maps inferred via Pay, Search, Photos metadata) likely builds a rich estimated location history including home, workplace, and frequented venues.</div>
+      </div>
+      <div class="asset-value">★★★★☆</div>
+    </div>
+    <div class="asset-row">
+      <div class="asset-icon">📸</div>
+      <div class="asset-info">
+        <div class="asset-name">Facial & Visual Biometric Data</div>
+        <div class="asset-desc">Google Photos face recognition, Instagram/Snapchat filters, and TikTok effects may process biometric visual data — estimates suggest this is increasingly high-value.</div>
+      </div>
+      <div class="asset-value">★★★☆☆</div>
+    </div>
+    <div class="asset-row">
+      <div class="asset-icon">🎮</div>
+      <div class="asset-info">
+        <div class="asset-name">Social Graph & Communication Network</div>
+        <div class="asset-desc">WhatsApp contacts, Discord servers, and Snapchat friends list provide estimated mapping of your real-world relationships and influence network.</div>
+      </div>
+      <div class="asset-value">★★★☆☆</div>
+    </div>
+  </div>
+
+  <!-- WOW INSIGHTS -->
+  <div class="section-title">WOW Insights</div>
+  <div class="wow-grid" style="margin-bottom:16px">
+    <div class="wow-card">
+      <div class="wow-emoji">🕵️</div>
+      <div class="wow-title">The Shadow Profile Problem</div>
+      <div class="wow-body">Even if you delete an app, companies may retain data already collected. Your estimated digital twin could persist in data broker databases long after deletion.</div>
+      <div class="wow-tag" style="color:var(--red)">EST. · HIGH RELEVANCE</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-emoji">🔗</div>
+      <div class="wow-title">Cross-Platform Identity Stitching</div>
+      <div class="wow-body">Google, Meta, and potentially TikTok may use device fingerprinting and shared phone numbers to link your profiles across platforms — creating one unified estimated identity.</div>
+      <div class="wow-tag" style="color:var(--orange)">EST. · HIGH RELEVANCE</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-emoji">💬</div>
+      <div class="wow-title">WhatsApp Metadata Paradox</div>
+      <div class="wow-body">Messages are end-to-end encrypted, but metadata — who you talk to, when, and how often — is reportedly shared with Meta for ad targeting according to privacy researchers.</div>
+      <div class="wow-tag" style="color:var(--amber)">EST. · MEDIUM RELEVANCE</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-emoji">🌏</div>
+      <div class="wow-title">ByteDance Data Jurisdiction Risk</div>
+      <div class="wow-body">TikTok is owned by ByteDance (China). Some regulators have flagged estimated potential for data access under Chinese data laws — a geopolitical privacy risk.</div>
+      <div class="wow-tag" style="color:var(--red)">EST. · CONTESTED TOPIC</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-emoji">📱</div>
+      <div class="wow-title">Google Knows Your Offline Life</div>
+      <div class="wow-body">Google Pay + Search + Photos + Maps (inferred) may combine to build an estimated profile of your real-world movements, purchases, and social activity even without you posting.</div>
+      <div class="wow-tag" style="color:var(--orange)">EST. · HIGH RELEVANCE</div>
+    </div>
+    <div class="wow-card">
+      <div class="wow-emoji">🎯</div>
+      <div class="wow-title">Roblox & Young User Data</div>
+      <div class="wow-body">Roblox collects estimated behavioural and spending data including virtual currency purchases. Depending on your age, this may fall under stricter data protection regulations like COPPA or India's DPDP.</div>
+      <div class="wow-tag" style="color:var(--accent2)">EST. · MEDIUM RELEVANCE</div>
+    </div>
+  </div>
+
+  <!-- PRIVACY IMPROVEMENT PLAN -->
+  <div class="section-title">Privacy Improvement Plan</div>
+  <div class="card full">
+    <div class="card-label">Actionable Steps to Improve Your Privacy Score <span class="badge-fact" style="font-size:9px;padding:1px 5px">VERIFIED ADVICE</span></div>
+    <div class="plan-item">
+      <div class="plan-step" style="background:var(--red-dim);color:var(--red)">01</div>
+      <div class="plan-body">
+        <div class="plan-title">Audit TikTok & Instagram App Permissions</div>
+        <div class="plan-desc">Go to your phone's Settings → Apps → TikTok / Instagram → Permissions. Revoke Camera, Microphone, Location, and Contacts access if not actively needed. These apps do not require all permissions to function.</div>
+        <div class="plan-impact"><span style="color:var(--green)">+12 Privacy Score</span><span style="color:var(--text3)">· High Impact</span><span style="color:var(--cyan)">· 5 min</span></div>
+      </div>
+    </div>
+    <div class="plan-item">
+      <div class="plan-step" style="background:var(--red-dim);color:var(--red)">02</div>
+      <div class="plan-body">
+        <div class="plan-title">Turn Off Google Ad Personalisation</div>
+        <div class="plan-desc">Visit myaccount.google.com → Data & Privacy → Ad Settings → Turn off personalised ads. This limits Google's ability to build a cross-app advertising profile linking Search, YouTube, and Maps.</div>
+        <div class="plan-impact"><span style="color:var(--green)">+9 Privacy Score</span><span style="color:var(--text3)">· High Impact</span><span style="color:var(--cyan)">· 3 min</span></div>
+      </div>
+    </div>
+    <div class="plan-item">
+      <div class="plan-step" style="background:var(--orange-dim);color:var(--orange)">03</div>
+      <div class="plan-body">
+        <div class="plan-title">Enable End-to-End Encryption for WhatsApp Chat Backups</div>
+        <div class="plan-desc">WhatsApp → Settings → Chats → Chat Backup → End-to-end Encrypted Backup → Turn On. Without this, your chat backups stored on Google Drive or iCloud are not encrypted by default.</div>
+        <div class="plan-impact"><span style="color:var(--green)">+7 Privacy Score</span><span style="color:var(--text3)">· Medium Impact</span><span style="color:var(--cyan)">· 2 min</span></div>
+      </div>
+    </div>
+    <div class="plan-item">
+      <div class="plan-step" style="background:var(--orange-dim);color:var(--orange)">04</div>
+      <div class="plan-body">
+        <div class="plan-title">Use a Privacy-First Search Engine</div>
+        <div class="plan-desc">Replace Google Search with DuckDuckGo or Brave Search for general browsing. Google Search is your single highest-exposure data point — reducing its use meaningfully limits your estimated behavioural profile.</div>
+        <div class="plan-impact"><span style="color:var(--green)">+10 Privacy Score</span><span style="color:var(--text3)">· High Impact</span><span style="color:var(--cyan)">· 10 min setup</span></div>
+      </div>
+    </div>
+    <div class="plan-item">
+      <div class="plan-step" style="background:var(--amber-dim);color:var(--amber)">05</div>
+      <div class="plan-body">
+        <div class="plan-title">Review Snapchat & TikTok Location Sharing</div>
+        <div class="plan-desc">Snapchat's Snap Map and TikTok's location services can expose real-time or estimated location data. Set Snap Map to "Ghost Mode" and restrict TikTok location to "Never" in iOS/Android settings.</div>
+        <div class="plan-impact"><span style="color:var(--green)">+6 Privacy Score</span><span style="color:var(--text3)">· Medium Impact</span><span style="color:var(--cyan)">· 4 min</span></div>
+      </div>
+    </div>
+    <div class="plan-item">
+      <div class="plan-step" style="background:var(--green-dim);color:var(--green)">06</div>
+      <div class="plan-body">
+        <div class="plan-title">Use a Separate Email for Shopping Apps</div>
+        <div class="plan-desc">Create a dedicated email for Amazon and Meesho purchases. This limits cross-service data linkage and reduces the ability of data brokers to correlate your shopping identity with your social profiles.</div>
+        <div class="plan-impact"><span style="color:var(--green)">+5 Privacy Score</span><span style="color:var(--text3)">· Medium Impact</span><span style="color:var(--cyan)">· 15 min</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL VERDICT -->
+  <div class="section-title">Final Verdict</div>
+  <div class="verdict-wrap">
+    <div class="verdict-title">⚖️ Overall Assessment: Significant Footprint · Fair Privacy Posture</div>
+    <div class="verdict-body">
+      Based on your confirmed 15-app ecosystem, you have a <strong>significant digital footprint</strong> spanning entertainment, social media, payments, shopping, and gaming. The combination of Alphabet (4 apps), Meta (2 apps), TikTok, PUBG Mobile, and dual e-commerce platforms creates what privacy researchers would estimate as a rich, cross-correlated data profile. Your privacy score of <strong>31/100 (Fair)</strong> reflects a high-exposure ecosystem — not unusual for a modern smartphone user, but meaningfully above average due to the breadth of data categories covered (behavioural, biometric, financial, location, and communication). The good news: several high-impact, low-effort actions — particularly around Google ad settings, app permissions, and search habits — could realistically raise your estimated privacy score by 20–30 points within a week.
+    </div>
+    <div class="verdict-tags">
+      <span class="verdict-tag">15 Apps Confirmed</span>
+      <span class="verdict-tag">7 Parent Companies</span>
+      <span class="verdict-tag">Footprint: 74 / 100</span>
+      <span class="verdict-tag">Privacy: 31 / 100</span>
+      <span class="verdict-tag">Behavioural Risk: High</span>
+      <span class="verdict-tag">Financial Exposure: Medium</span>
+      <span class="verdict-tag">India DPDP Act Applies</span>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ <strong>Disclaimer:</strong> All scores, risk levels, inferences, and profile estimates in this report are derived from publicly known privacy research and app data practices — not from any private database or personal account access. App usage is treated as Fact; all behavioral, demographic, and risk inferences are Estimates only. This report does not constitute legal or cybersecurity advice. No certainty is claimed about any individual's data. For verified information, consult each platform's official Privacy Policy or a certified data privacy professional.
+  </div>
+
+</div>
+</body>
+</html>
