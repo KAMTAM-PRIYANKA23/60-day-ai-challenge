@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Shark Tank Simulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #050b14 0%, #0a192f 100%);
+        }
+
+        .shark-gradient {
+            background: linear-gradient(90deg, #00d2ff 0%, #0066ff 100%);
+        }
+
+        .card-glow:hover {
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.2);
+            border-color: rgba(0, 210, 255, 0.4);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #050b14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0a192f;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0066ff;
+        }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-900">
+
+    <header class="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.15)]">
+                <i class="fa-solid fa-fish-fins text-2xl animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-cyan-400 bg-clip-text text-transparent">SHARK TANK</h1>
+                <p class="text-xs font-semibold tracking-widest text-cyan-400/80 uppercase">AI Simulator v1.0</p>
+            </div>
+        </div>
+        <button onclick="toggleLeaderboardModal()" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-slate-700/60 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 hover:scale-105 cursor-pointer">
+            <i class="fa-solid fa-trophy text-amber-400"></i> Leaderboard
+        </button>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 flex flex-col justify-center">
+        
+        <section id="step-input" class="w-full max-w-3xl mx-auto space-y-8 animate-fade-in">
+            <div class="text-center max-w-2xl mx-auto space-y-3">
+                <span class="px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full text-xs font-semibold tracking-wider uppercase">Are you ready to pitch?</span>
+                <h2 class="text-3xl md:text-4xl font-black tracking-tight text-white">Enter the Tank. Face the Sharks.</h2>
+                <p class="text-slate-400 text-sm md:text-base">Fill out your business parameters comprehensively. Our hyper-specialized AI Judges evaluate with institutional rigor.</p>
+            </div>
+
+            <form id="pitchForm" onsubmit="handlePitchSubmit(event)" class="bg-slate-900/60 backdrop-blur-lg border border-slate-800 p-6 md:p-8 rounded-3xl shadow-2xl space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Startup Name</label>
+                        <input type="text" id="startupName" required placeholder="e.g., OmniFlux Energy" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all text-white placeholder-slate-600">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Target Audience</label>
+                        <input type="text" id="targetAudience" required placeholder="e.g., Enterprise Data Centers" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all text-white placeholder-slate-600">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">The Core Problem Statement</label>
+                    <textarea id="problem" required rows="3" placeholder="What systemic bottleneck, inefficiency, or burning issue are you solving?" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all text-white placeholder-slate-600 resize-none"></textarea>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Your Proprietary Solution</label>
+                    <textarea id="solution" required rows="3" placeholder="Describe your product, technology, or service offering and its unfair advantage..." class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all text-white placeholder-slate-600 resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="space-y-2 md:col-span-1">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Revenue Model</label>
+                        <select id="revenueModel" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all text-white cursor-pointer">
+                            <option value="SaaS / Subscription">SaaS / Subscription</option>
+                            <option value="Transactional Marketplace">Transactional Marketplace</option>
+                            <option value="Direct-to-Consumer (D2C)">Direct-to-Consumer (D2C)</option>
+                            <option value="Usage-based / API Billing">Usage-based / API Billing</option>
+                            <option value="B2B Enterprise Licensing">B2B Enterprise Licensing</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Funding Request ($)</label>
+                        <input type="number" id="fundingAsk" required min="1000" placeholder="e.g., 500000" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all text-white placeholder-slate-600">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Equity Offered (%)</label>
+                        <input type="number" id="equityAsk" required min="1" max="99" step="0.1" placeholder="e.g., 10" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 transition-all text-white placeholder-slate-600">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full shark-gradient hover:opacity-95 text-slate-950 font-bold uppercase tracking-wider py-4 rounded-xl transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg shadow-blue-500/20 cursor-pointer text-sm">
+                    Initiate Venture Pitch Round <i class="fa-solid fa-arrow-right ml-2"></i>
+                </button>
+            </form>
+        </section>
+
+        <section id="step-pitch" class="hidden w-full max-w-6xl mx-auto space-y-8 animate-fade-in">
+            <div class="bg-gradient-to-r from-slate-900 to-slate-950 border border-slate-800 p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Active Pitch Session</span>
+                    <h3 id="displayPitchTitle" class="text-2xl font-black text-white mt-1">Startup Title</h3>
+                    <p id="displayPitchSummary" class="text-slate-400 text-sm mt-1 max-w-xl"></p>
+                </div>
+                <div class="bg-slate-950/80 border border-slate-800 px-5 py-3 rounded-xl flex items-center gap-6">
+                    <div>
+                        <p class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Ask</p>
+                        <p id="displayAsk" class="text-base font-bold text-emerald-400"></p>
+                    </div>
+                    <div class="w-px h-8 bg-slate-800"></div>
+                    <div>
+                        <p class="text-[10px] uppercase font-bold tracking-wider text-slate-500">Valuation</p>
+                        <p id="displayValuation" class="text-base font-bold text-cyan-400"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4" id="judgesPanel">
+                </div>
+
+            <div id="dialogueBox" class="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 space-y-6 min-h-[220px] flex flex-col justify-between">
+                <div id="dialogueContent" class="space-y-4">
+                    </div>
+                
+                <div id="dialogueControls" class="hidden border-t border-slate-800/60 pt-4 flex gap-3">
+                    <input type="text" id="founderResponse" placeholder="Type your strategic defense/answer to the judge..." class="flex-1 bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 text-white placeholder-slate-600">
+                    <button onclick="submitResponse()" class="bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold px-6 rounded-xl text-sm transition-all cursor-pointer whitespace-nowrap flex items-center gap-2">
+                        Submit Answer <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+                
+                <div id="processingIndicator" class="hidden text-center py-4 text-slate-400 text-sm font-medium italic animate-pulse">
+                    <i class="fa-solid fa-circle-notch animate-spin mr-2 text-cyan-400"></i> Simulating analytical cross-examination...
+                </div>
+            </div>
+        </section>
+
+        <section id="step-results" class="hidden w-full max-w-5xl mx-auto space-y-8 animate-fade-in">
+            <div class="text-center space-y-2">
+                <h2 class="text-3xl md:text-4xl font-black text-white tracking-tight">The Verdict is In</h2>
+                <p class="text-slate-400 text-sm">Financial parameters, risk mitigation indices, and cross-examination score cards compiled.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-1 bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col justify-between items-center text-center relative overflow-hidden">
+                    <div id="verdictBadgeGlow" class="absolute inset-0 opacity-10 blur-xl pointer-events-none"></div>
+                    
+                    <div class="w-full space-y-4 relative z-10">
+                        <div id="verdictIconContainer" class="w-20 h-20 rounded-2xl mx-auto flex items-center justify-center text-3xl">
+                            </div>
+                        <div>
+                            <p class="text-xs uppercase font-bold tracking-widest text-slate-500">Consensus Verdict</p>
+                            <h3 id="verdictTitle" class="text-3xl font-black tracking-tight text-white mt-1">Verdict Title</h3>
+                        </div>
+                    </div>
+
+                    <div class="w-full border-t border-b border-slate-800/80 my-6 py-4 space-y-3 relative z-10">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Deal Funding</span>
+                            <span id="resultFunding" class="font-bold text-emerald-400"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Implied Valuation</span>
+                            <span id="resultValuation" class="font-bold text-cyan-400"></span>
+                        </div>
+                    </div>
+
+                    <p id="verdictReasoning" class="text-xs text-slate-400 leading-relaxed italic relative z-10">
+                        Reasoning text.
+                    </p>
+                </div>
+
+                <div class="md:col-span-2 bg-slate-900 border border-slate-800 p-6 rounded-3xl flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Investment Score Metrics Matrix</h4>
+                        <div class="space-y-4" id="scoreBarsContainer">
+                            </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/60 text-center">
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">VC Sentiment</span>
+                            <span id="judgeSentiment-0" class="text-xs font-semibold block mt-1"></span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Founder Sentiment</span>
+                            <span id="judgeSentiment-1" class="text-xs font-semibold block mt-1"></span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Customer Sentiment</span>
+                            <span id="judgeSentiment-2" class="text-xs font-semibold block mt-1"></span>
+                        </div>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+                            <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider">Angel Sentiment</span>
+                            <span id="judgeSentiment-3" class="text-xs font-semibold block mt-1"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-4 justify-center items-center">
+                <button onclick="downloadPDFReport()" class="flex items-center gap-2 bg-cyan-500 hover:bg-cyan-600 text-slate-950 font-bold px-6 py-3 rounded-xl text-sm transition-all duration-300 transform hover:-translate-y-0.5 shadow-lg shadow-cyan-500/10 cursor-pointer">
+                    <i class="fa-solid fa-file-pdf"></i> Export Pitch Analysis Report
+                </button>
+                <button onclick="sharePitchResults()" class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-all duration-300 transform hover:-translate-y-0.5 cursor-pointer">
+                    <i class="fa-solid fa-share-nodes"></i> Share Assessment
+                </button>
+                <button onclick="resetSimulation()" class="flex items-center gap-2 bg-slate-950 hover:bg-slate-900 border border-dashed border-slate-800 text-slate-400 hover:text-white px-6 py-3 rounded-xl text-sm transition-all duration-300 cursor-pointer">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Run Another Idea
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="leaderboardModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
+            <div class="p-6 border-b border-slate-800 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400 text-xl"></i>
+                    <h3 class="text-lg font-black text-white">Historical Tank Ecosystem Records</h3>
+                </div>
+                <button onclick="toggleLeaderboardModal()" class="text-slate-400 hover:text-white w-8 h-8 rounded-full bg-slate-950 flex items-center justify-center cursor-pointer border border-slate-800"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-1 space-y-4" id="leaderboardList">
+                </div>
+            <div class="p-4 border-t border-slate-800 bg-slate-950/40 text-center">
+                <button onclick="clearLeaderboard()" class="text-xs text-rose-400/80 hover:text-rose-400 font-semibold tracking-wider uppercase transition-colors cursor-pointer"><i class="fa-solid fa-trash-can mr-1"></i> Clear Ecosystem Metrics Log</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-6 text-slate-600 text-xs tracking-wide border-t border-slate-900/60 mt-auto bg-slate-950/20">
+        Engineered with rule-based multi-agent architecture simulations. No real financial obligations or capital contracts are implied.
+    </footer>
+
+    <script>
+        // Seed database for deterministic simulation parsing
+        const JUDGES_DATA = [
+            { id: 0, name: "Marcus 'Scale' Vance", role: "Venture Capitalist", strategy: "Market Size & Total Addressable Market TAM", icon: "fa-solid fa-chart-line-up", accent: "from-blue-600 to-indigo-600", color: "#3b82f6" },
+            { id: 1, name: "Elena Rostova", role: "Experienced Founder", strategy: "Product-Market Fit & Operational Velocity", icon: "fa-solid fa-bolt", accent: "from-amber-500 to-orange-600", color: "#f59e0b" },
+            { id: 2, name: "Devon 'End-User' King", role: "Mass Demographics Advocate", strategy: "Everyday Utility, Cost Mitigation & UI Accessibility", icon: "fa-solid fa-users", accent: "from-purple-600 to-pink-600", color: "#a855f7" },
+            { id: 3, name: "Sybil Sterling", role: "Super Angel Investor", strategy: "Unit Economics, Margin Defensibility & Cash Flow", icon: "fa-solid fa-gem", accent: "from-emerald-500 to-teal-600", color: "#10b981" }
+        ];
+
+        // Global Orchestration States
+        let currentPitch = {};
+        let simulationRound = 0; // Tracks sequence index of interview questions
+        let currentJudgeIndex = 0; // Track active speaking agent
+        let judgeDialogues = []; // Stores conversation timeline logs
+        let calculatedScores = {};
+        let finalVerdict = {};
+
+        // Lifecycle Startup Setup Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeLeaderboardIfEmpty();
+        });
+
+        // Step 1 Submission Processor
+        function handlePitchSubmit(event) {
+            event.preventDefault();
+            
+            const ask = parseFloat(document.getElementById('fundingAsk').value);
+            const equity = parseFloat(document.getElementById('equityAsk').value);
+            const impliedValuation = (ask / (equity / 100));
+
+            currentPitch = {
+                name: document.getElementById('startupName').value.trim(),
+                audience: document.getElementById('targetAudience').value.trim(),
+                problem: document.getElementById('problem').value.trim(),
+                solution: document.getElementById('solution').value.trim(),
+                revenueModel: document.getElementById('revenueModel').value,
+                fundingAsk: ask,
+                equityAsk: equity,
+                valuation: impliedValuation
+            };
+
+            // Transition UI State Viewports
+            document.getElementById('step-input').classList.add('hidden');
+            document.getElementById('step-pitch').classList.remove('hidden');
+
+            // Render Global Panel Contexts
+            document.getElementById('displayPitchTitle').innerText = currentPitch.name;
+            document.getElementById('displayPitchSummary').innerText = `A disruptive ${currentPitch.revenueModel} ecosystem explicitly targeting ${currentPitch.audience}.`;
+            document.getElementById('displayAsk').innerText = `$${currentPitch.fundingAsk.toLocaleString()} at ${currentPitch.equityAsk}%`;
+            document.getElementById('displayValuation').innerText = `$${currentPitch.valuation.toLocaleString()}`;
+
+            generateJudgesHTML();
+            initiatePitchSequence();
+        }
+
+        // Programmatic Judge UI Node Injection
+        function generateJudgesHTML() {
+            const panel = document.getElementById('judgesPanel');
+            panel.innerHTML = '';
+            
+            JUDGES_DATA.forEach((j) => {
+                panel.innerHTML += `
+                    <div id="judgeCard-${j.id}" class="bg-slate-900 border border-slate-800 p-5 rounded-2xl transition-all duration-500 flex flex-col items-center text-center space-y-3 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${j.accent}"></div>
+                        <div class="w-12 h-12 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-400" id="judgeIconWrapper-${j.id}">
+                            <i class="${j.icon} text-lg"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-white tracking-tight">${j.name}</h4>
+                            <p class="text-[10px] text-cyan-400 uppercase font-semibold tracking-wider mt-0.5">${j.role}</p>
+                        </div>
+                        <p class="text-[11px] text-slate-500 leading-snug">${j.strategy}</p>
+                        <div id="statusBadge-${j.id}" class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 bg-slate-950 border border-slate-800 rounded-full text-slate-500">
+                            Waiting
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Pitch Sequence Master Engine State Matrix
+        function initiatePitchSequence() {
+            simulationRound = 1;
+            currentJudgeIndex = 0;
+            judgeDialogues = [];
+            executeQuestionStep();
+        }
+
+        function executeQuestionStep() {
+            // Check if all Judges completed their two specific deep-dives
+            if (simulationRound > 2) {
+                concludeSimulationCalculations();
+                return;
+            }
+
+            // Set all judges cards back to resting state UI definitions
+            JUDGES_DATA.forEach(j => {
+                const card = document.getElementById(`judgeCard-${j.id}`);
+                const badge = document.getElementById(`statusBadge-${j.id}`);
+                card.className = "bg-slate-900 border border-slate-800 p-5 rounded-2xl transition-all duration-500 flex flex-col items-center text-center space-y-3 relative overflow-hidden opacity-40 scale-95";
+                badge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 bg-slate-950 border border-slate-800 rounded-full text-slate-500";
+                badge.innerText = "Observing";
+            });
+
+            // Activate Target Interviewing Judge Profile Highlight Matrix
+            const activeJudge = JUDGES_DATA[currentJudgeIndex];
+            const activeCard = document.getElementById(`judgeCard-${activeJudge.id}`);
+            const activeBadge = document.getElementById(`statusBadge-${activeJudge.id}`);
+            
+            activeCard.className = "bg-slate-900/90 border border-cyan-500 p-5 rounded-2xl transition-all duration-500 flex flex-col items-center text-center space-y-3 relative overflow-hidden scale-105 shadow-[0_0_30px_rgba(0,102,255,0.15)] z-10";
+            activeBadge.className = "text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 bg-cyan-500/10 border border-cyan-500/30 rounded-full text-cyan-400";
+            activeBadge.innerText = "Interrogating";
+
+            // Hide Control Mechanics during context formulation phase delays
+            document.getElementById('dialogueControls').classList.add('hidden');
+            document.getElementById('processingIndicator').classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('processingIndicator').classList.add('hidden');
+                
+                const questionText = generateProceduralQuestion(activeJudge, simulationRound);
+                
+                const content = document.getElementById('dialogueContent');
+                content.innerHTML = `
+                    <div class="flex items-start gap-3">
+                        <div class="p-2 bg-slate-950 border border-slate-800 rounded-xl text-cyan-400 mt-0.5">
+                            <i class="${activeJudge.icon} text-sm"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-400">${activeJudge.name} (${activeJudge.role}) &bull; Question ${simulationRound}/2</span>
+                            <p class="text-sm md:text-base font-medium text-white mt-1 leading-relaxed">"${questionText}"</p>
+                        </div>
+                    </div>
+                `;
+
+                // Push dialog node reference logs
+                judgeDialogues.push({
+                    judge: activeJudge.name,
+                    role: activeJudge.role,
+                    round: simulationRound,
+                    question: questionText,
+                    answer: ""
+                });
+
+                document.getElementById('dialogueControls').classList.remove('hidden');
+                document.getElementById('founderResponse').value = "";
+                document.getElementById('founderResponse').focus();
+            }, 1200);
+        }
+
+        // Pseudo-AI Generative Procedural Questioning Script System Engine
+        function generateProceduralQuestion(judge, round) {
+            const name = currentPitch.name;
+            const target = currentPitch.audience;
+            const model = currentPitch.revenueModel;
+            const valStr = `$${(currentPitch.valuation/1e6).toFixed(2)}M`;
+
+            const database = {
+                0: [ // Venture Capitalist
+                    `Your problem statement references pain-points within ${target}. However, can you prove this market size scales efficiently to hit a global sub-segment, or are you constrained to a niche consulting infrastructure?`,
+                    `You are asking for $${currentPitch.fundingAsk.toLocaleString()} pricing your enterprise valuation at ${valStr}. Walk me through how this capital injection directly maps to user growth acceleration metrics over the next 12 sequential months?`
+                ],
+                1: [ // Founder
+                    `As builders, operational velocity matters. What stops a well-capitalized hyperscaler or incumbent platform from executing your entire core offering features as a minor sprint release next quarter?`,
+                    `Your current solution framework feels complex for onboarding. Explain your go-to-market acquisition channels. How do you compress customer conversion delays?`
+                ],
+                2: [ // Customer Advocate
+                    `Looking at this purely from the perspective of an end-user within ${target}—why would I deliberately abandon my current legacy habits or platforms to absorb the switching costs of utilizing ${name}?`,
+                    `The core value proposition relies heavily on your solution. Is this user-experience genuinely seamless, or are you creating technical complexity that users will reject?`
+                ],
+                3: [ // Angel
+                    `Let's drill down directly into unit economics. With a ${model} framework, how long does it take you to fully recoup customer acquisition expenses, and what are your true gross margins?`,
+                    `Capital efficiency is existential right now. If your customer expansion slows down significantly, what is your operational runway before this entity requires emergency bridging finance?`
+                ]
+            };
+            return database[judge.id][round - 1];
+        }
+
+        // Handle Form/Input Interactions from Users in dialogue viewports
+        function submitResponse() {
+            const answerField = document.getElementById('founderResponse');
+            const answerText = answerField.value.trim();
+            if(!answerText) return;
+
+            // Track answer parameter references inside data nodes
+            const currentLogEntry = judgeDialogues[judgeDialogues.length - 1];
+            currentLogEntry.answer = answerText;
+
+            // Step tracking pointers along the matrix
+            currentJudgeIndex++;
+            if (currentJudgeIndex >= JUDGES_DATA.length) {
+                currentJudgeIndex = 0;
+                simulationRound++;
+            }
+
+            executeQuestionStep();
+        }
+
+        // Comprehensive Assessment System Scoring & Metrics Evaluation Engine Logic
+        function concludeSimulationCalculations() {
+            document.getElementById('step-pitch').classList.add('hidden');
+            document.getElementById('step-results').classList.remove('hidden');
+
+            // Algorithm to evaluate response strength based on lengths, metrics and structural parameters inside inputs
+            let textScoreMultiplier = 1.0;
+            judgeDialogues.forEach(d => {
+                if (d.answer.length > 80) textScoreMultiplier += 0.03; // Reward comprehensive inputs
+                if (/\d/.test(d.answer)) textScoreMultiplier += 0.02; // Reward analytical quantitative answers
+            });
+            textScoreMultiplier = Math.min(textScoreMultiplier, 1.25);
+
+            // Establish algorithmic baseline variables based on the valuation sanity thresholds
+            let valRatio = currentPitch.valuation / 5000000; // Benchmark normalized relative valuation metrics to $5M seed scales
+            let baselineDeclineFactor = valRatio > 2.0 ? 15 : 0; // Penalize astronomical requests cleanly
+
+            calculatedScores = {
+                market: Math.round(Math.min(100, (72 + (Math.random() * 20)) * textScoreMultiplier - (valRatio > 4 ? 10 : 0))),
+                innovation: Math.round(Math.min(100, (68 + (Math.random() * 25)) * textScoreMultiplier)),
+                business: Math.round(Math.min(100, (70 + (Math.random() * 20)) * textScoreMultiplier - baselineDeclineFactor)),
+                execution: Math.round(Math.min(100, (65 + (Math.random() * 25)) * textScoreMultiplier)),
+            };
+
+            const aggregateSum = calculatedScores.market + calculatedScores.innovation + calculatedScores.business + calculatedScores.execution;
+            calculatedScores.investment = Math.round(aggregateSum / 4);
+
+            // Establish structured programmatic decisions profiles
+            let outcome = "Come Back Later";
+            let icon = "fa-solid fa-hourglass-half text-amber-400";
+            let bgGlow = "bg-amber-500";
+            let textAccent = "text-amber-400";
+            let panelStyles = "bg-amber-500/10 border-amber-500/20";
+            let finalFundedAmount = 0;
+            let finalEquityGranted = currentPitch.equityAsk;
+            let narrativeReasoning = "";
+
+            if (calculatedScores.investment >= 88) {
+                outcome = "Invested";
+                icon = "fa-solid fa-handshake text-emerald-400";
+                bgGlow = "bg-emerald-500";
+                textAccent = "text-emerald-400";
+                panelStyles = "bg-emerald-500/10 border-emerald-500/20";
+                finalFundedAmount = currentPitch.fundingAsk;
+                narrativeReasoning = `Outstanding defense profile. The combination of verified pain-points in ${currentPitch.audience} alongside superior defensive unit margins led the panel to a full validation consensus match.`;
+                triggerConfettiBurst();
+            } else if (calculatedScores.investment >= 75) {
+                outcome = "Acquired";
+                icon = "fa-solid fa-building-circle-check text-cyan-400";
+                bgGlow = "bg-cyan-500";
+                textAccent = "text-cyan-400";
+                panelStyles = "bg-cyan-500/10 border-cyan-500/20";
+                finalFundedAmount = currentPitch.fundingAsk * 1.5;
+                finalEquityGranted = 100;
+                narrativeReasoning = `The panel views your operational velocity as strong, but believes scaling independently presents undue systemic friction. A strategic outright platform acquisition was issued instead.`;
+            } else if (calculatedScores.investment >= 60) {
+                outcome = "Come Back Later";
+                icon = "fa-solid fa-hourglass-half text-amber-400";
+                bgGlow = "bg-amber-500";
+                textAccent = "text-amber-400";
+                panelStyles = "bg-amber-500/10 border-amber-500/20";
+                finalFundedAmount = 0;
+                narrativeReasoning = `Interesting foundational paradigm but execution risk profiles remain outside current parameters. Re-architect validation metrics within the primary target demographic and return for next cycle's cohort.`;
+            } else {
+                outcome = "Rejected";
+                icon = "fa-solid fa-circle-xmark text-rose-400";
+                bgGlow = "bg-rose-500";
+                textAccent = "text-rose-400";
+                panelStyles = "bg-rose-500/10 border-rose-500/20";
+                finalFundedAmount = 0;
+                narrativeReasoning = `The structural unit economics combined with mispriced valuation metrics failed to construct institutional investment viability. The venture is currently non-defensible.`;
+            }
+
+            finalVerdict = { outcome, finalFundedAmount, finalEquityGranted, narrativeReasoning };
+
+            // Update DOM states elements
+            document.getElementById('verdictTitle').innerText = outcome;
+            document.getElementById('verdictTitle').className = `text-3xl font-black tracking-tight mt-1 ${textAccent}`;
+            document.getElementById('verdictIconContainer').className = `w-20 h-20 rounded-2xl mx-auto flex items-center justify-center text-3xl ${panelStyles}`;
+            document.getElementById('verdictIconContainer').innerHTML = `<i class="${icon}"></i>`;
+            document.getElementById('verdictBadgeGlow').className = `absolute inset-0 opacity-10 blur-xl pointer-events-none ${bgGlow}`;
+            
+            document.getElementById('resultFunding').innerText = finalFundedAmount > 0 ? `$${finalFundedAmount.toLocaleString()} at ${finalEquityGranted}%` : "$0 (No Deal)";
+            document.getElementById('resultValuation').innerText = finalFundedAmount > 0 ? `$${(finalFundedAmount / (finalEquityGranted / 100)).toLocaleString()}` : "N/A";
+            document.getElementById('verdictReasoning').innerText = `"${narrativeReasoning}"`;
+
+            renderAnalyticsScoreBars();
+            saveSessionToLeaderboard();
+        }
+
+        // Render graphical parameter indicators matrix bars
+        function renderAnalyticsScoreBars() {
+            const container = document.getElementById('scoreBarsContainer');
+            container.innerHTML = '';
+
+            const metrics = [
+                { label: "Market Potential & Expansion Strategy", score: calculatedScores.market, hue: "bg-blue-500" },
+                { label: "Proprietary Product Innovation Index", score: calculatedScores.innovation, hue: "bg-purple-500" },
+                { label: "Business Model & Unit Defensibility", score: calculatedScores.business, hue: "bg-emerald-500" },
+                { label: "Execution Velocity & Defense Profile", score: calculatedScores.execution, hue: "bg-amber-500" },
+                { label: "Composite Institutional Investment Worthiness", score: calculatedScores.investment, hue: "shark-gradient", highlight: true }
+            ];
+
+            metrics.forEach(m => {
+                container.innerHTML += `
+                    <div class="${m.highlight ? 'bg-slate-950/60 p-3.5 border border-slate-800/80 rounded-xl mt-4' : ''}">
+                        <div class="flex justify-between items-center text-xs mb-1.5">
+                            <span class="${m.highlight ? 'font-bold text-white' : 'text-slate-400 font-medium'}">${m.label}</span>
+                            <span class="font-bold ${m.highlight ? 'text-cyan-400 text-sm' : 'text-slate-200'}">${m.score}/100</span>
+                        </div>
+                        <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800/40">
+                            <div class="${m.hue} h-full rounded-full transition-all duration-1000" style="width: ${m.score}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Map individualized judge sentiment nodes
+            JUDGES_DATA.forEach(j => {
+                const node = document.getElementById(`judgeSentiment-${j.id}`);
+                let scoreDelta = calculatedScores.investment + (j.id * 3) - 5; 
+                let sentiment = "REJECT";
+                node.className = "text-xs font-bold block mt-1";
+
+                if (scoreDelta >= 85) { sentiment = "STRONG BUY"; node.classList.add("text-emerald-400"); }
+                else if (scoreDelta >= 70) { sentiment = "ACCUMULATE"; node.classList.add("text-cyan-400"); }
+                else if (scoreDelta >= 55) { sentiment = "HOLD/NEUTRAL"; node.classList.add("text-amber-400"); }
+                else { sentiment = "PASS/BEARISH"; node.classList.add("text-rose-400"); }
+                
+                node.innerText = sentiment;
+            });
+        }
+
+        // Confetti Engine Trigger
+        function triggerConfettiBurst() {
+            confetti({ particleCount: 140, spread: 80, origin: { y: 0.6 } });
+        }
+
+        // Reset Engine Workspace Loop
+        function resetSimulation() {
+            document.getElementById('pitchForm').reset();
+            document.getElementById('step-results').classList.add('hidden');
+            document.getElementById('step-input').classList.remove('hidden');
+            currentPitch = {};
+            judgeDialogues = [];
+        }
+
+        // Share Dialog API Integrations Layer
+        function sharePitchResults() {
+            const textString = `My startup pitch for "${currentPitch.name}" scored ${calculatedScores.investment}/100 in the AI Shark Tank Simulator! Outcome: ${finalVerdict.outcome}. Test your concept here!`;
+            if(navigator.share) {
+                navigator.share({ title: 'AI Shark Tank Simulator Metric Summary', text: textString, url: window.location.href })
+                .catch(() => copyToClipboardText(textString));
+            } else {
+                copyToClipboardText(textString);
+            }
+        }
+
+        function copyToClipboardText(text) {
+            navigator.clipboard.writeText(text);
+            alert("Venture evaluation string copied to clipboard allocation tracking vectors!");
+        }
+
+        // Leaderboard Array Processing Engine LocalStorage Integrations
+        function initializeLeaderboardIfEmpty() {
+            if(!localStorage.getItem('sharkTankLeaderboard')) {
+                const defaults = [
+                    { name: "Nova Quantum Labs", score: 92, status: "Invested", model: "B2B Enterprise Licensing" },
+                    { name: "SustainaBite AgTech", score: 78, status: "Acquired", model: "Transactional Marketplace" },
+                    { name: "HyperLoop Courier Systems", score: 54, status: "Rejected", model: "Usage-based / API Billing" }
+                ];
+                localStorage.setItem('sharkTankLeaderboard', JSON.stringify(defaults));
+            }
+        }
+
+        function saveSessionToLeaderboard() {
+            let data = JSON.parse(localStorage.getItem('sharkTankLeaderboard') || "[]");
+            data.push({
+                name: currentPitch.name,
+                score: calculatedScores.investment,
+                status: finalVerdict.outcome,
+                model: currentPitch.revenueModel
+            });
+            // Sort structural data descending sequence ranking orders
+            data.sort((a,b) => b.score - a.score);
+            localStorage.setItem('sharkTankLeaderboard', JSON.stringify(data));
+        }
+
+        function toggleLeaderboardModal() {
+            const el = document.getElementById('leaderboardModal');
+            if(el.classList.contains('hidden')) {
+                // Populate interface structures before tracking display states
+                const listContainer = document.getElementById('leaderboardList');
+                listContainer.innerHTML = '';
+                let data = JSON.parse(localStorage.getItem('sharkTankLeaderboard') || "[]");
+                
+                data.forEach((item, index) => {
+                    let medal = index === 0 ? "🥇 " : index === 1 ? "🥈 " : index === 2 ? "🥉 " : "";
+                    let outcomeBadgeColor = item.status === "Invested" ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : 
+                                             item.status === "Acquired" ? "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" :
+                                             item.status === "Rejected" ? "text-rose-400 bg-rose-500/10 border-rose-500/20" : 
+                                                                          "text-amber-400 bg-amber-500/10 border-amber-500/20";
+                    listContainer.innerHTML += `
+                        <div class="flex items-center justify-between p-4 bg-slate-950 border border-slate-800 rounded-2xl">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-black w-6 text-slate-500">${medal || (index + 1)}</span>
+                                var<div>
+                                    <h5 class="text-sm font-bold text-white">${item.name}</h5>
+                                    <span class="text-[10px] text-slate-500 font-medium">${item.model}</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs uppercase font-bold px-2.5 py-0.5 rounded-full border ${outcomeBadgeColor}">${item.status}</span>
+                                <span class="text-base font-black text-cyan-400">${item.score}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                el.classList.remove('hidden');
+            } else {
+                el.classList.add('hidden');
+            }
+        }
+
+        function clearLeaderboard() {
+            localStorage.setItem('sharkTankLeaderboard', JSON.stringify([]));
+            document.getElementById('leaderboardList').innerHTML = `<p class="text-center text-sm text-slate-500 py-6">Database cleared clean.</p>`;
+        }
+
+        // Export Institutional Grade Evaluation Pitch Report PDFs Document Layer
+        function downloadPDFReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFillColor(10, 25, 47);
+            doc.rect(0, 0, 220, 300, "F");
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(22);
+            doc.setTextColor(0, 210, 255);
+            doc.text("SHARK TANK EVALUATION REPORT", 20, 25);
+            
+            doc.setDrawColor(0, 102, 255);
+            doc.setLineWidth(0.5);
+            doc.line(20, 32, 190, 32);
+
+            doc.setFontSize(14);
+            doc.setTextColor(255, 255, 255);
+            doc.text(`Venture Profile: ${currentPitch.name}`, 20, 45);
+            
+            doc.setFontSize(10);
+            doc.setFont("Helvetica", "normal");
+            doc.setTextColor(160, 174, 192);
+            doc.text(`Target Audience: ${currentPitch.audience}`, 20, 52);
+            doc.text(`Revenue Architecture: ${currentPitch.revenueModel}`, 20, 58);
+            doc.text(`Capital Requirements Ask: $${currentPitch.fundingAsk.toLocaleString()} at ${currentPitch.equityAsk}% Equity`, 20, 64);
+
+            doc.setFillColor(15, 32, 67);
+            doc.rect(20, 72, 170, 35, "F");
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(0, 210, 255);
+            doc.text(`CONSENSUS DECISION OUTCOME: ${finalVerdict.outcome.toUpperCase()}`, 25, 80);
+            
+            doc.setFont("Helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(230, 230, 230);
+            const wrappedReasoning = doc.splitTextToSize(finalVerdict.narrativeReasoning, 160);
+            doc.text(wrappedReasoning, 25, 88);
+
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(255, 255, 255);
+            doc.text("QUANTITATIVE DISRUPTIVE EVALUATION INDEX SCORE CARDS", 20, 125);
+
+            let offset = 135;
+            const scoringMatrix = [
+                { k: "Market Potential Index", v: calculatedScores.market },
+                { k: "Proprietary Innovation Metric", v: calculatedScores.innovation },
+                { k: "Business Economics Defensibility", v: calculatedScores.business },
+                { k: "Execution Speed Capacity Velocity", v: calculatedScores.execution },
+                { k: "Institutional Investment Score Matrix", v: calculatedScores.investment }
+            ];
+
+            scoringMatrix.forEach(item => {
+                doc.setFont("Helvetica", "normal");
+                doc.setFontSize(10);
+                doc.setTextColor(200, 200, 200);
+                doc.text(item.k, 20, offset);
+                doc.setFont("Helvetica", "bold");
+                doc.setTextColor(0, 210, 255);
+                doc.text(`${item.v} / 100`, 160, offset);
+                
+                doc.setDrawColor(30, 41, 59);
+                doc.line(20, offset + 2, 190, offset + 2);
+                offset += 10;
+            });
+
+            // Dialog Timeline Logs
+            doc.setFont("Helvetica", "bold");
+            doc.setFontSize(12);
+            doc.setTextColor(255, 255, 255);
+            doc.text("CROSS EXAMINATION CROSS-EXAMINATION LOGS", 20, offset + 10);
+            
+            offset += 20;
+            judgeDialogues.slice(0, 3).forEach(dialogue => {
+                if(offset > 270) { doc.addPage(); doc.setFillColor(10,25,47); doc.rect(0,0,220,300,"F"); offset = 25; }
+                doc.setFont("Helvetica", "bold");
+                doc.setFontSize(9);
+                doc.setTextColor(0, 210, 255);
+                doc.text(`${dialogue.judge} (${dialogue.role}):`, 20, offset);
+                
+                doc.setFont("Helvetica", "oblique");
+                doc.setTextColor(180, 180, 180);
+                const qWrapped = doc.splitTextToSize(`"${dialogue.question}"`, 170);
+                doc.text(qWrapped, 20, offset + 5);
+                offset += (qWrapped.length * 4) + 5;
+
+                doc.setFont("Helvetica", "normal");
+                doc.setTextColor(255, 255, 255);
+                const aWrapped = doc.splitTextToSize(`Response Defended: "${dialogue.answer}"`, 170);
+                doc.text(aWrapped, 20, offset);
+                offset += (aWrapped.length * 4) + 10;
+            });
+
+            doc.save(`SharkTank_Report_${currentPitch.name.replace(/\s+/g, '_')}.pdf`);
+        }
+    </script>
+</body>
+</html>
