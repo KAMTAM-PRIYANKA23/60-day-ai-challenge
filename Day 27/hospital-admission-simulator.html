@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hospital Admission Readiness Simulator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1F3A;
+    --navy-mid: #122a4e;
+    --navy-light: #1a3a66;
+    --teal: #00BFA5;
+    --teal-dim: #00897B;
+    --amber: #FFB300;
+    --red: #EF4444;
+    --green: #10B981;
+    --slate: #94A3B8;
+    --surface: #0F2744;
+    --card: #132d52;
+    --card-hi: #173460;
+    --border: rgba(0,191,165,0.18);
+    --text: #E2EAF4;
+    --muted: #7B96B8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--navy);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  .mono { font-family: 'IBM Plex Mono', monospace; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .card-hi {
+    background: var(--card-hi);
+    border: 1px solid rgba(0,191,165,0.3);
+    border-radius: 6px;
+  }
+  select, input {
+    background: var(--navy-light);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 4px;
+    padding: 8px 12px;
+    width: 100%;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  select:focus, input:focus { border-color: var(--teal); }
+  select option { background: var(--navy-mid); }
+  label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; display: block; margin-bottom: 5px; }
+  .btn-primary {
+    background: var(--teal);
+    color: var(--navy);
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.18s, transform 0.1s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: #00d4b8; }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-sec {
+    background: transparent;
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 7px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-sec:hover { background: rgba(0,191,165,0.1); }
+  .btn-warn {
+    background: transparent;
+    border: 1px solid var(--amber);
+    color: var(--amber);
+    font-size: 12px; font-weight: 600;
+    padding: 7px 16px; border-radius: 4px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-warn:hover { background: rgba(255,179,0,0.1); }
+  .btn-danger {
+    background: transparent;
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-size: 12px; font-weight: 600;
+    padding: 7px 16px; border-radius: 4px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .btn-danger:hover { background: rgba(239,68,68,0.1); }
+  .status-pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+    padding: 3px 10px; border-radius: 12px;
+  }
+  .pill-green { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+  .pill-amber { background: rgba(255,179,0,0.12); color: var(--amber); border: 1px solid rgba(255,179,0,0.3); }
+  .pill-red { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .pill-teal { background: rgba(0,191,165,0.12); color: var(--teal); border: 1px solid rgba(0,191,165,0.3); }
+  .pill-slate { background: rgba(148,163,184,0.12); color: var(--slate); border: 1px solid rgba(148,163,184,0.2); }
+  .score-ring {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    position: relative;
+  }
+  .score-ring svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+  .score-inner { position: relative; z-index: 1; text-align: center; }
+  .timeline-dot {
+    width: 12px; height: 12px; border-radius: 50%;
+    flex-shrink: 0; margin-top: 4px;
+  }
+  .timeline-line { width: 2px; background: var(--border); flex: 1; min-height: 24px; margin-left: 5px; }
+  .risk-bar-track { background: rgba(255,255,255,0.07); border-radius: 2px; height: 6px; overflow: hidden; }
+  .risk-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+  .section-header {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--teal); margin-bottom: 14px;
+    border-bottom: 1px solid var(--border); padding-bottom: 8px;
+  }
+  .notice-box {
+    background: rgba(255,179,0,0.07);
+    border: 1px solid rgba(255,179,0,0.3);
+    border-radius: 5px; padding: 12px 14px;
+    font-size: 12px; color: #FFD54F; line-height: 1.6;
+  }
+  .notice-blue {
+    background: rgba(0,191,165,0.06);
+    border: 1px solid rgba(0,191,165,0.25);
+    border-radius: 5px; padding: 12px 14px;
+    font-size: 12px; color: #80DEEA; line-height: 1.6;
+  }
+  .action-completed { opacity: 0.4; text-decoration: line-through; pointer-events: none; }
+  @keyframes fadeSlide { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+  .animate-in { animation: fadeSlide 0.35s ease both; }
+  @keyframes pulse-ring { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+  .pulse { animation: pulse-ring 2s ease infinite; }
+  .header-stripe {
+    background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-light) 100%);
+    border-bottom: 2px solid var(--teal);
+  }
+  .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid-form { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header-stripe px-6 py-4">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🏥</span>
+      <div>
+        <div class="text-xs mono font-semibold tracking-widest" style="color:var(--teal)">HOSPITAL ADMISSION COORDINATOR</div>
+        <div class="font-semibold text-sm" style="color:var(--text)">Admission Readiness Simulator</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="status-pill pill-teal pulse">● TRAINING MODE</span>
+    </div>
+  </div>
+</header>
+
+<!-- TRAINING BANNER -->
+<div style="background:rgba(255,179,0,0.08);border-bottom:1px solid rgba(255,179,0,0.2);">
+  <div class="max-w-6xl mx-auto px-6 py-2 text-xs" style="color:#FFD54F">
+    ⚠ <strong>Training Simulation Only</strong> — All provider, payer, and facility names are illustrative training data. Not for use in live patient care or actual admission workflows.
+  </div>
+</div>
+
+<main class="max-w-6xl mx-auto px-4 py-8" id="app">
+
+  <!-- ═══════════════ SETUP PANEL ═══════════════ -->
+  <div id="setupPanel" class="animate-in">
+    <div class="mb-6">
+      <div class="mono text-xs tracking-widest mb-1" style="color:var(--teal)">STEP 1 OF 3</div>
+      <h1 class="text-2xl font-bold">Admission Setup</h1>
+      <p class="text-sm mt-1" style="color:var(--muted)">Configure the admission scenario to begin your readiness analysis.</p>
+    </div>
+
+    <div class="card p-6 mb-6">
+      <div class="section-header">Provider & Clinical Information</div>
+      <div class="grid-form mb-4">
+        <div>
+          <label>Facility (Illustrative)</label>
+          <select id="provider">
+            <option value="">Select facility…</option>
+            <option value="Riverdale Medical Center">Riverdale Medical Center</option>
+            <option value="Summit General Hospital">Summit General Hospital</option>
+            <option value="Lakewood Regional">Lakewood Regional Medical Center</option>
+            <option value="Northfield University Hospital">Northfield University Hospital</option>
+          </select>
+        </div>
+        <div>
+          <label>Attending Physician (Illustrative)</label>
+          <select id="physician">
+            <option value="">Select physician…</option>
+            <option value="Dr. Elena Vasquez, MD – Cardiology">Dr. Elena Vasquez, MD – Cardiology</option>
+            <option value="Dr. Marcus Obi, MD – Internal Medicine">Dr. Marcus Obi, MD – Internal Medicine</option>
+            <option value="Dr. Sarah Lin, MD – Pulmonology">Dr. Sarah Lin, MD – Pulmonology</option>
+            <option value="Dr. James Holloway, MD – Orthopedics">Dr. James Holloway, MD – Orthopedics</option>
+            <option value="Dr. Priya Nair, MD – Critical Care">Dr. Priya Nair, MD – Critical Care</option>
+          </select>
+        </div>
+        <div>
+          <label>Primary Diagnosis</label>
+          <select id="diagnosis">
+            <option value="">Select diagnosis…</option>
+            <option value="Acute MI">Acute Myocardial Infarction (Acute MI)</option>
+            <option value="CHF">Congestive Heart Failure (CHF)</option>
+            <option value="Pneumonia">Community-Acquired Pneumonia</option>
+            <option value="Elective Surgery">Elective Surgery</option>
+            <option value="Hip Fracture">Hip Fracture</option>
+          </select>
+        </div>
+        <div>
+          <label>Admission Type</label>
+          <select id="admissionType">
+            <option value="">Select type…</option>
+            <option value="Inpatient">Inpatient</option>
+            <option value="Observation">Observation</option>
+            <option value="Emergency">Emergency</option>
+            <option value="ICU">ICU</option>
+            <option value="Same-Day Surgery">Same-Day Surgery</option>
+          </select>
+        </div>
+        <div>
+          <label>Admission Date</label>
+          <input type="date" id="admissionDate">
+        </div>
+        <div>
+          <label>Insurance / Payer (Illustrative)</label>
+          <select id="payer">
+            <option value="">Select payer…</option>
+            <option value="BlueCross BlueShield (Illustrative)">BlueCross BlueShield (Illustrative)</option>
+            <option value="Aetna (Illustrative)">Aetna (Illustrative)</option>
+            <option value="Medicare (Illustrative)">Medicare (Illustrative)</option>
+            <option value="Medicaid (Illustrative)">Medicaid (Illustrative)</option>
+            <option value="United Health (Illustrative)">United Health (Illustrative)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- PA Status -->
+      <div class="mb-4">
+        <label>Prior Authorization (PA) Status</label>
+        <div class="flex gap-3 flex-wrap">
+          <button onclick="setPA('Approved')" id="pa-Approved" class="btn-sec" style="min-width:110px">✅ Approved</button>
+          <button onclick="setPA('Pending')" id="pa-Pending" class="btn-sec" style="min-width:110px">⏳ Pending</button>
+          <button onclick="setPA('Denied')" id="pa-Denied" class="btn-sec" style="min-width:110px">❌ Denied</button>
+          <button onclick="setPA('Not Required')" id="pa-Not Required" class="btn-sec" style="min-width:130px">N/A — Not Required</button>
+        </div>
+        <div id="paSelectedDisplay" class="mt-2 text-sm" style="color:var(--muted)">No PA status selected.</div>
+      </div>
+
+      <!-- Observation notice always visible -->
+      <div id="obsNotice" class="notice-box" style="display:none;">
+        <strong>📋 Observation Status Notice</strong><br>
+        CMS 2-Midnight Rule applies — different cost-sharing, SNF eligibility, and billing than inpatient. Medicare patients require written MOON (Medicare Outpatient Observation Notice) notification.
+      </div>
+    </div>
+
+    <button class="btn-primary" onclick="startAnalysis()">
+      🏥 Analyze Admission Readiness
+    </button>
+  </div>
+
+  <!-- ═══════════════ ANALYSIS PANEL ═══════════════ -->
+  <div id="analysisPanel" style="display:none">
+  </div>
+
+</main>
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let state = {
+  pa: null,
+  provider: '', physician: '', diagnosis: '', admissionType: '',
+  admissionDate: '', payer: '',
+  completedActions: new Set(),
+  appealed: false,
+  appealResult: null, // 'success' | 'denied'
+  readinessScore: 0,
+  statusMap: {}
+};
+
+// ─── PA Selection ─────────────────────────────────────────────────────────────
+function setPA(val) {
+  state.pa = val;
+  ['Approved','Pending','Denied','Not Required'].forEach(v => {
+    const btn = document.getElementById('pa-'+v);
+    if (btn) btn.style.borderColor = '';
+    if (btn) btn.style.color = '';
+    if (btn) btn.style.background = '';
+  });
+  const btn = document.getElementById('pa-'+val);
+  if (btn) {
+    btn.style.borderColor = 'var(--teal)';
+    btn.style.background = 'rgba(0,191,165,0.15)';
+    btn.style.color = 'var(--teal)';
+  }
+  document.getElementById('paSelectedDisplay').textContent = 'PA Status: ' + val;
+}
+
+// Observation notice
+document.getElementById('admissionType').addEventListener('change', function() {
+  document.getElementById('obsNotice').style.display = this.value === 'Observation' ? 'block' : 'none';
+});
+
+// ─── Compute Score ────────────────────────────────────────────────────────────
+function computeScore() {
+  const { pa, diagnosis, admissionType, completedActions, appealed, appealResult } = state;
+  const effectivePA = (pa === 'Denied' && appealed && appealResult === 'success') ? 'Approved' : pa;
+
+  // PA: 25%
+  let paScore = 0;
+  if (effectivePA === 'Approved' || effectivePA === 'Not Required') paScore = 25;
+  else if (effectivePA === 'Pending') paScore = 10;
+  else if (effectivePA === 'Denied') paScore = 0;
+
+  // Insurance: 15%
+  let insScore = completedActions.has('verify-insurance') ? 15 : 5;
+
+  // Bed: 10%
+  let bedScore = completedActions.has('assign-bed') ? 10 : 3;
+
+  // Documentation: 20%
+  let docScore = 8;
+  if (completedActions.has('upload-docs')) docScore += 8;
+  if (completedActions.has('contact-physician')) docScore += 4;
+
+  // Physician Orders: 20%
+  let ordersScore = 6;
+  if (completedActions.has('contact-physician')) ordersScore += 10;
+  if (completedActions.has('notify-nursing')) ordersScore += 4;
+
+  // Consent: 10%
+  let consentScore = completedActions.has('complete-consent') ? 10 : 2;
+
+  let total = paScore + insScore + bedScore + docScore + ordersScore + consentScore;
+
+  // Hard cap: Denied PA + ICU cannot reach 70% from admin tasks alone
+  if ((pa === 'Denied' || (pa === 'Denied' && !appealResult)) && admissionType === 'ICU') {
+    total = Math.min(total, 52);
+  }
+
+  // Initial analysis: 30–60% range
+  total = Math.max(30, Math.min(total, 97));
+
+  // Clinical risk penalty for Acute MI / CHF / ICU
+  const highRisk = ['Acute MI','CHF'].includes(diagnosis) || admissionType === 'ICU';
+  if (highRisk && !completedActions.has('contact-physician')) total = Math.min(total, 72);
+
+  state.readinessScore = Math.round(total);
+  state.paEffective = effectivePA;
+  return state.readinessScore;
+}
+
+// ─── Status Map ───────────────────────────────────────────────────────────────
+function buildStatusMap() {
+  const { pa, payer, diagnosis, admissionType, completedActions, appealed, appealResult } = state;
+  const effectivePA = state.paEffective;
+  const score = state.readinessScore;
+
+  return {
+    pa: {
+      label: 'Prior Authorization',
+      status: effectivePA === 'Approved' || effectivePA === 'Not Required' ? 'green'
+             : effectivePA === 'Pending' ? 'amber' : 'red',
+      text: effectivePA === 'Approved' ? 'Approved — cleared for admission'
+          : effectivePA === 'Not Required' ? 'Not Required — no PA needed'
+          : effectivePA === 'Pending' ? 'Pending — awaiting payer decision'
+          : (appealed && appealResult === 'success') ? 'Appeal Approved'
+          : (appealed && appealResult === 'denied') ? 'Appeal Denied'
+          : 'Denied — action required',
+      weight: '25%'
+    },
+    insurance: {
+      label: 'Insurance Verification',
+      status: completedActions.has('verify-insurance') ? 'green' : 'amber',
+      text: completedActions.has('verify-insurance') ? `Verified — ${payer}` : 'Not yet verified',
+      weight: '15%'
+    },
+    bed: {
+      label: 'Bed Assignment',
+      status: completedActions.has('assign-bed') ? 'green' : 'amber',
+      text: completedActions.has('assign-bed') ? 'Bed assigned and held' : 'Pending assignment',
+      weight: '10%'
+    },
+    documentation: {
+      label: 'Clinical Documentation',
+      status: completedActions.has('upload-docs') ? (completedActions.has('contact-physician') ? 'green' : 'amber') : 'red',
+      text: completedActions.has('upload-docs') && completedActions.has('contact-physician')
+          ? 'Complete — physician attestation confirmed'
+          : completedActions.has('upload-docs') ? 'Uploaded — physician attestation pending'
+          : 'Incomplete — upload required',
+      weight: '20%'
+    },
+    orders: {
+      label: 'Physician Orders',
+      status: completedActions.has('contact-physician') && completedActions.has('notify-nursing') ? 'green'
+             : completedActions.has('contact-physician') ? 'amber' : 'red',
+      text: completedActions.has('contact-physician') && completedActions.has('notify-nursing')
+          ? 'Orders placed — nursing notified'
+          : completedActions.has('contact-physician') ? 'Orders confirmed — nursing pending'
+          : 'Not yet ordered',
+      weight: '20%'
+    },
+    consent: {
+      label: 'Patient Consent',
+      status: completedActions.has('complete-consent') ? 'green' : 'amber',
+      text: completedActions.has('complete-consent') ? 'Signed and witnessed' : 'Pending patient signature',
+      weight: '10%'
+    }
+  };
+}
+
+// ─── Timeline Steps ───────────────────────────────────────────────────────────
+function getTimelineSteps() {
+  const c = state.completedActions;
+  const score = state.readinessScore;
+  return [
+    { label: 'PA Review', done: ['Approved','Not Required'].includes(state.paEffective) || (state.appealed && state.appealResult === 'success') },
+    { label: 'Insurance Verification', done: c.has('verify-insurance') },
+    { label: 'Bed Assignment', done: c.has('assign-bed') },
+    { label: 'Documentation', done: c.has('upload-docs') },
+    { label: 'Consent', done: c.has('complete-consent') },
+    { label: 'Patient Arrival Prep', done: c.has('prepare-arrival') },
+    { label: 'Registration', done: score >= 75 && c.has('prepare-arrival') },
+    { label: 'Clinical Assessment', done: score >= 85 },
+    { label: 'Admission Complete', done: score >= 90 }
+  ];
+}
+
+// ─── Risk Scores ─────────────────────────────────────────────────────────────
+function getRisks() {
+  const { pa, diagnosis, admissionType, completedActions, paEffective } = state;
+  const highClinical = ['Acute MI','CHF'].includes(diagnosis) || admissionType === 'ICU';
+  const docRisk = completedActions.has('upload-docs') && completedActions.has('contact-physician') ? 15 : completedActions.has('upload-docs') ? 45 : 80;
+  const insRisk = completedActions.has('verify-insurance') ? 10 : 60;
+  const bedRisk = completedActions.has('assign-bed') ? 5 : 40;
+  const clinicalRisk = highClinical
+    ? (completedActions.has('contact-physician') ? 30 : 75)
+    : (completedActions.has('contact-physician') ? 10 : 35);
+  return [
+    { label: 'Documentation Risk', val: docRisk, high: docRisk > 60 },
+    { label: 'Insurance Risk', val: insRisk, high: insRisk > 50 },
+    { label: 'Bed Risk', val: bedRisk, high: bedRisk > 35 },
+    { label: `Clinical Risk${highClinical ? ' ⚡ Elevated' : ''}`, val: clinicalRisk, high: clinicalRisk > 50 }
+  ];
+}
+
+// ─── Render ───────────────────────────────────────────────────────────────────
+function render() {
+  computeScore();
+  const score = state.readinessScore;
+  const sm = buildStatusMap();
+  const risks = getRisks();
+  const timeline = getTimelineSteps();
+  const { pa, diagnosis, admissionType, paEffective, payer } = state;
+  const denied = pa === 'Denied' && !(state.appealed && state.appealResult === 'success');
+  const pending = pa === 'Pending';
+  const highRisk = ['Acute MI','CHF'].includes(diagnosis) || admissionType === 'ICU';
+  const interqualNote = ['Acute MI','CHF'].includes(diagnosis);
+  const showGovernance = score >= 75;
+  const finalReady = score >= 90;
+
+  const scoreColor = score >= 90 ? '#10B981' : score >= 75 ? '#00BFA5' : score >= 60 ? '#FFB300' : '#EF4444';
+
+  // Score ring SVG
+  const r = 48, cx = 55, cy = 55, circ = 2 * Math.PI * r;
+  const dash = (score / 100) * circ;
+
+  const html = `
+  <div class="animate-in">
+
+    <!-- Top Bar: Setup Summary + Score -->
+    <div class="card p-5 mb-6 flex flex-wrap gap-5 items-start justify-between">
+      <div>
+        <div class="section-header" style="border:none;margin-bottom:8px">Admission Scenario</div>
+        <div class="flex flex-wrap gap-2 mb-2">
+          <span class="status-pill pill-teal">🏥 ${state.provider}</span>
+          <span class="status-pill pill-teal">👨‍⚕️ ${state.physician.split('–')[0].trim()}</span>
+          <span class="status-pill pill-slate">Dx: ${diagnosis}</span>
+          <span class="status-pill pill-slate">${admissionType}</span>
+          <span class="status-pill pill-slate">${payer}</span>
+          <span class="status-pill pill-slate">📅 ${state.admissionDate}</span>
+        </div>
+        ${admissionType === 'Observation' ? `
+          <div class="notice-box mt-3" style="max-width:540px">
+            <strong>📋 Observation Status</strong><br>
+            CMS 2-Midnight Rule applies — different cost-sharing, SNF eligibility, and billing than inpatient. Medicare patients require written MOON notification.
+          </div>` : ''}
+        ${interqualNote ? `
+          <div class="notice-blue mt-3" style="max-width:540px">
+            <strong>📐 InterQual/Milliman Note</strong><br>
+            InterQual/Milliman thresholds apply — ensure documentation meets medical necessity standards before UR review.
+          </div>` : ''}
+      </div>
+      <!-- Score Ring -->
+      <div class="flex flex-col items-center gap-1" style="min-width:120px">
+        <div class="score-ring">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="10"/>
+            <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${scoreColor}" stroke-width="10"
+              stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"
+              style="transition:stroke-dasharray 0.5s ease"/>
+          </svg>
+          <div class="score-inner">
+            <div class="mono font-bold text-xl" style="color:${scoreColor}">${score}%</div>
+            <div style="font-size:9px;color:var(--muted);letter-spacing:0.06em">READINESS</div>
+          </div>
+        </div>
+        <div class="text-xs text-center" style="color:var(--muted)">
+          ${finalReady ? '✅ Ready to Admit' : score >= 75 ? '⚠ Near Ready' : '🔴 Gaps Remain'}
+        </div>
+        <button class="btn-sec mt-1" onclick="resetSim()" style="font-size:11px;padding:4px 10px">↩ New Scenario</button>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-6 lg:grid" style="grid-template-columns:1fr 340px">
+
+      <!-- LEFT COLUMN -->
+      <div class="flex flex-col gap-5">
+
+        <!-- Status Grid -->
+        <div class="card p-5">
+          <div class="section-header">Admission Status Checks</div>
+          <div class="flex flex-col gap-3">
+            ${Object.values(sm).map(s => `
+              <div class="flex items-center justify-between gap-3 py-2" style="border-bottom:1px solid var(--border)">
+                <div class="flex items-center gap-3">
+                  <span class="status-pill pill-${s.status}">${s.status === 'green' ? '●' : s.status === 'amber' ? '◐' : '○'}</span>
+                  <div>
+                    <div class="text-sm font-medium">${s.label}</div>
+                    <div class="text-xs" style="color:var(--muted)">${s.text}</div>
+                  </div>
+                </div>
+                <div class="mono text-xs" style="color:var(--muted);flex-shrink:0">Wt: ${s.weight}</div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- PA Branch Actions -->
+        <div class="card p-5">
+          <div class="section-header">PA Branch — Required Actions</div>
+          ${paEffective === 'Approved' || paEffective === 'Not Required' ? `
+            <div class="text-sm" style="color:var(--green)">✅ PA cleared — proceed with workflow actions below.</div>
+          ` : pending ? `
+            <div class="text-sm mb-3" style="color:var(--amber)">⏳ PA is pending. Complete these actions to advance:</div>
+            <div class="flex flex-wrap gap-2">
+              ${actionBtn('pa-followup', '📞 Follow Up with Payer')}
+              ${actionBtn('upload-docs', '📄 Upload Clinical Docs')}
+              ${actionBtn('contact-physician', '👨‍⚕️ Contact Physician')}
+            </div>
+          ` : denied ? `
+            <div class="text-sm mb-3" style="color:var(--red)">❌ PA Denied. Work through appeal process:</div>
+            <div class="flex flex-wrap gap-2 mb-3">
+              ${actionBtn('review-reason', '🔍 Review Denial Reason')}
+              ${actionBtn('contact-insurance', '📞 Contact Insurance')}
+              ${!state.appealed ? `<button class="btn-warn" onclick="submitAppeal()">📋 Submit Appeal</button>` : ''}
+            </div>
+            ${state.appealed && !state.appealResult ? `
+              <div class="notice-box">
+                Appeal submitted. Awaiting payer determination…
+                <div class="flex gap-2 mt-2">
+                  <button class="btn-primary" onclick="resolveAppeal('success')" style="font-size:12px;padding:7px 14px">✅ Appeal Approved</button>
+                  <button class="btn-danger" onclick="resolveAppeal('denied')">❌ Appeal Denied</button>
+                </div>
+              </div>` : ''}
+            ${state.appealResult === 'success' ? `<div style="color:var(--green)" class="text-sm">✅ Appeal approved — PA converted to Approved.</div>` : ''}
+            ${state.appealResult === 'denied' ? `<div style="color:var(--red)" class="text-sm">❌ Appeal denied. Consider peer-to-peer review or escalation. Admission may not be approved.</div>` : ''}
+          ` : `<div class="text-sm" style="color:var(--muted)">Set PA status in setup to see branch actions.</div>`}
+        </div>
+
+        <!-- Workflow Actions -->
+        <div class="card p-5">
+          <div class="section-header">Workflow Actions</div>
+          <div class="flex flex-wrap gap-2">
+            ${actionBtn('assign-bed', '🛏 Assign Bed')}
+            ${actionBtn('verify-insurance', '🔒 Verify Insurance')}
+            ${actionBtn('upload-docs', '📄 Upload Documentation')}
+            ${actionBtn('complete-consent', '✍ Complete Consent')}
+            ${actionBtn('contact-physician', '👨‍⚕️ Contact Physician')}
+            ${actionBtn('notify-nursing', '🔔 Notify Nursing')}
+            ${actionBtn('prepare-arrival', '🚑 Prepare Patient Arrival')}
+          </div>
+        </div>
+
+        <!-- Care Coordination Cards -->
+        <div class="card p-5">
+          <div class="section-header">Care Coordination Team</div>
+          <div class="grid gap-3" style="grid-template-columns:1fr 1fr">
+            ${coordCard('👨‍⚕️', 'Attending Physician', state.physician.split('–')[0].trim(), `Responsible for H&P, admit orders, ${diagnosis} management plan. Contact for order confirmation.`)}
+            ${coordCard('📋', 'Case Manager', 'TBD — Assign on Admit', 'Coordinates care plan, discharge planning initiation, payer communication, and length-of-stay management.')}
+            ${coordCard('🩺', 'Nursing (Charge)', 'Floor Coordinator', 'Bed readiness, patient acceptance, medication reconciliation, initial nursing assessment.')}
+            ${coordCard('🔎', 'Utilization Review', 'UR Specialist', 'Concurrent review, denial risk identification, InterQual and Milliman criteria validation, payer authorization tracking.')}
+            ${coordCard('🏠', 'Discharge Planner', 'Social Work / SW', `SNF eligibility${admissionType === 'Observation' ? ' (note: Obs status affects SNF coverage)' : ''}, DME, home health referral, family education.`)}
+          </div>
+        </div>
+
+        <!-- Risk Tracking -->
+        <div class="card p-5">
+          <div class="section-header">Risk Tracking</div>
+          <div class="flex flex-col gap-4">
+            ${risks.map(r => `
+              <div>
+                <div class="flex justify-between mb-1">
+                  <span class="text-xs font-semibold" style="color:${r.high ? 'var(--red)' : 'var(--muted)'}">${r.label}</span>
+                  <span class="mono text-xs" style="color:${r.high ? 'var(--red)' : 'var(--teal)'}">${r.val}%</span>
+                </div>
+                <div class="risk-bar-track">
+                  <div class="risk-bar-fill" style="width:${r.val}%;background:${r.high ? 'var(--red)' : r.val > 30 ? 'var(--amber)' : 'var(--teal)'}"></div>
+                </div>
+              </div>`).join('')}
+          </div>
+          ${highRisk ? `<div class="notice-box mt-4"><strong>⚡ Elevated Clinical Risk</strong><br>Clinical risk weighted higher for ${diagnosis}${admissionType === 'ICU' ? ' / ICU' : ''}. Physician contact and documentation completion are critical path items.</div>` : ''}
+        </div>
+
+        ${showGovernance ? `
+        <div class="card-hi p-5 animate-in">
+          <div class="section-header" style="color:var(--amber)">Governance Snapshot</div>
+          <div class="text-xs mb-1" style="color:var(--muted)">Industry benchmarks (estimates only — illustrative training data)</div>
+          <div class="grid gap-3" style="grid-template-columns:1fr 1fr 1fr">
+            <div class="card p-3 text-center">
+              <div class="mono font-bold text-lg" style="color:var(--amber)">3–5d</div>
+              <div class="text-xs mt-1" style="color:var(--muted)">PA Turnaround</div>
+            </div>
+            <div class="card p-3 text-center">
+              <div class="mono font-bold text-lg" style="color:var(--amber)">~8–10%</div>
+              <div class="text-xs mt-1" style="color:var(--muted)">Inpatient Denial Rate (CMS est.)</div>
+            </div>
+            <div class="card p-3 text-center">
+              <div class="mono font-bold text-lg" style="color:var(--amber)">~$11</div>
+              <div class="text-xs mt-1" style="color:var(--muted)">PA Rework Cost / Tx (CAQH est.)</div>
+            </div>
+          </div>
+        </div>` : ''}
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="flex flex-col gap-5">
+
+        <!-- Timeline -->
+        <div class="card p-5">
+          <div class="section-header">Admission Timeline</div>
+          <div class="flex flex-col gap-0">
+            ${timeline.map((t, i) => `
+              <div class="flex gap-3">
+                <div class="flex flex-col items-center">
+                  <div class="timeline-dot" style="background:${t.done ? 'var(--green)' : 'rgba(148,163,184,0.3)'}"></div>
+                  ${i < timeline.length - 1 ? `<div class="timeline-line" style="background:${t.done ? 'rgba(16,185,129,0.3)' : 'var(--border)'}"></div>` : ''}
+                </div>
+                <div class="pb-3">
+                  <div class="text-xs font-semibold" style="color:${t.done ? 'var(--green)' : 'var(--muted)'}">${t.label}</div>
+                  ${t.done ? `<div style="font-size:10px;color:var(--green)">✓ Complete</div>` : `<div style="font-size:10px;color:var(--muted)">Pending</div>`}
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>
+
+        <!-- Final Decision -->
+        <div class="card-hi p-5">
+          <div class="section-header" style="color:${finalReady ? 'var(--green)' : 'var(--amber)'}">
+            ${finalReady ? '✅ Final Decision' : '⚠ Admission Status'}
+          </div>
+          ${finalReady ? `
+            <div class="text-sm font-semibold mb-2" style="color:var(--green)">ADMIT — Readiness criteria met</div>
+            <div class="text-xs mb-3" style="color:var(--muted)">All primary conditions satisfied. Proceed with patient admission.</div>
+            <div class="text-xs flex flex-col gap-1">
+              <div>• PA: ${sm.pa.text}</div>
+              <div>• Insurance: ${sm.insurance.text}</div>
+              <div>• Bed: ${sm.bed.text}</div>
+              <div>• Documentation: ${sm.documentation.text}</div>
+              <div>• Orders: ${sm.orders.text}</div>
+              <div>• Consent: ${sm.consent.text}</div>
+            </div>
+          ` : `
+            <div class="text-sm font-semibold mb-2" style="color:var(--amber)">NOT READY — ${score}% (Need ≥90%)</div>
+            <div class="text-xs mb-3" style="color:var(--muted)">Complete the following to reach admission threshold:</div>
+            <div class="text-xs flex flex-col gap-2">
+              ${!['Approved','Not Required'].includes(paEffective) ? `<div style="color:var(--red)">❌ PA: ${sm.pa.text}</div>` : ''}
+              ${!state.completedActions.has('verify-insurance') ? `<div style="color:var(--amber)">⚠ Verify insurance with ${payer}</div>` : ''}
+              ${!state.completedActions.has('assign-bed') ? `<div style="color:var(--amber)">⚠ Assign and confirm bed</div>` : ''}
+              ${!state.completedActions.has('upload-docs') ? `<div style="color:var(--red)">❌ Upload clinical documentation</div>` : ''}
+              ${!state.completedActions.has('contact-physician') ? `<div style="color:var(--red)">❌ Contact physician for orders/attestation</div>` : ''}
+              ${!state.completedActions.has('notify-nursing') ? `<div style="color:var(--amber)">⚠ Notify nursing team</div>` : ''}
+              ${!state.completedActions.has('complete-consent') ? `<div style="color:var(--amber)">⚠ Obtain patient consent</div>` : ''}
+              ${!state.completedActions.has('prepare-arrival') ? `<div style="color:var(--amber)">⚠ Prepare patient arrival</div>` : ''}
+            </div>
+            ${denied && !state.appealResult ? `<div class="notice-box mt-3">PA denial is the primary blocker. Appeal must be approved before admission can proceed.</div>` : ''}
+          `}
+        </div>
+
+      </div>
+    </div>
+  </div>`;
+
+  document.getElementById('analysisPanel').innerHTML = html;
+}
+
+// ─── Helper: action button ────────────────────────────────────────────────────
+function actionBtn(id, label) {
+  const done = state.completedActions.has(id);
+  return `<button 
+    onclick="doAction('${id}')" 
+    class="btn-sec ${done ? 'action-completed' : ''}"
+    ${done ? 'disabled' : ''}
+  >${done ? '✓ ' : ''}${label}</button>`;
+}
+
+function coordCard(icon, title, name, detail) {
+  return `<div class="card p-3">
+    <div class="flex items-center gap-2 mb-1">
+      <span>${icon}</span>
+      <span class="text-xs font-semibold" style="color:var(--teal)">${title}</span>
+    </div>
+    <div class="text-xs font-medium mb-1">${name}</div>
+    <div class="text-xs" style="color:var(--muted);line-height:1.5">${detail}</div>
+  </div>`;
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+function doAction(id) {
+  state.completedActions.add(id);
+  render();
+}
+
+function submitAppeal() {
+  state.appealed = true;
+  render();
+}
+
+function resolveAppeal(result) {
+  state.appealResult = result;
+  render();
+}
+
+function resetSim() {
+  state = {
+    pa: null, provider: '', physician: '', diagnosis: '', admissionType: '',
+    admissionDate: '', payer: '', completedActions: new Set(),
+    appealed: false, appealResult: null, readinessScore: 0, statusMap: {}
+  };
+  document.getElementById('setupPanel').style.display = '';
+  document.getElementById('analysisPanel').style.display = 'none';
+  document.getElementById('admissionType').value = '';
+  document.getElementById('obsNotice').style.display = 'none';
+  ['Approved','Pending','Denied','Not Required'].forEach(v => {
+    const btn = document.getElementById('pa-'+v);
+    if (btn) { btn.style.borderColor = ''; btn.style.background = ''; btn.style.color = ''; }
+  });
+  document.getElementById('paSelectedDisplay').textContent = 'No PA status selected.';
+}
+
+// ─── Start ─────────────────────────────────────────────────────────────────────
+function startAnalysis() {
+  state.provider = document.getElementById('provider').value;
+  state.physician = document.getElementById('physician').value;
+  state.diagnosis = document.getElementById('diagnosis').value;
+  state.admissionType = document.getElementById('admissionType').value;
+  state.admissionDate = document.getElementById('admissionDate').value;
+  state.payer = document.getElementById('payer').value;
+
+  if (!state.provider || !state.physician || !state.diagnosis || !state.admissionType || !state.admissionDate || !state.payer) {
+    alert('Please complete all setup fields before analyzing.'); return;
+  }
+  if (!state.pa) { alert('Please select a PA status before analyzing.'); return; }
+
+  document.getElementById('setupPanel').style.display = 'none';
+  document.getElementById('analysisPanel').style.display = '';
+  render();
+}
+</script>
+</body>
+</html>
+```
