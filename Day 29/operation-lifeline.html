@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Operation Lifeline: Supply Chain Crisis Lab</title>
+<style>
+  @font-face { font-family: 'system-mono'; src: local('Menlo'), local('Consolas'); }
+
+  :root{
+    --bg-0:#0a0e14;
+    --bg-1:#0f1521;
+    --bg-2:#141b2a;
+    --bg-3:#1b2436;
+    --line:#26314a;
+    --line-soft:#1c2438;
+    --amber:#f5a623;
+    --amber-soft:#f5a62333;
+    --teal:#2bd9c9;
+    --teal-soft:#2bd9c92a;
+    --red:#ff5d5d;
+    --red-soft:#ff5d5d26;
+    --violet:#9b8cff;
+    --text-0:#eef2f9;
+    --text-1:#aab4c8;
+    --text-2:#717f9a;
+    --radius:18px;
+    --radius-sm:12px;
+    --serif: 'Iowan Old Style','Palatino Linotype', Georgia, 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Helvetica, Arial, sans-serif;
+    --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:
+      radial-gradient(900px 480px at 85% -10%, #18233a 0%, transparent 60%),
+      radial-gradient(700px 420px at -10% 10%, #161f33 0%, transparent 55%),
+      var(--bg-0);
+    color:var(--text-0);
+    font-family:var(--sans);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  #root{ min-height:100vh; }
+
+  ::selection{ background:var(--amber-soft); color:var(--text-0); }
+
+  .scaffold{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 24px 90px;
+  }
+
+  /* ---------- Top bar / telemetry signature ---------- */
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 22px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:linear-gradient(180deg, var(--bg-2), var(--bg-1));
+    margin-bottom:26px;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    display:flex; align-items:center; gap:12px;
+  }
+  .brand-mark{
+    width:34px; height:34px; border-radius:9px;
+    background:conic-gradient(from 220deg, var(--amber), var(--violet), var(--teal), var(--amber));
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:700; font-size:13px; color:#0a0e14;
+    box-shadow:0 0 0 1px var(--line), 0 6px 18px -6px #f5a62355;
+  }
+  .brand-text .eyebrow{
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-2);
+  }
+  .brand-text .title{
+    font-size:15px; font-weight:700; letter-spacing:.01em;
+  }
+  .telemetry{
+    display:flex; gap:18px; flex-wrap:wrap;
+  }
+  .telemetry-item{
+    font-family:var(--mono); font-size:11.5px; color:var(--text-2);
+    display:flex; align-items:center; gap:7px;
+  }
+  .telemetry-item .dot{
+    width:7px; height:7px; border-radius:50%;
+    background:var(--teal);
+    box-shadow:0 0 0 3px var(--teal-soft);
+  }
+  .telemetry-item.live .dot{
+    background:var(--amber);
+    box-shadow:0 0 0 3px var(--amber-soft);
+    animation:pulse-dot 1.6s infinite;
+  }
+  @keyframes pulse-dot{
+    0%,100%{ transform:scale(1); opacity:1; }
+    50%{ transform:scale(1.5); opacity:.55; }
+  }
+  .telemetry-item strong{ color:var(--text-1); font-weight:600; }
+
+  /* ---------- Generic layout helpers ---------- */
+  .stage{
+    animation:stage-in .5s cubic-bezier(.16,.9,.3,1);
+  }
+  @keyframes stage-in{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .eyebrow-label{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--amber); margin-bottom:10px; display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow-label::before{
+    content:''; width:18px; height:1px; background:var(--amber); opacity:.6;
+  }
+
+  h1.stage-title{
+    font-family:var(--serif);
+    font-size:clamp(28px,4.2vw,42px);
+    font-weight:600;
+    line-height:1.1;
+    margin:0 0 12px;
+    letter-spacing:-.01em;
+  }
+  p.stage-sub{
+    color:var(--text-1);
+    font-size:15.5px;
+    line-height:1.65;
+    max-width:680px;
+    margin:0 0 28px;
+  }
+
+  .why-box{
+    border:1px dashed var(--line);
+    border-left:3px solid var(--violet);
+    background:var(--bg-2);
+    border-radius:10px;
+    padding:14px 16px;
+    font-size:13.5px;
+    line-height:1.6;
+    color:var(--text-1);
+    margin:18px 0 28px;
+  }
+  .why-box b{ color:var(--violet); font-weight:700; }
+
+  /* ---------- Welcome ---------- */
+  .welcome-wrap{
+    min-height:78vh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:40px 20px;
+  }
+  .welcome-glyph{
+    width:84px; height:84px; border-radius:22px;
+    background:linear-gradient(155deg, var(--bg-3), var(--bg-1));
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:30px;
+    position:relative;
+    box-shadow:0 20px 60px -25px #000;
+  }
+  .welcome-glyph svg{ width:40px; height:40px; }
+  .welcome-glyph::after{
+    content:'';
+    position:absolute; inset:-1px;
+    border-radius:22px;
+    border:1px solid var(--amber-soft);
+    animation:ring-pulse 2.4s infinite;
+  }
+  @keyframes ring-pulse{
+    0%{ transform:scale(1); opacity:.9; }
+    100%{ transform:scale(1.35); opacity:0; }
+  }
+  .welcome-eyebrow{
+    font-family:var(--mono); letter-spacing:.2em; text-transform:uppercase;
+    font-size:12px; color:var(--text-2); margin-bottom:18px;
+  }
+  h1.welcome-title{
+    font-family:var(--serif);
+    font-size:clamp(36px,6vw,64px);
+    line-height:1.05;
+    margin:0 0 18px;
+    background:linear-gradient(135deg, #fff 10%, #c9d4e8 55%, #8b97b3 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    letter-spacing:-.02em;
+  }
+  p.welcome-sub{
+    max-width:560px; color:var(--text-1); font-size:16.5px; line-height:1.7; margin:0 0 36px;
+  }
+  .welcome-facts{
+    display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-bottom:42px;
+  }
+  .welcome-fact{
+    font-family:var(--mono); font-size:12px; color:var(--text-2);
+    border:1px solid var(--line); border-radius:30px; padding:8px 16px;
+    background:var(--bg-2);
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn{
+    font-family:var(--sans);
+    font-size:14.5px;
+    font-weight:600;
+    padding:13px 26px;
+    border-radius:11px;
+    border:1px solid transparent;
+    cursor:pointer;
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+    display:inline-flex; align-items:center; gap:9px;
+  }
+  .btn:active{ transform:translateY(1px) scale(.99); }
+  .btn-primary{
+    background:linear-gradient(135deg, var(--amber), #e08c00);
+    color:#1a1206;
+    box-shadow:0 10px 30px -10px #f5a62366;
+  }
+  .btn-primary:hover{ box-shadow:0 14px 34px -8px #f5a62399; transform:translateY(-1px); }
+  .btn-primary:disabled{
+    opacity:.4; cursor:not-allowed; box-shadow:none; transform:none;
+  }
+  .btn-ghost{
+    background:transparent; color:var(--text-1); border-color:var(--line);
+  }
+  .btn-ghost:hover{ border-color:var(--text-2); color:var(--text-0); background:var(--bg-2); }
+  .btn-sm{ padding:9px 16px; font-size:13px; border-radius:9px; }
+
+  .stage-footer{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:34px; gap:14px; flex-wrap:wrap;
+  }
+
+  /* ---------- Card grid ---------- */
+  .grid{
+    display:grid;
+    gap:16px;
+    grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+  }
+  .card{
+    background:linear-gradient(165deg, var(--bg-2), var(--bg-1));
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .card:hover{
+    transform:translateY(-3px);
+    border-color:#384866;
+    box-shadow:0 18px 40px -22px #000;
+  }
+  .card .card-label{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--text-2); margin-bottom:8px;
+  }
+  .card .card-value{
+    font-size:21px; font-weight:700; letter-spacing:-.01em; margin-bottom:4px;
+  }
+  .card .card-hint{ font-size:12.5px; color:var(--text-1); line-height:1.5; }
+  .card .card-icon{
+    position:absolute; top:16px; right:16px; opacity:.5;
+  }
+
+  /* ---------- Company profile ---------- */
+  .company-header{
+    display:flex; align-items:center; gap:16px; margin-bottom:24px; flex-wrap:wrap;
+  }
+  .company-logo{
+    width:54px; height:54px; border-radius:14px;
+    background:var(--bg-3); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--serif); font-size:22px; font-weight:700; color:var(--amber);
+  }
+  .company-name{ font-family:var(--serif); font-size:24px; font-weight:600; margin:0; }
+  .company-tag{ color:var(--text-2); font-size:13px; font-family:var(--mono); }
+
+  /* ---------- Crisis card ---------- */
+  .crisis-banner{
+    border-radius:var(--radius);
+    border:1px solid #5a2c2c;
+    background:linear-gradient(135deg, #2a1414, #1c1116 60%);
+    padding:26px 26px;
+    margin:26px 0 30px;
+    position:relative;
+    overflow:hidden;
+  }
+  .crisis-banner::before{
+    content:''; position:absolute; inset:0;
+    background:repeating-linear-gradient(135deg, #ff5d5d08 0 2px, transparent 2px 14px);
+    pointer-events:none;
+  }
+  .crisis-tag{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--red); background:var(--red-soft); padding:6px 12px; border-radius:30px;
+    margin-bottom:14px;
+    border:1px solid #ff5d5d44;
+  }
+  .crisis-tag .dot{ width:7px; height:7px; border-radius:50%; background:var(--red); animation:pulse-dot 1.4s infinite; }
+  .crisis-title{ font-family:var(--serif); font-size:26px; margin:0 0 10px; font-weight:600; }
+  .crisis-desc{ color:var(--text-1); font-size:14.5px; line-height:1.7; max-width:760px; }
+  .crisis-meta{ display:flex; gap:24px; margin-top:18px; flex-wrap:wrap; }
+  .crisis-meta-item{ font-family:var(--mono); font-size:12px; color:var(--text-2); }
+  .crisis-meta-item b{ color:var(--text-0); display:block; font-size:14px; font-family:var(--sans); margin-top:2px; }
+
+  /* ---------- Metrics bars ---------- */
+  .metrics-panel{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px 22px 14px; margin:24px 0;
+  }
+  .metrics-panel-title{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--text-2); margin-bottom:18px;
+  }
+  .metric-row{ margin-bottom:16px; }
+  .metric-row-top{
+    display:flex; justify-content:space-between; align-items:baseline; margin-bottom:7px;
+  }
+  .metric-name{ font-size:13.5px; font-weight:600; color:var(--text-0); }
+  .metric-value{ font-family:var(--mono); font-size:13px; color:var(--text-1); }
+  .metric-value.delta-up{ color:var(--teal); }
+  .metric-value.delta-down{ color:var(--red); }
+  .bar-track{
+    height:9px; border-radius:6px; background:var(--bg-3);
+    overflow:hidden; position:relative; border:1px solid var(--line-soft);
+  }
+  .bar-fill{
+    height:100%; border-radius:6px;
+    transition:width 1s cubic-bezier(.16,.9,.3,1);
+    background:linear-gradient(90deg, var(--teal), #1fb7a9);
+  }
+  .bar-fill.warn{ background:linear-gradient(90deg, var(--amber), #d98a00); }
+  .bar-fill.danger{ background:linear-gradient(90deg, var(--red), #c43a3a); }
+
+  /* ---------- Action choice cards (war room / AI) ---------- */
+  .choice-grid{
+    display:grid; gap:14px;
+    grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+    margin-bottom:8px;
+  }
+  .choice-card{
+    text-align:left;
+    background:var(--bg-2);
+    border:1px solid var(--line);
+    border-radius:var(--radius-sm);
+    padding:18px;
+    cursor:pointer;
+    transition:all .2s ease;
+    color:var(--text-0);
+    font-family:inherit;
+    position:relative;
+  }
+  .choice-card:hover{ border-color:#3c4d70; background:var(--bg-3); transform:translateY(-2px); }
+  .choice-card.selected{
+    border-color:var(--amber);
+    background:linear-gradient(165deg, #2a2010, #1c1810);
+    box-shadow:0 0 0 1px var(--amber-soft);
+  }
+  .choice-card.disabled{ opacity:.35; cursor:not-allowed; }
+  .choice-card.disabled:hover{ transform:none; border-color:var(--line); background:var(--bg-2); }
+  .choice-check{
+    position:absolute; top:14px; right:14px;
+    width:22px; height:22px; border-radius:50%;
+    border:1.5px solid var(--line); display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:transparent; transition:all .2s ease;
+  }
+  .choice-card.selected .choice-check{
+    background:var(--amber); border-color:var(--amber); color:#1a1206;
+  }
+  .choice-title{ font-weight:700; font-size:14.5px; margin:0 0 6px; padding-right:28px; }
+  .choice-desc{ font-size:12.8px; color:var(--text-1); line-height:1.55; margin:0 0 12px; }
+  .choice-tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .choice-pill{
+    font-family:var(--mono); font-size:10.5px; padding:3px 9px; border-radius:20px;
+    background:var(--bg-3); color:var(--text-2); border:1px solid var(--line);
+  }
+
+  /* ---------- Negotiation ---------- */
+  .negotiation-stage{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:24px; margin-bottom:22px;
+  }
+  .neg-round-label{
+    font-family:var(--mono); font-size:11px; color:var(--amber); letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px;
+  }
+  .neg-prompt{ font-size:15.5px; line-height:1.7; color:var(--text-0); margin-bottom:20px; }
+  .neg-stats{
+    display:flex; gap:22px; margin-bottom:22px; flex-wrap:wrap;
+  }
+  .neg-stat{ font-family:var(--mono); font-size:12px; color:var(--text-2); }
+  .neg-stat b{ display:block; font-size:17px; color:var(--text-0); font-family:var(--sans); margin-top:2px; }
+
+  /* ---------- Boardroom ---------- */
+  .question-counter{
+    font-family:var(--mono); font-size:11.5px; color:var(--text-2); letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px;
+  }
+
+  /* ---------- Progress stepper ---------- */
+  .stepper{
+    display:flex; gap:8px; margin-bottom:30px; flex-wrap:wrap;
+  }
+  .step-pip{
+    flex:1; min-width:60px; height:5px; border-radius:4px; background:var(--bg-3);
+    position:relative; overflow:hidden;
+  }
+  .step-pip.done{ background:var(--teal); }
+  .step-pip.active{ background:var(--line); }
+  .step-pip.active::after{
+    content:''; position:absolute; inset:0; width:50%;
+    background:var(--amber); animation:step-shimmer 1.4s infinite;
+  }
+  @keyframes step-shimmer{
+    0%{ transform:translateX(-100%); } 100%{ transform:translateX(300%); }
+  }
+  .step-labels{
+    display:flex; justify-content:space-between; font-family:var(--mono); font-size:10px;
+    color:var(--text-2); margin-top:-22px; margin-bottom:30px; flex-wrap:wrap; gap:4px;
+  }
+
+  /* ---------- Final dashboard ---------- */
+  .score-hero{
+    display:flex; align-items:center; gap:32px; flex-wrap:wrap;
+    background:linear-gradient(135deg, var(--bg-2), var(--bg-1));
+    border:1px solid var(--line); border-radius:var(--radius);
+    padding:32px; margin-bottom:28px;
+  }
+  .score-ring-wrap{ position:relative; width:160px; height:160px; flex-shrink:0; }
+  .score-ring-wrap svg{ transform:rotate(-90deg); }
+  .score-ring-bg{ fill:none; stroke:var(--bg-3); stroke-width:12; }
+  .score-ring-fg{ fill:none; stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset 1.4s cubic-bezier(.16,.9,.3,1); }
+  .score-ring-text{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .score-ring-text .num{ font-family:var(--serif); font-size:40px; font-weight:700; }
+  .score-ring-text .lbl{ font-family:var(--mono); font-size:10px; color:var(--text-2); text-transform:uppercase; letter-spacing:.1em; }
+  .score-hero-text{ flex:1; min-width:240px; }
+  .score-grade{ font-family:var(--serif); font-size:26px; margin:0 0 8px; }
+  .score-blurb{ color:var(--text-1); font-size:14.5px; line-height:1.65; max-width:560px; }
+
+  .feedback-grid{
+    display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+    margin-bottom:24px;
+  }
+  .feedback-card{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:var(--radius-sm);
+    padding:18px;
+    border-left:3px solid var(--line);
+  }
+  .feedback-card.mistake{ border-left-color:var(--red); }
+  .feedback-card.best{ border-left-color:var(--teal); }
+  .feedback-card.expert{ border-left-color:var(--violet); }
+  .feedback-card .fc-label{
+    font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--text-2); margin-bottom:8px;
+  }
+  .feedback-card .fc-body{ font-size:13.5px; line-height:1.6; color:var(--text-0); }
+
+  .lessons-panel{
+    background:var(--bg-2); border:1px solid var(--line); border-radius:var(--radius);
+    padding:22px; margin-bottom:28px;
+  }
+  .lessons-panel ul{ margin:0; padding-left:20px; }
+  .lessons-panel li{ font-size:13.8px; line-height:1.8; color:var(--text-1); }
+  .lessons-panel li::marker{ color:var(--amber); }
+
+  /* ---------- misc ---------- */
+  .pill-row{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+  .pill{
+    font-family:var(--mono); font-size:11.5px; padding:6px 13px; border-radius:30px;
+    background:var(--bg-2); border:1px solid var(--line); color:var(--text-1);
+  }
+
+  @media (max-width:640px){
+    .scaffold{ padding:18px 14px 70px; }
+    .topbar{ padding:12px 14px; }
+    .telemetry{ display:none; }
+    .score-hero{ padding:22px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useMemo } = React;
+
+/* =========================================================================
+   ICONS (tiny inline SVGs, no external assets)
+========================================================================= */
+const Icon = ({ name, size=18, color="currentColor" }) => {
+  const common = { width:size, height:size, viewBox:"0 0 24 24", fill:"none", stroke:color, strokeWidth:1.7, strokeLinecap:"round", strokeLinejoin:"round" };
+  switch(name){
+    case "ship": return <svg {...common}><path d="M2 20l1.5-4h17L22 20"/><path d="M4 16V8l8-3 8 3v8"/><path d="M12 5v11"/></svg>;
+    case "factory": return <svg {...common}><path d="M3 21V9l5 3V9l5 3V9l5 3v9z"/><path d="M3 21h18"/></svg>;
+    case "warehouse": return <svg {...common}><path d="M3 9l9-5 9 5v11H3z"/><path d="M9 20v-7h6v7"/></svg>;
+    case "globe": return <svg {...common}><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>;
+    case "fire": return <svg {...common}><path d="M12 22c4 0 6.5-2.7 6.5-6.2 0-2.6-1.5-4-2.6-5.7-.7 1.4-1.6 2-2.2 1.3.6-2.6-.6-5-2.7-6.4-.4 2-1.5 3.2-3 4.6C6.1 11.2 5.5 13 5.5 15.2 5.5 19 8 22 12 22z"/></svg>;
+    case "bank": return <svg {...common}><path d="M3 21h18"/><path d="M4 21V10l8-6 8 6v11"/><path d="M9 21v-7h6v7"/></svg>;
+    case "anchor": return <svg {...common}><circle cx="12" cy="5" r="2"/><path d="M12 7v14"/><path d="M5 12H2a10 10 0 0010 10 10 10 0 0010-10h-3"/><path d="M5 12a7 7 0 007 7"/></svg>;
+    case "shield": return <svg {...common}><path d="M12 2l8 4v6c0 5-3.4 8.5-8 10-4.6-1.5-8-5-8-10V6z"/><path d="M9.5 12l2 2 4-4"/></svg>;
+    case "wave": return <svg {...common}><path d="M2 12c2 0 2-3 4-3s2 3 4 3 2-3 4-3 2 3 4 3 2-3 4-3"/><path d="M2 18c2 0 2-3 4-3s2 3 4 3 2-3 4-3 2 3 4 3 2-3 4-3"/></svg>;
+    case "box": return <svg {...common}><path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>;
+    case "flag": return <svg {...common}><path d="M4 22V3"/><path d="M4 4h13l-2.5 4L17 12H4"/></svg>;
+    case "truck": return <svg {...common}><path d="M2 16V6h11v10"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6.5" cy="18.5" r="1.5"/><circle cx="17.5" cy="18.5" r="1.5"/></svg>;
+    case "check": return <svg {...common}><path d="M20 6L9 17l-5-5"/></svg>;
+    case "spark": return <svg {...common}><path d="M12 2v6M12 16v6M2 12h6M16 12h6M5 5l4 4M15 15l4 4M5 19l4-4M15 9l4-4"/></svg>;
+    case "compass": return <svg {...common}><circle cx="12" cy="12" r="9"/><path d="M15 9l-2 6-6 2 2-6z"/></svg>;
+    case "brain": return <svg {...common}><path d="M9 4a3 3 0 00-3 3v1a3 3 0 00-1 5.8V15a3 3 0 003 3h1m4-14a3 3 0 013 3v1a3 3 0 011 5.8V15a3 3 0 01-3 3h-1m-4-14v16m4-16v16"/></svg>;
+    case "eye": return <svg {...common}><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>;
+    case "radar": return <svg {...common}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/><path d="M12 3v9l6-3"/></svg>;
+    case "copilot": return <svg {...common}><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 12h.01M16 12h.01"/><path d="M9 3l1.5 3M15 3l-1.5 3"/></svg>;
+    case "trend-up": return <svg {...common}><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>;
+    case "alert": return <svg {...common}><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.6L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.6a2 2 0 00-3.4 0z"/></svg>;
+    case "users": return <svg {...common}><circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"/><circle cx="18" cy="9" r="2.7"/><path d="M16.5 14c2.7.3 5 2.3 5.5 6"/></svg>;
+    case "scale": return <svg {...common}><path d="M12 3v18M5 7h14M5 7l-3 7a3.5 3.5 0 007 0l-3-7zM19 7l-3 7a3.5 3.5 0 007 0l-3-7z"/></svg>;
+    case "target": return <svg {...common}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>;
+    default: return null;
+  }
+};
+
+/* =========================================================================
+   RANDOM DATA GENERATORS
+========================================================================= */
+const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const clamp = (v, lo=0, hi=100) => Math.max(lo, Math.min(hi, v));
+
+const INDUSTRIES = [
+  { name: "Consumer Electronics", icon: "spark" },
+  { name: "Automotive Parts", icon: "truck" },
+  { name: "Pharmaceuticals", icon: "shield" },
+  { name: "Apparel & Footwear", icon: "box" },
+  { name: "Food & Beverage", icon: "factory" },
+  { name: "Industrial Equipment", icon: "factory" },
+  { name: "Home Furnishings", icon: "box" },
+  { name: "Specialty Chemicals", icon: "fire" },
+];
+
+const NAME_PREFIXES = ["Northbridge","Vantix","Solara","Cascade","Meridian","Anchorpoint","Halcyon","Ferrowave","Brightline","Kestrel","Ironvale","Lumenor","Tradewind","Polaris","Greenforge"];
+const NAME_SUFFIXES = ["Industries","Holdings","Global","Group","Manufacturing","Co.","Logistics","Dynamics","Materials","Systems"];
+
+const COUNTRIES = ["Vietnam","Mexico","Germany","India","Poland","South Korea","Brazil","Indonesia","Turkey","Thailand","Czech Republic","Malaysia"];
+
+function generateCompany(){
+  const industry = rand(INDUSTRIES);
+  const name = `${rand(NAME_PREFIXES)} ${rand(NAME_SUFFIXES)}`;
+  const revenue = randInt(80, 950); // millions
+  const factories = randInt(2, 9);
+  const warehouses = randInt(3, 14);
+  const suppliers = randInt(6, 40);
+  const inventoryDays = randInt(12, 60);
+  const leadTime = randInt(8, 45);
+  const countryCount = randInt(2, 4);
+  const countries = [...COUNTRIES].sort(() => Math.random() - 0.5).slice(0, countryCount);
+
+  return {
+    name, industry, revenue, factories, warehouses, suppliers,
+    inventoryDays, leadTime, countries,
+    initials: name.split(" ").map(w=>w[0]).slice(0,2).join("")
+  };
+}
+
+const CRISES = [
+  {
+    type: "Factory Fire",
+    icon: "fire",
+    urgency: "Critical",
+    desc: (c) => `A fire broke out overnight at your largest production facility in ${rand(c.countries)}. Output from that site is suspended pending a safety inspection, and the timeline for reopening is unclear.`,
+    impactArea: "Production capacity",
+    color: "var(--red)",
+  },
+  {
+    type: "Supplier Bankruptcy",
+    icon: "bank",
+    urgency: "High",
+    desc: (c) => `One of your top-five raw material suppliers filed for bankruptcy protection this morning. Open purchase orders worth a significant share of next month's input volume are now at risk.`,
+    impactArea: "Supply continuity",
+    color: "var(--amber)",
+  },
+  {
+    type: "Port Strike",
+    icon: "anchor",
+    urgency: "High",
+    desc: (c) => `Dockworkers at a major port serving ${rand(c.countries)} have walked out indefinitely. Containers carrying inbound components and outbound finished goods are stuck on the water.`,
+    impactArea: "Logistics throughput",
+    color: "var(--amber)",
+  },
+  {
+    type: "Cyberattack",
+    icon: "shield",
+    urgency: "Critical",
+    desc: (c) => `A ransomware attack has locked your warehouse management system across ${randInt(2,5)} distribution centers. Pick, pack, and ship operations are running on manual workarounds.`,
+    impactArea: "Order fulfillment",
+    color: "var(--red)",
+  },
+  {
+    type: "Flood",
+    icon: "wave",
+    urgency: "High",
+    desc: (c) => `Severe flooding has closed the main highway corridor connecting your ${rand(c.countries)} facility to the regional port, cutting off the usual outbound route for at least two weeks.`,
+    impactArea: "Distribution network",
+    color: "var(--amber)",
+  },
+  {
+    type: "Raw Material Shortage",
+    icon: "box",
+    urgency: "Medium",
+    desc: (c) => `A key input material has become scarce industry-wide after a competitor's plant outage spiked demand. Spot market prices have already moved sharply against you.`,
+    impactArea: "Input availability",
+    color: "var(--violet)",
+  },
+  {
+    type: "Political Conflict",
+    icon: "flag",
+    urgency: "Critical",
+    desc: (c) => `Escalating political tensions in ${rand(c.countries)} have triggered new export controls with almost no notice. Customs clearance for your shipments has effectively stalled.`,
+    impactArea: "Cross-border trade",
+    color: "var(--red)",
+  },
+  {
+    type: "Shipping Delay",
+    icon: "ship",
+    urgency: "Medium",
+    desc: (c) => `Severe vessel congestion has pushed average transit times well beyond schedule. Several inbound shipments carrying components for your next production run are now weeks late.`,
+    impactArea: "Inbound logistics",
+    color: "var(--violet)",
+  },
+];
+
+function generateCrisis(company){
+  const template = rand(CRISES);
+  return {
+    ...template,
+    description: template.desc(company),
+    financialImpact: randInt(3, 18), // % revenue at risk
+    daysToResolve: randInt(7, 60),
+  };
+}
+
+/* =========================================================================
+   WAR ROOM ACTIONS
+========================================================================= */
+const WAR_ROOM_ACTIONS = [
+  {
+    id: "air_freight",
+    title: "Switch to air freight",
+    desc: "Reroute the most urgent shipments by air instead of ocean or ground to compress delivery time, accepting a steep cost premium.",
+    tags: ["Fast", "Expensive"],
+    effects: { cost: -14, inventory: +6, profit: -10, delivery: +22, satisfaction: +10 },
+  },
+  {
+    id: "alt_supplier",
+    title: "Activate backup supplier",
+    desc: "Bring a pre-vetted secondary supplier online immediately to fill the gap, even though pricing and quality haven't been fully negotiated.",
+    tags: ["Resilient", "Risky quality"],
+    effects: { cost: -8, inventory: +14, profit: -6, delivery: +12, satisfaction: +6 },
+  },
+  {
+    id: "draw_safety_stock",
+    title: "Draw down safety stock",
+    desc: "Release reserve inventory held for emergencies to cover near-term customer orders, temporarily depleting your buffer.",
+    tags: ["Immediate", "Depletes buffer"],
+    effects: { cost: -2, inventory: -20, profit: -2, delivery: +16, satisfaction: +12 },
+  },
+  {
+    id: "reroute_warehouse",
+    title: "Reroute through alternate warehouse",
+    desc: "Shift fulfillment to a distribution center outside the affected region, adding distance but avoiding the disruption entirely.",
+    tags: ["Stable", "Longer routes"],
+    effects: { cost: -6, inventory: +2, profit: -4, delivery: +6, satisfaction: +5 },
+  },
+  {
+    id: "customer_comms",
+    title: "Proactively notify customers",
+    desc: "Get ahead of the disruption with transparent, early communication and revised delivery estimates before customers have to ask.",
+    tags: ["Low cost", "Trust-building"],
+    effects: { cost: -1, inventory: 0, profit: 0, delivery: 0, satisfaction: +16 },
+  },
+  {
+    id: "freeze_nonessential",
+    title: "Freeze non-essential spending",
+    desc: "Pause discretionary procurement and capital projects to preserve cash while the crisis is being managed.",
+    tags: ["Cash preserving", "Slows growth"],
+    effects: { cost: +12, inventory: -3, profit: +8, delivery: -2, satisfaction: -4 },
+  },
+];
+
+/* =========================================================================
+   NEGOTIATION TREE (4 rounds)
+========================================================================= */
+const NEGOTIATION_ROUNDS = [
+  {
+    prompt: "Your backup supplier opens with a 22% price increase, citing 'force majeure' and limited capacity. How do you respond?",
+    options: [
+      { label: "Accept the increase to lock in supply now", trust: +10, price: -22, leadTime: +2, note: "You bought goodwill and speed, but set an expensive precedent." },
+      { label: "Counter with data on long-term order volume", trust: +4, price: -10, leadTime: 0, note: "A measured counter that respects the relationship while protecting margin." },
+      { label: "Push back hard and threaten to walk away", trust: -12, price: -6, leadTime: +6, note: "You saved on price but rattled the relationship and slowed things down." },
+    ],
+  },
+  {
+    prompt: "The supplier asks for a 12-month exclusivity commitment in exchange for priority allocation during shortages.",
+    options: [
+      { label: "Agree to exclusivity for guaranteed priority", trust: +14, price: -4, leadTime: -8, note: "Strong trust and faster lead times, but you're now dependent on one source." },
+      { label: "Offer a shorter 3-month trial instead", trust: +6, price: -2, leadTime: -3, note: "A balanced compromise that limits your exposure." },
+      { label: "Decline and keep sourcing flexible", trust: -6, price: 0, leadTime: +4, note: "You kept your options open, but lost some priority standing." },
+    ],
+  },
+  {
+    prompt: "Mid-negotiation, the supplier reveals their own upstream costs have risen unexpectedly and asks for shared risk via a price index clause.",
+    options: [
+      { label: "Agree to an indexed pricing clause", trust: +12, price: -8, leadTime: -2, note: "This builds durable trust and keeps the relationship fair over time." },
+      { label: "Offer a one-time goodwill payment instead", trust: +5, price: -5, leadTime: 0, note: "A pragmatic middle ground that avoids long-term commitments." },
+      { label: "Refuse and ask them to absorb the cost", trust: -10, price: +2, leadTime: +5, note: "You protected near-term cost, but strained the partnership." },
+    ],
+  },
+  {
+    prompt: "Final round: the supplier offers a closing deal — slightly higher price, but guaranteed lead time and dedicated capacity.",
+    options: [
+      { label: "Accept the guaranteed-capacity deal", trust: +10, price: -10, leadTime: -12, note: "A strong close: reliability now outweighs marginal cost." },
+      { label: "Negotiate a hybrid: partial guarantee, lower premium", trust: +6, price: -5, leadTime: -6, note: "You split the difference and kept some flexibility." },
+      { label: "Hold firm on original pricing terms", trust: -4, price: +4, leadTime: +2, note: "You protected cost but left reliability on the table." },
+    ],
+  },
+];
+
+/* =========================================================================
+   BOARDROOM QUESTIONS
+========================================================================= */
+const BOARDROOM_QUESTIONS = [
+  {
+    q: "The board wants a public statement within the hour. What do you prioritize?",
+    options: [
+      { label: "Transparency about what's known, with a follow-up timeline", score: 18, tone: "Builds trust through honesty, even with incomplete information." },
+      { label: "A reassuring statement that downplays the severity", score: 4, tone: "Risks a credibility hit if the full picture later emerges." },
+      { label: "Delay the statement until everything is confirmed", score: 9, tone: "Caution has merit, but silence invites speculation." },
+    ],
+  },
+  {
+    q: "Your CFO wants to cut the crisis response budget by 30% to protect quarterly margins. Your move?",
+    options: [
+      { label: "Hold the response budget; margin protection can wait", score: 16, tone: "Prioritizing operational stability over short-term optics is sound leadership." },
+      { label: "Split the difference with a 15% cut", score: 11, tone: "A reasonable compromise, though it may slow recovery slightly." },
+      { label: "Approve the full cut to satisfy the board", score: 3, tone: "Short-term thinking that could deepen the crisis." },
+    ],
+  },
+  {
+    q: "A key customer threatens to switch suppliers unless you guarantee on-time delivery in writing.",
+    options: [
+      { label: "Offer a conditional guarantee with clear contingencies", score: 17, tone: "Confident but realistic — protects the relationship without overpromising." },
+      { label: "Give an unconditional guarantee to keep the account", score: 5, tone: "Risky: failing to deliver later would be far more damaging." },
+      { label: "Let the customer walk rather than overcommit", score: 8, tone: "Defensible, but may cost more in lost revenue than necessary." },
+    ],
+  },
+  {
+    q: "Mid-crisis, a journalist asks for an on-the-record interview about the disruption.",
+    options: [
+      { label: "Designate a trained spokesperson for a careful interview", score: 15, tone: "Controls the narrative while staying engaged with the press." },
+      { label: "Decline all media contact entirely", score: 7, tone: "Avoids risk but cedes the narrative to others." },
+      { label: "Let any available executive respond informally", score: 2, tone: "High risk of inconsistent or damaging statements." },
+    ],
+  },
+  {
+    q: "Recovery is underway. How do you handle the post-crisis review with your leadership team?",
+    options: [
+      { label: "Run a blameless retrospective focused on systemic fixes", score: 19, tone: "The gold standard — it surfaces real fixes instead of scapegoats." },
+      { label: "Identify individuals responsible for the gaps", score: 4, tone: "This discourages future transparency and reporting of risks." },
+      { label: "Skip the review and move on to the next priority", score: 6, tone: "Missing a chance to convert pain into institutional learning." },
+    ],
+  },
+];
+
+/* =========================================================================
+   AI STRATEGY OPTIONS
+========================================================================= */
+const AI_INVESTMENTS = [
+  {
+    id: "forecasting",
+    title: "Demand Forecasting",
+    icon: "trend-up",
+    desc: "Machine learning models that predict customer demand using sales history, seasonality, and market signals.",
+    impact: "Reduces stockouts and overproduction by anticipating demand shifts before they hit your supply chain.",
+    boosts: { resilience: 10, cost: 6, satisfaction: 8 },
+  },
+  {
+    id: "inventory_opt",
+    title: "Inventory Optimization",
+    icon: "box",
+    desc: "Algorithms that continuously recalculate optimal stock levels across every warehouse and distribution node.",
+    impact: "Frees up working capital tied up in excess stock while reducing the risk of running out.",
+    boosts: { cost: 12, resilience: 6, satisfaction: 4 },
+  },
+  {
+    id: "supplier_risk",
+    title: "Supplier Risk Monitoring",
+    icon: "radar",
+    desc: "Real-time monitoring of supplier financial health, geopolitical exposure, and operational signals.",
+    impact: "Surfaces early warning signs of supplier trouble — like the bankruptcy you may have just faced — before it becomes a crisis.",
+    boosts: { resilience: 14, cost: 2, satisfaction: 2 },
+  },
+  {
+    id: "warehouse_vision",
+    title: "Warehouse Vision",
+    icon: "eye",
+    desc: "Computer vision systems that track inventory accuracy and automate quality checks on the warehouse floor.",
+    impact: "Cuts picking errors and shrinkage, improving fulfillment accuracy without adding headcount.",
+    boosts: { cost: 8, satisfaction: 10, resilience: 3 },
+  },
+  {
+    id: "procurement_copilot",
+    title: "Procurement Copilot",
+    icon: "copilot",
+    desc: "An AI assistant that drafts supplier negotiations, flags contract risk clauses, and benchmarks pricing automatically.",
+    impact: "Speeds up sourcing decisions and strengthens your negotiating position with better data at the table.",
+    boosts: { cost: 9, resilience: 7, satisfaction: 3 },
+  },
+];
+
+/* =========================================================================
+   SHARED UI PIECES
+========================================================================= */
+function TopBar({ stageIndex, totalStages, crisisActive }){
+  return (
+    <div className="topbar">
+      <div className="brand">
+        <div className="brand-mark">OL</div>
+        <div className="brand-text">
+          <div className="eyebrow">Crisis Simulation</div>
+          <div className="title">Operation Lifeline</div>
+        </div>
+      </div>
+      <div className="telemetry">
+        <div className={"telemetry-item" + (crisisActive ? " live" : "")}>
+          <span className="dot"></span>
+          {crisisActive ? <span>Crisis status: <strong>Active</strong></span> : <span>Crisis status: <strong>Standby</strong></span>}
+        </div>
+        <div className="telemetry-item">
+          <span className="dot"></span>
+          Stage <strong>{stageIndex} / {totalStages}</strong>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Stepper({ stageIndex, labels }){
+  return (
+    <div>
+      <div className="stepper">
+        {labels.map((l, i) => (
+          <div key={i} className={"step-pip " + (i < stageIndex ? "done" : i === stageIndex ? "active" : "")}></div>
+        ))}
+      </div>
+      <div className="step-labels">
+        {labels.map((l,i) => <span key={i} style={{opacity: i<=stageIndex?1:0.4}}>{l}</span>)}
+      </div>
+    </div>
+  );
+}
+
+function MetricBar({ name, value, suffix="", barClass="" }){
+  const cls = barClass || (value < 35 ? "danger" : value < 60 ? "warn" : "");
+  return (
+    <div className="metric-row">
+      <div className="metric-row-top">
+        <span className="metric-name">{name}</span>
+        <span className="metric-value">{Math.round(value)}{suffix}</span>
+      </div>
+      <div className="bar-track">
+        <div className={"bar-fill " + cls} style={{ width: clamp(value) + "%" }}></div>
+      </div>
+    </div>
+  );
+}
+
+function WhyBox({ children }){
+  return <div className="why-box"><b>Why this matters:</b> {children}</div>;
+}
+
+/* =========================================================================
+   STAGE 0: WELCOME
+========================================================================= */
+function Welcome({ onStart }){
+  return (
+    <div className="welcome-wrap stage">
+      <div className="welcome-glyph">
+        <Icon name="compass" size={38} color="var(--amber)" />
+      </div>
+      <div className="welcome-eyebrow">A Supply Chain Decision Simulator</div>
+      <h1 className="welcome-title">Operation Lifeline</h1>
+      <p className="welcome-sub">
+        Run a fictional global company through a live supply chain crisis. You'll make the calls on cost,
+        inventory, negotiation, leadership, and AI strategy — and see exactly how each decision ripples
+        through the business. No experience required; every choice comes with plain-language context.
+      </p>
+      <div className="welcome-facts">
+        <span className="welcome-fact">⏱ ~10 minutes</span>
+        <span className="welcome-fact">🎲 Randomized every run</span>
+        <span className="welcome-fact">📊 6 decision stages</span>
+        <span className="welcome-fact">🎓 Built for beginners</span>
+      </div>
+      <button className="btn btn-primary" onClick={onStart}>
+        <Icon name="spark" size={17} />
+        Start Simulation
+      </button>
+    </div>
+  );
+}
+
+/* =========================================================================
+   STAGE 1: COMPANY PROFILE
+========================================================================= */
+function CompanyProfile({ company, onNext }){
+  return (
+    <div className="stage">
+      <div className="eyebrow-label">Step 1 of 6 · Company Briefing</div>
+      <h1 className="stage-title">Meet your company</h1>
+      <p className="stage-sub">
+        Before any crisis hits, get familiar with the business you're running. These numbers will shape
+        how much room you have to maneuver later — a company with thin inventory and long lead times has
+        far less slack when something goes wrong.
+      </p>
+
+      <div className="company-header">
+        <div className="company-logo">{company.initials}</div>
+        <div>
+          <p className="company-name">{company.name}</p>
+          <span className="company-tag">{company.industry.name} · ${company.revenue}M annual revenue</span>
+        </div>
+      </div>
+
+      <div className="grid">
+        <div className="card">
+          <Icon name={company.industry.icon} size={20} color="var(--amber)" />
+          <div className="card-label" style={{marginTop:10}}>Industry</div>
+          <div className="card-value">{company.industry.name}</div>
+          <div className="card-hint">Sets the baseline pace and risk profile of the supply chain.</div>
+        </div>
+        <div className="card">
+          <Icon name="trend-up" size={20} color="var(--teal)" />
+          <div className="card-label" style={{marginTop:10}}>Annual Revenue</div>
+          <div className="card-value">${company.revenue}M</div>
+          <div className="card-hint">Bigger revenue means bigger exposure when disruptions hit.</div>
+        </div>
+        <div className="card">
+          <Icon name="factory" size={20} color="var(--violet)" />
+          <div className="card-label" style={{marginTop:10}}>Factories</div>
+          <div className="card-value">{company.factories}</div>
+          <div className="card-hint">More factories spread risk, but add coordination complexity.</div>
+        </div>
+        <div className="card">
+          <Icon name="warehouse" size={20} color="var(--violet)" />
+          <div className="card-label" style={{marginTop:10}}>Warehouses</div>
+          <div className="card-value">{company.warehouses}</div>
+          <div className="card-hint">Determines how flexible your distribution network can be.</div>
+        </div>
+        <div className="card">
+          <Icon name="users" size={20} color="var(--teal)" />
+          <div className="card-label" style={{marginTop:10}}>Active Suppliers</div>
+          <div className="card-value">{company.suppliers}</div>
+          <div className="card-hint">More suppliers reduce dependency on any single source.</div>
+        </div>
+        <div className="card">
+          <Icon name="box" size={20} color="var(--amber)" />
+          <div className="card-label" style={{marginTop:10}}>Inventory On Hand</div>
+          <div className="card-value">{company.inventoryDays} days</div>
+          <div className="card-hint">Your buffer before a disruption starts hurting customers directly.</div>
+        </div>
+        <div className="card">
+          <Icon name="truck" size={20} color="var(--amber)" />
+          <div className="card-label" style={{marginTop:10}}>Average Lead Time</div>
+          <div className="card-value">{company.leadTime} days</div>
+          <div className="card-hint">Time from ordering materials to having them ready to use.</div>
+        </div>
+        <div className="card">
+          <Icon name="globe" size={20} color="var(--teal)" />
+          <div className="card-label" style={{marginTop:10}}>Operating Countries</div>
+          <div className="card-value" style={{fontSize:15}}>{company.countries.join(", ")}</div>
+          <div className="card-hint">Each country brings its own regulatory and political exposure.</div>
+        </div>
+      </div>
+
+      <WhyBox>
+        Low inventory days plus a long lead time is the riskiest combination — there's little buffer and
+        it takes a long time to refill it. Keep that tension in mind as the crisis unfolds.
+      </WhyBox>
+
+      <div className="stage-footer">
+        <span></span>
+        <button className="btn btn-primary" onClick={onNext}>
+          Continue to Crisis Briefing
+          <Icon name="alert" size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   STAGE 2: CRISIS BRIEFING
+========================================================================= */
+function CrisisBriefing({ company, crisis, onNext }){
+  const urgencyColor = crisis.urgency === "Critical" ? "var(--red)" : crisis.urgency === "High" ? "var(--amber)" : "var(--violet)";
+  return (
+    <div className="stage">
+      <div className="eyebrow-label">Step 2 of 6 · Crisis Briefing</div>
+      <h1 className="stage-title">A disruption just hit</h1>
+      <p className="stage-sub">
+        Read the briefing carefully — the urgency level and financial exposure below will set the stakes
+        for every decision you make in the War Room next.
+      </p>
+
+      <div className="crisis-banner">
+        <div className="crisis-tag"><span className="dot"></span>{crisis.urgency} Urgency</div>
+        <div style={{display:"flex", alignItems:"center", gap:14, marginBottom:6}}>
+          <Icon name={crisis.icon} size={26} color="var(--red)" />
+          <h2 className="crisis-title">{crisis.type}</h2>
+        </div>
+        <p className="crisis-desc">{crisis.description}</p>
+        <div className="crisis-meta">
+          <div className="crisis-meta-item">Primary impact area<b>{crisis.impactArea}</b></div>
+          <div className="crisis-meta-item">Revenue at risk<b style={{color:"var(--red)"}}>{crisis.financialImpact}%</b></div>
+          <div className="crisis-meta-item">Typical time to resolve<b>{crisis.daysToResolve} days</b></div>
+        </div>
+      </div>
+
+      <WhyBox>
+        Urgency tells you how fast you need to act; financial impact tells you how much is on the line.
+        A "Critical" crisis with high revenue exposure usually calls for faster, more decisive moves —
+        even if they cost more upfront.
+      </WhyBox>
+
+      <div className="stage-footer">
+        <span></span>
+        <button className="btn btn-primary" onClick={onNext}>
+          Enter the War Room
+          <Icon name="shield" size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   STAGE 3: WAR ROOM
+========================================================================= */
+function WarRoom({ onComplete }){
+  const [selected, setSelected] = useState([]);
+  const [locked, setLocked] = useState(false);
+  const [metrics, setMetrics] = useState({ cost:50, inventory:50, profit:50, delivery:50, satisfaction:50 });
+  const [showResults, setShowResults] = useState(false);
+
+  const toggle = (id) => {
+    if (locked) return;
+    setSelected(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 3) return prev;
+      return [...prev, id];
+    });
+  };
+
+  const simulate = () => {
+    setLocked(true);
+    const chosen = WAR_ROOM_ACTIONS.filter(a => selected.includes(a.id));
+    const next = { cost:50, inventory:50, profit:50, delivery:50, satisfaction:50 };
+    chosen.forEach(a => {
+      next.cost = clamp(next.cost + a.effects.cost);
+      next.inventory = clamp(next.inventory + a.effects.inventory);
+      next.profit = clamp(next.profit + a.effects.profit);
+      next.delivery = clamp(next.delivery + a.effects.delivery);
+      next.satisfaction = clamp(next.satisfaction + a.effects.satisfaction);
+    });
+    setShowResults(true);
+    // animate after a tick so CSS transition triggers
+    setTimeout(() => setMetrics(next), 80);
+  };
+
+  const avgScore = Math.round((metrics.cost + metrics.inventory + metrics.profit + metrics.delivery + metrics.satisfaction) / 5);
+
+  return (
+    <div className="stage">
+      <div className="eyebrow-label">Step 3 of 6 · War Room</div>
+      <h1 className="stage-title">Choose your response</h1>
+      <p className="stage-sub">
+        Pick exactly <b style={{color:"var(--text-0)"}}>three</b> response actions. Each one trades off
+        differently between cost, inventory, profit, delivery speed, and customer satisfaction — there's
+        no single "correct" combination, only different bets.
+      </p>
+
+      <WhyBox>
+        Real crisis response is about trade-offs, not perfect answers. Speeding up delivery usually costs
+        more; protecting cash usually slows you down. Watch how your three choices interact below.
+      </WhyBox>
+
+      <div className="choice-grid">
+        {WAR_ROOM_ACTIONS.map(a => {
+          const isSel = selected.includes(a.id);
+          const disabled = !isSel && selected.length >= 3;
+          return (
+            <button
+              key={a.id}
+              className={"choice-card" + (isSel ? " selected" : "") + (disabled || locked ? " disabled" : "")}
+              onClick={() => toggle(a.id)}
+              disabled={locked}
+            >
+              <div className="choice-check">{isSel ? <Icon name="check" size={13} /> : ""}</div>
+              <h3 className="choice-title">{a.title}</h3>
+              <p className="choice-desc">{a.desc}</p>
+              <div className="choice-tags">
+                {a.tags.map(t => <span key={t} className="choice-pill">{t}</span>)}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{display:"flex", justifyContent:"space-between", alignItems:"center", margin:"18px 0 6px", flexWrap:"wrap", gap:10}}>
+        <span className="pill">{selected.length} / 3 actions selected</span>
+        {!showResults && (
+          <button className="btn btn-primary" disabled={selected.length !== 3} onClick={simulate}>
+            <Icon name="spark" size={16} />
+            Simulate Response
+          </button>
+        )}
+      </div>
+
+      {showResults && (
+        <div className="metrics-panel">
+          <div className="metrics-panel-title">Simulated business impact</div>
+          <MetricBar name="Cost Control" value={metrics.cost} suffix="/100" />
+          <MetricBar name="Inventory Health" value={metrics.inventory} suffix="/100" />
+          <MetricBar name="Profit Margin" value={metrics.profit} suffix="/100" />
+          <MetricBar name="Delivery Speed" value={metrics.delivery} suffix="/100" />
+          <MetricBar name="Customer Satisfaction" value={metrics.satisfaction} suffix="/100" />
+          <div className="why-box" style={{marginTop:4}}>
+            <b>Reading these results:</b> nothing here is a fail state — a 35 on cost control simply
+            means your three choices leaned toward speed and service over saving money. That's a valid
+            strategy if customer trust matters most right now.
+          </div>
+          <div className="stage-footer" style={{marginTop:8}}>
+            <span className="pill">Overall response index: {avgScore}/100</span>
+            <button className="btn btn-primary" onClick={() => onComplete({ selected, metrics })}>
+              Continue to Negotiation
+              <Icon name="users" size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* =========================================================================
+   STAGE 4: NEGOTIATION
+========================================================================= */
+function Negotiation({ onComplete }){
+  const [round, setRound] = useState(0);
+  const [stats, setStats] = useState({ trust:50, price:50, leadTime:50 });
+  const [history, setHistory] = useState([]);
+  const [selectedIdx, setSelectedIdx] = useState(null);
+
+  const current = NEGOTIATION_ROUNDS[round];
+  const isLast = round === NEGOTIATION_ROUNDS.length - 1;
+
+  const choose = (opt, idx) => {
+    if (selectedIdx !== null) return;
+    setSelectedIdx(idx);
+    const next = {
+      trust: clamp(stats.trust + opt.trust),
+      price: clamp(stats.price + opt.price),
+      leadTime: clamp(stats.leadTime + opt.leadTime),
+    };
+    setTimeout(() => {
+      setStats(next);
+      setHistory(h => [...h, { round: round+1, label: opt.label, note: opt.note }]);
+    }, 50);
+  };
+
+  const advance = () => {
+    if (isLast){
+      const negotiationScore = Math.round((stats.trust + stats.price + stats.leadTime) / 3);
+      onComplete({ stats, history, negotiationScore });
+    } else {
+      setRound(r => r + 1);
+      setSelectedIdx(null);
+    }
+  };
+
+  return (
+    <div className="stage">
+      <div className="eyebrow-label">Step 4 of 6 · Supplier Negotiation</div>
+      <h1 className="stage-title">Negotiate with your backup supplier</h1>
+      <p className="stage-sub">
+        Four rounds, one relationship. Every choice shifts the supplier's trust in you, the price you'll
+        pay, and how fast they'll prioritize your orders. Aggressive tactics can win on price but cost you
+        trust — and trust is what gets you priority treatment the next time something goes wrong.
+      </p>
+
+      <div className="negotiation-stage">
+        <div className="neg-round-label">Round {round+1} of {NEGOTIATION_ROUNDS.length}</div>
+        <p className="neg-prompt">{current.prompt}</p>
+
+        <div className="neg-stats">
+          <div className="neg-stat">Trust<b style={{color:"var(--teal)"}}>{Math.round(stats.trust)}</b></div>
+          <div className="neg-stat">Price Favorability<b style={{color:"var(--amber)"}}>{Math.round(stats.price)}</b></div>
+          <div className="neg-stat">Lead Time Favorability<b style={{color:"var(--violet)"}}>{Math.round(stats.leadTime)}</b></div>
+        </div>
+
+        <div className="choice-grid">
+          {current.options.map((opt, idx) => (
+            <button
+              key={idx}
+              className={"choice-card" + (selectedIdx === idx ? " selected" : "") + (selectedIdx !== null && selectedIdx !== idx ? " disabled" : "")}
+              onClick={() => choose(opt, idx)}
+              disabled={selectedIdx !== null}
+            >
+              <div className="choice-check">{selectedIdx === idx ? <Icon name="check" size={13} /> : ""}</div>
+              <h3 className="choice-title">{opt.label}</h3>
+              {selectedIdx === idx && <p className="choice-desc">{opt.note}</p>}
+            </button>
+          ))}
+        </div>
+
+        {selectedIdx !== null && (
+          <div className="stage-footer" style={{marginTop:6}}>
+            <span></span>
+            <button className="btn btn-primary" onClick={advance}>
+              {isLast ? "See Negotiation Outcome" : "Next Round"}
+              <Icon name="alert" size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <WhyBox>
+        Real supplier negotiations are repeated games, not one-off transactions. Burning trust for a
+        short-term discount can come back to bite you the next time you need flexibility.
+      </WhyBox>
+    </div>
+  );
+}
+
+/* =========================================================================
+   STAGE 5: CEO BOARDROOM
+========================================================================= */
+function Boardroom({ onComplete }){
+  const [qIndex, setQIndex] = useState(0);
+  const [score, setScore] = useState(0);
+  const [selectedIdx, setSelectedIdx] = useState(null);
+  const [answers, setAnswers] = useState([]);
+
+  const current = BOARDROOM_QUESTIONS[qIndex];
+  const isLast = qIndex === BOARDROOM_QUESTIONS.length - 1;
+
+  const choose = (opt, idx) => {
+    if (selectedIdx !== null) return;
+    setSelectedIdx(idx);
+  };
+
+  const advance = () => {
+    const opt = current.options[selectedIdx];
+    const newScore = score + opt.score;
+    const newAnswers = [...answers, { q: current.q, label: opt.label, tone: opt.tone, score: opt.score }];
+    if (isLast){
+      onComplete({ leadershipScore: Math.round((newScore / (20 * BOARDROOM_QUESTIONS.length)) * 100), answers: newAnswers });
+    } else {
+      setScore(newScore);
+      setAnswers(newAnswers);
+      setQIndex(q => q + 1);
+      setSelectedIdx(null);
+    }
+  };
+
+  return (
+    <div className="stage">
+      <div className="eyebrow-label">Step 5 of 6 · CEO Boardroom</div>
+      <h1 className="stage-title">Lead from the top</h1>
+      <p className="stage-sub">
+        As CEO, your job shifts from operational fixes to judgment calls — what to say, what to fund, and
+        what example to set. Five questions, each testing a different facet of executive decision-making.
+      </p>
+
+      <div className="negotiation-stage">
+        <div className="question-counter">Question {qIndex+1} of {BOARDROOM_QUESTIONS.length}</div>
+        <p className="neg-prompt">{current.q}</p>
+
+        <div className="choice-grid">
+          {current.options.map((opt, idx) => (
+            <button
+              key={idx}
+              className={"choice-card" + (selectedIdx === idx ? " selected" : "") + (selectedIdx !== null && selectedIdx !== idx ? " disabled" : "")}
+              onClick={() => choose(opt, idx)}
+              disabled={selectedIdx !== null}
+            >
+              <div className="choice-check">{selectedIdx === idx ? <Icon name="check" size={13} /> : ""}</div>
+              <h3 className="choice-title">{opt.label}</h3>
+              {selectedIdx === idx && <p className="choice-desc">{opt.tone}</p>}
+            </button>
+          ))}
+        </div>
+
+        {selectedIdx !== null && (
+          <div className="stage-footer" style={{marginTop:6}}>
+            <span></span>
+            <button className="btn btn-primary" onClick={advance}>
+              {isLast ? "See Leadership Score" : "Next Question"}
+              <Icon name="alert" size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      <WhyBox>
+        There's rarely one "right" leadership answer — but some choices consistently build long-term
+        trust with employees, customers, and the board, while others trade that trust for short-term
+        comfort.
+      </WhyBox>
+    </div>
+  );
+}
+
+/* =========================================================================
+   STAGE 6: AI STRATEGY
+========================================================================= */
+function AIStrategy({ onComplete }){
+  const [selected, setSelected] = useState([]);
+
+  const toggle = (id) => {
+    setSelected(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
+      if (prev.length >= 2) return prev;
+      return [...prev, id];
+    });
+  };
+
+  const submit = () => {
+    const chosen = AI_INVESTMENTS.filter(a => selected.includes(a.id));
+    const totals = chosen.reduce((acc, a) => {
+      acc.cost += a.boosts.cost || 0;
+      acc.resilience += a.boosts.resilience || 0;
+      acc.satisfaction += a.boosts.satisfaction || 0;
+      return acc;
+    }, { cost:0, resilience:0, satisfaction:0 });
+    onComplete({ selected: chosen, totals });
+  };
+
+  return (
+    <div className="stage">
+      <div className="eyebrow-label">Step 6 of 6 · AI Strategy</div>
+      <h1 className="stage-title">Invest in future resilience</h1>
+      <p className="stage-sub">
+        The crisis is under control. Now look ahead: choose <b style={{color:"var(--text-0)"}}>two</b> AI
+        investments to strengthen the supply chain against the next disruption. Each one targets a
+        different weak point.
+      </p>
+
+      <WhyBox>
+        AI investments aren't magic fixes — they're targeted tools. Forecasting helps you see disruptions
+        coming; risk monitoring helps you see supplier weakness before it breaks; copilots speed up the
+        humans already doing the work.
+      </WhyBox>
+
+      <div className="choice-grid">
+        {AI_INVESTMENTS.map(a => {
+          const isSel = selected.includes(a.id);
+          const disabled = !isSel && selected.length >= 2;
+          return (
+            <button
+              key={a.id}
+              className={"choice-card" + (isSel ? " selected" : "") + (disabled ? " disabled" : "")}
+              onClick={() => toggle(a.id)}
+            >
+              <div className="choice-check">{isSel ? <Icon name="check" size={13} /> : ""}</div>
+              <div style={{marginBottom:10}}><Icon name={a.icon} size={20} color="var(--amber)" /></div>
+              <h3 className="choice-title">{a.title}</h3>
+              <p className="choice-desc">{a.desc}</p>
+              <p className="choice-desc" style={{color:"var(--teal)", fontWeight:600}}>{a.impact}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="stage-footer">
+        <span className="pill">{selected.length} / 2 investments selected</span>
+        <button className="btn btn-primary" disabled={selected.length !== 2} onClick={submit}>
+          Generate Final Report
+          <Icon name="target" size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   STAGE 7: FINAL DASHBOARD
+========================================================================= */
+function FinalDashboard({ allData, onReplay }){
+  const { company, crisis, warRoom, negotiation, boardroom, aiStrategy } = allData;
+  const [animScore, setAnimScore] = useState(0);
+
+  // ---- compute sub-scores (0-100) ----
+  const resilience = clamp(Math.round(
+    (warRoom.metrics.inventory + warRoom.metrics.delivery + aiStrategy.totals.resilience * 1.6) / 2
+  ));
+  const costControl = clamp(Math.round(
+    (warRoom.metrics.cost + warRoom.metrics.profit) / 2 - (aiStrategy.totals.cost * 0.3)
+  ));
+  const negotiationScore = clamp(negotiation.negotiationScore);
+  const leadershipScore = clamp(boardroom.leadershipScore);
+  const customerSatisfaction = clamp(Math.round(
+    (warRoom.metrics.satisfaction + aiStrategy.totals.satisfaction * 1.8) / 2
+  ));
+  const riskManagement = clamp(Math.round(
+    (negotiation.stats.trust + aiStrategy.totals.resilience * 1.5 + (100 - crisis.financialImpact * 4)) / 3
+  ));
+
+  const overall = clamp(Math.round(
+    (resilience + costControl + negotiationScore + leadershipScore + customerSatisfaction + riskManagement) / 6
+  ));
+
+  useEffect(() => {
+    const t = setTimeout(() => setAnimScore(overall), 150);
+    return () => clearTimeout(t);
+  }, [overall]);
+
+  const grade =
+    overall >= 85 ? "Exceptional Crisis Leadership" :
+    overall >= 70 ? "Strong Operator" :
+    overall >= 55 ? "Steady Hand, Room to Grow" :
+    overall >= 40 ? "Survived, Lessons Ahead" :
+    "Trial by Fire";
+
+  const ringColor = overall >= 70 ? "var(--teal)" : overall >= 45 ? "var(--amber)" : "var(--red)";
+  const circumference = 2 * Math.PI * 70;
+  const offset = circumference - (animScore / 100) * circumference;
+
+  // ---- biggest mistake / best decision logic ----
+  const subScores = [
+    { name: "Resilience", value: resilience },
+    { name: "Cost Control", value: costControl },
+    { name: "Negotiation", value: negotiationScore },
+    { name: "Leadership", value: leadershipScore },
+    { name: "Customer Satisfaction", value: customerSatisfaction },
+    { name: "Risk Management", value: riskManagement },
+  ];
+  const weakest = subScores.reduce((a,b) => a.value < b.value ? a : b);
+  const strongest = subScores.reduce((a,b) => a.value > b.value ? a : b);
+
+  const mistakeText = {
+    "Resilience": "Your response leaned too heavily on short-term fixes rather than rebuilding buffer capacity — the next disruption will hit just as hard.",
+    "Cost Control": "Spending moved faster than discipline during the response, eroding margin more than the crisis itself required.",
+    "Negotiation": "One or two hardline moments in the supplier negotiation cost more trust than the price savings were worth.",
+    "Leadership": "A few boardroom calls prioritized short-term comfort over the kind of transparency that builds lasting credibility.",
+    "Customer Satisfaction": "Operational fixes outpaced communication — customers likely felt the disruption before they heard from you.",
+    "Risk Management": "Underlying exposure (supplier concentration, weak monitoring) wasn't addressed enough to prevent a repeat crisis.",
+  }[weakest.name];
+
+  const bestText = {
+    "Resilience": "Your choices meaningfully rebuilt the company's ability to absorb future shocks, not just survive this one.",
+    "Cost Control": "You protected margin without sacrificing the response — a genuinely hard balance to strike under pressure.",
+    "Negotiation": "You built real trust with your supplier while still protecting favorable terms — that pays off long after this crisis ends.",
+    "Leadership": "Your boardroom decisions consistently chose transparency and long-term credibility over short-term comfort.",
+    "Customer Satisfaction": "Customers were kept informed and prioritized throughout, which is often what determines loyalty after a crisis.",
+    "Risk Management": "You meaningfully reduced the company's exposure to the next disruption, not just this one.",
+  }[strongest.name];
+
+  const expertRec =
+    weakest.name === "Cost Control" ? "Build a pre-approved 'crisis budget' tier so cost discipline doesn't depend on in-the-moment judgment calls." :
+    weakest.name === "Negotiation" ? "Invest in supplier relationship management year-round, not just during negotiations — trust compounds." :
+    weakest.name === "Leadership" ? "Run quarterly crisis-communication tabletop exercises so transparent instincts become second nature under pressure." :
+    weakest.name === "Customer Satisfaction" ? "Pair every operational response with a parallel customer-communication plan from day one." :
+    weakest.name === "Risk Management" ? "Expand supplier risk monitoring coverage now, while the lesson from this crisis is still fresh." :
+    "Maintain a standing safety-stock policy sized to your slowest lead-time category, not your average.";
+
+  const lessons = [
+    `${company.name} ran on ${company.inventoryDays} days of inventory against a ${company.leadTime}-day lead time — that gap is exactly where crises do the most damage.`,
+    `The ${crisis.type.toLowerCase()} put ${crisis.financialImpact}% of revenue at risk — a reminder that ${crisis.impactArea.toLowerCase()} is a single point of failure worth investing around.`,
+    `Negotiation trust ended at ${Math.round(negotiation.stats.trust)}/100 — trust built under pressure tends to outlast any single discount.`,
+    `Your strongest dimension was ${strongest.name} (${strongest.value}/100) — that's the muscle this organization should keep training.`,
+    `Your weakest dimension was ${weakest.name} (${weakest.value}/100) — that's the clearest opportunity for the next planning cycle.`,
+  ];
+
+  return (
+    <div className="stage">
+      <div className="eyebrow-label">Final Report</div>
+      <h1 className="stage-title">Crisis Debrief: {company.name}</h1>
+      <p className="stage-sub">
+        Here's how your decisions across the War Room, negotiation, boardroom, and AI strategy combined
+        into a single resilience profile for {company.name}.
+      </p>
+
+      <div className="score-hero">
+        <div className="score-ring-wrap">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle className="score-ring-bg" cx="80" cy="80" r="70" />
+            <circle
+              className="score-ring-fg"
+              cx="80" cy="80" r="70"
+              stroke={ringColor}
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+            />
+          </svg>
+          <div className="score-ring-text">
+            <div className="num">{animScore}</div>
+            <div className="lbl">Crisis Score</div>
+          </div>
+        </div>
+        <div className="score-hero-text">
+          <h2 className="score-grade">{grade}</h2>
+          <p className="score-blurb">
+            Across six decision points, {company.name} navigated a {crisis.urgency.toLowerCase()}-urgency
+            {" "}{crisis.type.toLowerCase()} with an overall crisis score of <b style={{color:"var(--text-0)"}}>{overall}/100</b>.
+            The breakdown below shows exactly where your strategy paid off and where it left value on the table.
+          </p>
+        </div>
+      </div>
+
+      <div className="metrics-panel">
+        <div className="metrics-panel-title">Performance breakdown</div>
+        <MetricBar name="Leadership" value={leadershipScore} suffix="/100" />
+        <MetricBar name="Negotiation" value={negotiationScore} suffix="/100" />
+        <MetricBar name="Resilience" value={resilience} suffix="/100" />
+        <MetricBar name="Cost Control" value={costControl} suffix="/100" />
+        <MetricBar name="Risk Management" value={riskManagement} suffix="/100" />
+        <MetricBar name="Customer Satisfaction" value={customerSatisfaction} suffix="/100" />
+      </div>
+
+      <div className="feedback-grid">
+        <div className="feedback-card mistake">
+          <div className="fc-label">Biggest mistake</div>
+          <div className="fc-body">{mistakeText}</div>
+        </div>
+        <div className="feedback-card best">
+          <div className="fc-label">Best decision</div>
+          <div className="fc-body">{bestText}</div>
+        </div>
+        <div className="feedback-card expert">
+          <div className="fc-label">Expert recommendation</div>
+          <div className="fc-body">{expertRec}</div>
+        </div>
+      </div>
+
+      <div className="lessons-panel">
+        <div className="metrics-panel-title" style={{marginBottom:14}}>Lessons learned</div>
+        <ul>
+          {lessons.map((l,i) => <li key={i}>{l}</li>)}
+        </ul>
+      </div>
+
+      <div className="stage-footer" style={{justifyContent:"center"}}>
+        <button className="btn btn-primary" onClick={onReplay}>
+          <Icon name="compass" size={17} />
+          Run a New Simulation
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================================
+   ROOT APP
+========================================================================= */
+const STAGE_LABELS = ["Welcome","Company","Crisis","War Room","Negotiation","Boardroom","AI Strategy","Report"];
+
+function App(){
+  const [stage, setStage] = useState(0); // 0=welcome,1=company,2=crisis,3=warroom,4=negotiation,5=boardroom,6=ai,7=final
+  const [company, setCompany] = useState(null);
+  const [crisis, setCrisis] = useState(null);
+  const [warRoomData, setWarRoomData] = useState(null);
+  const [negotiationData, setNegotiationData] = useState(null);
+  const [boardroomData, setBoardroomData] = useState(null);
+  const [aiData, setAiData] = useState(null);
+
+  const startSimulation = () => {
+    const c = generateCompany();
+    const cr = generateCrisis(c);
+    setCompany(c);
+    setCrisis(cr);
+    setStage(1);
+  };
+
+  const replay = () => {
+    setWarRoomData(null);
+    setNegotiationData(null);
+    setBoardroomData(null);
+    setAiData(null);
+    setCompany(null);
+    setCrisis(null);
+    setStage(0);
+  };
+
+  const crisisActive = stage >= 2 && stage <= 6;
+
+  let content = null;
+  if (stage === 0) content = <Welcome onStart={startSimulation} />;
+  else if (stage === 1) content = <CompanyProfile company={company} onNext={() => setStage(2)} />;
+  else if (stage === 2) content = <CrisisBriefing company={company} crisis={crisis} onNext={() => setStage(3)} />;
+  else if (stage === 3) content = <WarRoom onComplete={(d) => { setWarRoomData(d); setStage(4); }} />;
+  else if (stage === 4) content = <Negotiation onComplete={(d) => { setNegotiationData(d); setStage(5); }} />;
+  else if (stage === 5) content = <Boardroom onComplete={(d) => { setBoardroomData(d); setStage(6); }} />;
+  else if (stage === 6) content = <AIStrategy onComplete={(d) => { setAiData(d); setStage(7); }} />;
+  else if (stage === 7) content = (
+    <FinalDashboard
+      allData={{
+        company, crisis,
+        warRoom: warRoomData,
+        negotiation: negotiationData,
+        boardroom: boardroomData,
+        aiStrategy: aiData,
+      }}
+      onReplay={replay}
+    />
+  );
+
+  return (
+    <div className="scaffold">
+      <TopBar stageIndex={Math.min(stage, 7)} totalStages={7} crisisActive={crisisActive} />
+      {stage > 0 && stage < 7 && <Stepper stageIndex={stage - 1} labels={STAGE_LABELS.slice(1,7)} />}
+      {content}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
+</script>
+</body>
+</html>
