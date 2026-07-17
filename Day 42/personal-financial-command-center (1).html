@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Ledger — Your Financial Command Center</title>
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+:root{
+  --paper:#F7F3EA;
+  --paper-2:#EFE9DB;
+  --card:#FFFDF8;
+  --ink:#242220;
+  --ink-soft:#5B564D;
+  --ink-faint:#9A9384;
+  --line:#DCD4C0;
+  --lime:#B9D94D;
+  --lime-deep:#7FA22E;
+  --grape:#6E4E9E;
+  --grape-deep:#4E3272;
+  --rose:#E1607A;
+  --gold:#E8A33D;
+  --teal:#2F9E8F;
+  --danger:#D14545;
+  --shadow: 0 1px 2px rgba(36,34,32,.06), 0 8px 24px -12px rgba(36,34,32,.18);
+  --radius: 14px;
+  --font-display:'Arial Black','Segoe UI Black',system-ui,sans-serif;
+  --font-hand:'Segoe Print','Bradley Hand','Comic Sans MS',cursive;
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --font-mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+}
+[data-theme="dark"]{
+  --paper:#181613;
+  --paper-2:#100E0C;
+  --card:#211E1A;
+  --ink:#F2ECDD;
+  --ink-soft:#B9B1A0;
+  --ink-faint:#726B5D;
+  --line:#332F29;
+  --lime:#C7E265;
+  --lime-deep:#9AC13B;
+  --grape:#9A7AD1;
+  --grape-deep:#7A5CB5;
+  --rose:#F17E93;
+  --gold:#F0B65B;
+  --teal:#4FBFAE;
+  --danger:#E86A6A;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -14px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{-webkit-font-smoothing:antialiased;}
+body{
+  font-family:var(--font-body);
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 28px),
+    repeating-linear-gradient(90deg, transparent, transparent 27px, var(--line) 28px),
+    var(--paper);
+  background-size: 28px 28px, 28px 28px, cover;
+  background-blend-mode: normal;
+  color:var(--ink);
+  min-height:100vh;
+  transition: background-color .3s ease, color .3s ease;
+}
+[data-theme="dark"] body{ background-blend-mode: screen; opacity:1; }
+[data-theme="dark"] body{ background:
+    repeating-linear-gradient(0deg, transparent, transparent 27px, var(--line) 28px),
+    repeating-linear-gradient(90deg, transparent, transparent 27px, var(--line) 28px),
+    var(--paper);
+}
+::selection{ background:var(--lime); color:#20240a; }
+button{ font-family:inherit; cursor:pointer; }
+::-webkit-scrollbar{ width:10px; height:10px;}
+::-webkit-scrollbar-thumb{ background:var(--line); border-radius:8px;}
+::-webkit-scrollbar-track{ background:transparent;}
+
+a{ color:inherit; }
+
+/* ============================================================
+   SHELL
+============================================================ */
+.app-shell{
+  display:grid;
+  grid-template-columns: 250px 1fr;
+  min-height:100vh;
+}
+.spine{
+  position:relative;
+  background:var(--card);
+  border-right:1px solid var(--line);
+  padding:26px 18px 18px;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  box-shadow: var(--shadow);
+}
+.spine::before{
+  content:"";
+  position:absolute; left:0; top:0; bottom:0; width:6px;
+  background: repeating-linear-gradient(180deg, var(--grape) 0 22px, transparent 22px 34px);
+  opacity:.5;
+}
+.brand{
+  padding-left:8px;
+}
+.brand .kicker{
+  font-family:var(--font-hand);
+  color:var(--grape);
+  font-size:15px;
+  letter-spacing:.02em;
+  display:block;
+  transform:rotate(-2deg);
+}
+.brand h1{
+  font-family:var(--font-display);
+  font-size:26px;
+  letter-spacing:-0.01em;
+  line-height:1.05;
+  margin-top:2px;
+}
+.brand .sub{
+  font-size:12px;
+  color:var(--ink-faint);
+  margin-top:4px;
+}
+nav.tabs{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  flex:1;
+}
+.tab-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:none;
+  background:transparent;
+  color:var(--ink-soft);
+  text-align:left;
+  padding:10px 10px;
+  border-radius:10px;
+  font-size:14.5px;
+  font-weight:600;
+  position:relative;
+  transition:.15s ease;
+}
+.tab-btn svg{ width:18px; height:18px; flex-shrink:0; }
+.tab-btn:hover{ background:var(--paper-2); color:var(--ink); }
+.tab-btn.active{
+  background:var(--ink);
+  color:var(--paper);
+}
+[data-theme="dark"] .tab-btn.active{ background:var(--lime); color:#1c2005; }
+.tab-btn .tag{
+  margin-left:auto;
+  font-family:var(--font-mono);
+  font-size:9px;
+  color:var(--ink-faint);
+}
+.tab-btn.active .tag{ color:inherit; opacity:.6;}
+
+.spine-foot{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  border-top:1px dashed var(--line);
+  padding-top:14px;
+}
+.foot-btn{
+  display:flex; align-items:center; gap:8px;
+  background:var(--paper-2);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:8px 10px;
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--ink-soft);
+}
+.foot-btn:hover{ color:var(--ink); border-color:var(--grape); }
+.foot-btn svg{ width:15px; height:15px; }
+
+main.pages{
+  padding:32px 40px 80px;
+  max-width:1180px;
+}
+.page{ display:none; animation: fadeUp .4s ease; }
+.page.active{ display:block; }
+@keyframes fadeUp{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;} }
+
+.page-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:22px;
+  flex-wrap:wrap;
+}
+.page-head .eyebrow{
+  font-family:var(--font-hand);
+  color:var(--grape);
+  font-size:16px;
+  transform:rotate(-1deg);
+  display:inline-block;
+}
+.page-head h2{
+  font-family:var(--font-display);
+  font-size:30px;
+  letter-spacing:-0.01em;
+}
+.page-head p.desc{ color:var(--ink-soft); font-size:13.5px; margin-top:6px; max-width:520px;}
+
+/* ============================================================
+   CARDS / GRID
+============================================================ */
+.grid{ display:grid; gap:18px; }
+.grid.cols-4{ grid-template-columns:repeat(4,1fr);}
+.grid.cols-3{ grid-template-columns:repeat(3,1fr);}
+.grid.cols-2{ grid-template-columns:repeat(2,1fr);}
+@media (max-width:900px){
+  .grid.cols-4{ grid-template-columns:repeat(2,1fr);}
+  .grid.cols-3{ grid-template-columns:repeat(1,1fr);}
+  .grid.cols-2{ grid-template-columns:repeat(1,1fr);}
+}
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px 20px;
+  box-shadow:var(--shadow);
+}
+.card.tilt:hover{ transform:rotate(-.4deg) translateY(-2px); transition:.2s ease; }
+.card h3{
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ink-faint);
+  font-weight:700;
+  margin-bottom:8px;
+}
+.stat-num{
+  font-family:var(--font-mono);
+  font-size:27px;
+  font-weight:700;
+  letter-spacing:-0.01em;
+}
+.stat-sub{ font-size:12px; color:var(--ink-soft); margin-top:4px; }
+.pill{
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:700;
+  padding:2px 8px; border-radius:20px;
+  background:var(--paper-2); color:var(--ink-soft);
+}
+.pill.up{ background:rgba(127,162,46,.15); color:var(--lime-deep); }
+.pill.down{ background:rgba(209,69,69,.13); color:var(--danger); }
+
+/* Report card grade */
+.grade-card{
+  display:flex; align-items:center; gap:22px;
+  background:linear-gradient(135deg, var(--card), var(--paper-2));
+}
+.grade-badge{
+  width:92px; height:92px; border-radius:50%;
+  border:5px solid var(--ink);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display);
+  font-size:34px;
+  flex-shrink:0;
+  background:var(--paper);
+  position:relative;
+}
+[data-theme="dark"] .grade-badge{ border-color:var(--lime); }
+.grade-meta h3{ margin-bottom:2px; }
+.grade-meta .grade-line{ font-size:13.5px; color:var(--ink-soft); max-width:420px; }
+.subscores{ display:flex; gap:16px; margin-top:12px; flex-wrap:wrap; }
+.subscore{ font-size:11.5px; color:var(--ink-soft); }
+.subscore b{ color:var(--ink); font-family:var(--font-mono); }
+.bar-track{ width:70px; height:5px; border-radius:4px; background:var(--line); overflow:hidden; display:inline-block; vertical-align:middle; margin-left:6px;}
+.bar-fill{ height:100%; background:var(--grape); }
+
+/* ============================================================
+   BUTTONS / FORMS
+============================================================ */
+.btn{
+  display:inline-flex; align-items:center; gap:7px;
+  border:none; border-radius:10px;
+  padding:10px 16px;
+  font-weight:700; font-size:13.5px;
+  background:var(--ink); color:var(--paper);
+  transition:.15s ease;
+}
+.btn:hover{ transform:translateY(-1px); box-shadow:var(--shadow); }
+.btn.primary{ background:var(--lime); color:#1d2406; }
+.btn.ghost{ background:transparent; color:var(--ink); border:1.5px solid var(--line); }
+.btn.small{ padding:6px 11px; font-size:12px; }
+.btn svg{ width:15px; height:15px; }
+
+input, select, textarea{
+  font-family:inherit;
+  background:var(--paper);
+  border:1.5px solid var(--line);
+  border-radius:9px;
+  padding:9px 11px;
+  color:var(--ink);
+  font-size:13.5px;
+  width:100%;
+}
+input:focus, select:focus, textarea:focus{
+  outline:none; border-color:var(--grape);
+}
+label{ font-size:11.5px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; display:block; margin-bottom:5px; }
+.field{ margin-bottom:14px; }
+.field-row{ display:flex; gap:12px; }
+.field-row .field{ flex:1; }
+
+/* ============================================================
+   OVERVIEW EXTRAS
+============================================================ */
+.section-title{
+  font-family:var(--font-display);
+  font-size:17px;
+  margin: 30px 0 14px;
+  display:flex; align-items:center; gap:8px;
+}
+.section-title .dot{ width:9px; height:9px; border-radius:50%; background:var(--grape); }
+
+.two-col{ display:grid; grid-template-columns: 1.3fr 1fr; gap:18px; }
+@media (max-width:900px){ .two-col{ grid-template-columns:1fr; } }
+
+.list-row{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:9px 0; border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.list-row:last-child{ border-bottom:none; }
+.list-row .lr-left{ display:flex; align-items:center; gap:10px; }
+.cat-dot{ width:9px; height:9px; border-radius:3px; }
+.list-row .amt{ font-family:var(--font-mono); font-weight:700; }
+.amt.neg{ color:var(--rose); }
+.amt.pos{ color:var(--lime-deep); }
+
+/* ============================================================
+   GOAL JAR
+============================================================ */
+.jar-wrap{
+  display:flex; gap:30px; align-items:center; flex-wrap:wrap;
+}
+.jar-svg{ width:170px; height:220px; flex-shrink:0; }
+.jar-info{ flex:1; min-width:220px; }
+.jar-info h3{ font-family:var(--font-display); font-size:22px; text-transform:none; letter-spacing:0; color:var(--ink); margin-bottom:6px;}
+.jar-progress-text{ font-family:var(--font-mono); font-size:14px; color:var(--ink-soft); }
+.jar-progress-text b{ color:var(--ink); font-size:19px;}
+.milestone-row{ display:flex; gap:8px; margin-top:14px; flex-wrap:wrap; }
+.milestone{
+  font-size:11px; font-weight:700; padding:4px 9px; border-radius:20px;
+  border:1.5px dashed var(--line); color:var(--ink-faint);
+}
+.milestone.hit{ border-style:solid; border-color:var(--gold); color:var(--gold); background:rgba(232,163,61,.1); }
+
+/* ============================================================
+   CHARTS (canvas containers)
+============================================================ */
+.chart-box{ width:100%; }
+canvas{ width:100%; display:block; }
+
+/* ============================================================
+   TABLE / LOG
+============================================================ */
+table.log{ width:100%; border-collapse:collapse; font-size:13px; }
+table.log th{
+  text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--ink-faint); padding:8px 6px; border-bottom:2px solid var(--line);
+}
+table.log td{ padding:9px 6px; border-bottom:1px solid var(--line); }
+table.log tr:hover td{ background:var(--paper-2); }
+.del-btn{ background:none; border:none; color:var(--ink-faint); font-size:15px; }
+.del-btn:hover{ color:var(--danger); }
+
+/* ============================================================
+   BUDGET BARS
+============================================================ */
+.budget-row{ margin-bottom:14px; }
+.budget-row .brow-top{ display:flex; justify-content:space-between; font-size:12.5px; margin-bottom:5px; }
+.budget-row .brow-top b{ font-family:var(--font-mono); }
+.budget-track{ height:9px; border-radius:5px; background:var(--paper-2); overflow:hidden; border:1px solid var(--line); }
+.budget-fill{ height:100%; border-radius:5px; }
+
+/* ============================================================
+   INSIGHT CARDS
+============================================================ */
+.insight-card{
+  display:flex; gap:12px; align-items:flex-start;
+  border-left:4px solid var(--grape);
+  padding:12px 14px; background:var(--paper-2); border-radius:0 10px 10px 0;
+  margin-bottom:10px; font-size:13px; line-height:1.5;
+}
+.insight-card.warn{ border-color:var(--rose); }
+.insight-card.good{ border-color:var(--lime-deep); }
+.insight-card svg{ width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+
+.slider-block{ margin:18px 0; }
+.slider-block output{ font-family:var(--font-mono); font-weight:700; color:var(--grape); }
+input[type=range]{ accent-color:var(--grape); width:100%; }
+
+/* ============================================================
+   TIPS / CHECKLIST
+============================================================ */
+.check-item{ display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px dashed var(--line); font-size:13.5px;}
+.check-item input{ width:auto; margin-top:3px; accent-color:var(--lime-deep); }
+.check-item.done label{ text-decoration:line-through; color:var(--ink-faint); }
+.tip-card{ background:var(--paper-2); border-radius:10px; padding:14px; font-size:13px; border:1px solid var(--line);}
+.tip-card .tip-num{ font-family:var(--font-hand); color:var(--grape); font-size:15px; }
+.prompt-chip{
+  display:block; width:100%; text-align:left;
+  background:var(--card); border:1.5px dashed var(--line); border-radius:10px;
+  padding:11px 13px; font-size:12.8px; margin-bottom:8px; color:var(--ink-soft);
+}
+.prompt-chip:hover{ border-color:var(--grape); color:var(--ink); }
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(20,18,15,.55);
+  display:flex; align-items:center; justify-content:center; z-index:100;
+  backdrop-filter: blur(2px);
+}
+.modal{
+  background:var(--card); border-radius:16px; padding:26px;
+  width:420px; max-width:92vw; max-height:88vh; overflow:auto;
+  box-shadow:0 24px 60px -10px rgba(0,0,0,.4);
+  border:1px solid var(--line);
+}
+.modal h2{ font-family:var(--font-display); font-size:20px; margin-bottom:16px; }
+.modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:18px; }
+
+/* toast */
+#toast{
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:var(--paper); padding:11px 18px; border-radius:10px;
+  font-size:13px; font-weight:600; opacity:0; pointer-events:none; transition:.25s ease;
+  z-index:200; box-shadow:var(--shadow);
+}
+#toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* confetti */
+.confetti-piece{
+  position:fixed; top:-10px; width:8px; height:8px; z-index:300; pointer-events:none;
+  border-radius:2px;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width:820px){
+  .app-shell{ grid-template-columns:1fr; }
+  .spine{
+    position:sticky; top:0; z-index:50;
+    flex-direction:row; align-items:center; overflow-x:auto;
+    padding:12px 14px; gap:14px; border-right:none; border-bottom:1px solid var(--line);
+  }
+  .spine::before{ display:none; }
+  .brand{ display:none; }
+  nav.tabs{ flex-direction:row; flex:none; }
+  .tab-btn span.label-text{ display:none; }
+  .tab-btn .tag{ display:none; }
+  .spine-foot{ flex-direction:row; border-top:none; padding-top:0; margin-left:auto; }
+  main.pages{ padding:20px 16px 70px; }
+  .jar-wrap{ flex-direction:column; align-items:flex-start; }
+}
+
+/* Print */
+@media print{
+  .spine, .btn, .foot-btn, #toast, .modal-backdrop{ display:none !important; }
+  .app-shell{ grid-template-columns:1fr; }
+  body{ background:#fff; }
+  .page{ display:block !important; }
+  .page:not(#tab-overview){ page-break-before:always; }
+  .card{ box-shadow:none; border:1px solid #ccc; }
+}
+</style>
+</head>
+<body data-theme="light">
+
+<div class="app-shell">
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="spine">
+    <div class="brand">
+      <span class="kicker">for students, mostly broke, always saving</span>
+      <h1>The Ledger</h1>
+      <div class="sub">Personal Financial Command Center</div>
+    </div>
+
+    <nav class="tabs" id="navTabs">
+      <button class="tab-btn active" data-tab="overview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span class="label-text">Overview</span>
+      </button>
+      <button class="tab-btn" data-tab="goal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>
+        <span class="label-text">Goal Jar</span>
+      </button>
+      <button class="tab-btn" data-tab="income">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15c2-6 4-9 8-9s6 3 8 9"/><path d="M4 15h16"/><path d="M4 19h16"/></svg>
+        <span class="label-text">Income Pulse</span>
+      </button>
+      <button class="tab-btn" data-tab="budget">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/><path d="M8 4v5"/></svg>
+        <span class="label-text">Budget &amp; Spend</span>
+      </button>
+      <button class="tab-btn" data-tab="insights">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a6 6 0 0 0-4 10.5c.6.6 1 1.4 1 2.5h6c0-1.1.4-1.9 1-2.5A6 6 0 0 0 12 2z"/></svg>
+        <span class="label-text">Insights &amp; What-If</span>
+      </button>
+      <button class="tab-btn" data-tab="tips">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5a2 2 0 0 1 2-2h11l3 3v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M9 8h7"/><path d="M9 12h7"/><path d="M9 16h4"/></svg>
+        <span class="label-text">Tips &amp; Resources</span>
+      </button>
+    </nav>
+
+    <div class="spine-foot">
+      <button class="foot-btn" id="themeToggle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="themeIcon"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+        <span id="themeLabel">Dark mode</span>
+      </button>
+      <button class="foot-btn" id="printBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><rect x="6" y="14" width="12" height="8"/><path d="M6 18H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2"/></svg>
+        Print report
+      </button>
+      <button class="foot-btn" id="resetBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        Reset data
+      </button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="pages">
+
+    <!-- ===================== OVERVIEW ===================== -->
+    <section class="page active" id="tab-overview">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">the front page</span>
+          <h2>Overview</h2>
+          <p class="desc">Everything that matters this month, at a glance — built for money that shows up whenever it shows up.</p>
+        </div>
+        <button class="btn primary" id="btnQuickAdd">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+          Log money in/out
+        </button>
+      </div>
+
+      <div class="card grade-card" style="margin-bottom:18px;">
+        <div class="grade-badge" id="gradeBadge">A-</div>
+        <div class="grade-meta">
+          <h3>Financial Health Report Card</h3>
+          <div class="grade-line" id="gradeLine">Calculating your score from savings rate, goal progress, budget discipline and buffer...</div>
+          <div class="subscores" id="subscores"></div>
+        </div>
+      </div>
+
+      <div class="grid cols-4" id="statCards"></div>
+
+      <div class="two-col" style="margin-top:18px;">
+        <div class="card">
+          <h3>Cash flow, last 6 months</h3>
+          <div class="chart-box"><canvas id="cashflowChart" height="220"></canvas></div>
+        </div>
+        <div class="card">
+          <h3>Where spending went (this month)</h3>
+          <div class="chart-box"><canvas id="donutChart" height="220"></canvas></div>
+          <div id="donutLegend" style="margin-top:10px;"></div>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>Recent activity</div>
+      <div class="card">
+        <div id="recentList"></div>
+      </div>
+    </section>
+
+    <!-- ===================== GOAL ===================== -->
+    <section class="page" id="tab-goal">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">what you're actually saving for</span>
+          <h2 id="goalHeading">Goal Jar</h2>
+          <p class="desc">One clear jar, one clear number. Every rupee you set aside shows up here — including the ones from irregular allowance top-ups.</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn ghost" id="btnEditGoal">Edit goal</button>
+          <button class="btn primary" id="btnAddToJar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+            Add to jar
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="jar-wrap">
+          <svg class="jar-svg" viewBox="0 0 170 220" id="jarSvg">
+            <defs>
+              <clipPath id="jarClip"><path d="M25 40 Q25 30 35 30 L135 30 Q145 30 145 40 L150 195 Q150 212 132 212 L38 212 Q20 212 20 195 Z"/></clipPath>
+              <linearGradient id="liquidGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="var(--lime)"/>
+                <stop offset="100%" stop-color="var(--teal)"/>
+              </linearGradient>
+            </defs>
+            <path d="M25 40 Q25 30 35 30 L135 30 Q145 30 145 40 L150 195 Q150 212 132 212 L38 212 Q20 212 20 195 Z"
+                  fill="none" stroke="var(--ink)" stroke-width="3"/>
+            <rect x="55" y="14" width="60" height="18" rx="4" fill="none" stroke="var(--ink)" stroke-width="3"/>
+            <g clip-path="url(#jarClip)">
+              <rect id="jarLiquid" x="15" y="212" width="145" height="0" fill="url(#liquidGrad)"/>
+              <g id="jarCoins"></g>
+            </g>
+            <text id="jarPercentText" x="85" y="125" text-anchor="middle" font-family="var(--font-display)" font-size="26" fill="var(--ink)">0%</text>
+          </svg>
+          <div class="jar-info">
+            <h3 id="jarGoalName">New Laptop</h3>
+            <div class="jar-progress-text"><b id="jarSaved">₹0</b> saved of <b id="jarTarget">₹0</b></div>
+            <div class="stat-sub" id="jarEta" style="margin-top:8px;"></div>
+            <div class="milestone-row" id="milestoneRow"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>Contribution history</div>
+      <div class="card">
+        <table class="log">
+          <thead><tr><th>Date</th><th>Note</th><th style="text-align:right;">Amount</th><th></th></tr></thead>
+          <tbody id="jarLogBody"></tbody>
+        </table>
+        <div id="jarEmpty" class="stat-sub" style="padding:14px 0;">No contributions logged yet — hit "Add to jar" whenever a bit of allowance is free.</div>
+      </div>
+    </section>
+
+    <!-- ===================== INCOME ===================== -->
+    <section class="page" id="tab-income">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">money in, whenever it lands</span>
+          <h2>Income Pulse</h2>
+          <p class="desc">Allowance rarely arrives on a schedule. Log every deposit and let the smoother work out a safe weekly number.</p>
+        </div>
+        <button class="btn primary" id="btnAddIncome">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+          Log a deposit
+        </button>
+      </div>
+
+      <div class="grid cols-3">
+        <div class="card">
+          <h3>Received this month</h3>
+          <div class="stat-num" id="incThisMonth">₹0</div>
+          <div class="stat-sub">across <span id="incCountMonth">0</span> deposits</div>
+        </div>
+        <div class="card">
+          <h3>Smoothed weekly safe-spend</h3>
+          <div class="stat-num" id="incSmoothed">₹0</div>
+          <div class="stat-sub">based on your last few deposits</div>
+        </div>
+        <div class="card">
+          <h3>Irregularity</h3>
+          <div class="stat-num" id="incIrregular">—</div>
+          <div class="stat-sub">how bumpy your income has been</div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:18px;">
+        <h3>Deposit pulse</h3>
+        <div class="chart-box"><canvas id="pulseChart" height="180"></canvas></div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>All deposits</div>
+      <div class="card">
+        <table class="log">
+          <thead><tr><th>Date</th><th>Source</th><th>Note</th><th style="text-align:right;">Amount</th><th></th></tr></thead>
+          <tbody id="incomeLogBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== BUDGET ===================== -->
+    <section class="page" id="tab-budget">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">where it actually goes</span>
+          <h2>Budget &amp; Spending</h2>
+          <p class="desc">Soft envelope limits per category — nothing gets locked, you just get a heads up.</p>
+        </div>
+        <button class="btn primary" id="btnAddExpense">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+          Log an expense
+        </button>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>Envelopes this month</h3>
+          <div id="budgetBars"></div>
+          <button class="btn ghost small" id="btnEditBudgets" style="margin-top:8px;">Edit limits</button>
+        </div>
+        <div class="card">
+          <h3>Spent this month</h3>
+          <div class="stat-num" id="spentThisMonth">₹0</div>
+          <div class="stat-sub" id="spentVsBudget"></div>
+          <div class="chart-box" style="margin-top:14px;"><canvas id="budgetDonut" height="180"></canvas></div>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>Expense log</div>
+      <div class="card">
+        <table class="log">
+          <thead><tr><th>Date</th><th>Category</th><th>Note</th><th style="text-align:right;">Amount</th><th></th></tr></thead>
+          <tbody id="expenseLogBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== INSIGHTS ===================== -->
+    <section class="page" id="tab-insights">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">reading between the numbers</span>
+          <h2>Insights &amp; What-If</h2>
+          <p class="desc">Rule-based observations from your own data, plus a simulator for “what if I saved a bit more per deposit.”</p>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>What Claude notices</div>
+      <div id="insightsList"></div>
+
+      <div class="section-title"><span class="dot"></span>What-if simulator</div>
+      <div class="card">
+        <p class="stat-sub">Slide to test putting a bit more of every allowance drop into the jar, and see when you'd hit your goal.</p>
+        <div class="slider-block">
+          <label>Extra ₹ per deposit: <output id="whatifOut">0</output></label>
+          <input type="range" id="whatifSlider" min="0" max="2000" step="50" value="0">
+        </div>
+        <div class="grid cols-3">
+          <div class="card" style="box-shadow:none; background:var(--paper-2);">
+            <h3>Current pace</h3>
+            <div class="stat-num" id="whatifCurrent">—</div>
+          </div>
+          <div class="card" style="box-shadow:none; background:var(--paper-2);">
+            <h3>With extra saved</h3>
+            <div class="stat-num" id="whatifNew">—</div>
+          </div>
+          <div class="card" style="box-shadow:none; background:var(--paper-2);">
+            <h3>Time saved</h3>
+            <div class="stat-num" id="whatifDelta">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TIPS ===================== -->
+    <section class="page" id="tab-tips">
+      <div class="page-head">
+        <div>
+          <span class="eyebrow">the last page of the notebook</span>
+          <h2>Tips &amp; Financial Literacy</h2>
+          <p class="desc">Ideas built for irregular student money, a checklist to work through, and prompts to keep learning.</p>
+        </div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>Tips for irregular income</div>
+      <div class="grid cols-3" id="tipsGrid"></div>
+
+      <div class="section-title"><span class="dot"></span>Monthly money checklist</div>
+      <div class="card">
+        <div id="checklist"></div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>Ask Claude next</div>
+      <div class="card">
+        <p class="stat-sub" style="margin-bottom:12px;">Tap any prompt to copy it, then paste it into a new chat with Claude.</p>
+        <div id="promptChips"></div>
+      </div>
+
+      <div class="section-title"><span class="dot"></span>Useful resources</div>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Reading</h3>
+          <div class="stat-sub" style="line-height:1.9;">
+            "I Will Teach You To Be Rich" — Ramit Sethi, on automating money habits early.<br>
+            RBI's financial literacy portal, for the basics of banking and saving in India.<br>
+            Your college's student financial aid office — often has free 1:1 budgeting help.
+          </div>
+        </div>
+        <div class="card">
+          <h3>Habits worth building now</h3>
+          <div class="stat-sub" style="line-height:1.9;">
+            Skim your deposits and spends here once a week, same day each week.<br>
+            Split every deposit the moment it lands: goal share first, spend share second.<br>
+            Keep one small buffer untouched for the weeks with no income at all.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toast"></div>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+const STORAGE_KEY = 'ledger_student_v1';
+const CATS = [
+  {key:'Food', color:'#E1607A'},
+  {key:'Transport', color:'#E8A33D'},
+  {key:'Entertainment', color:'#6E4E9E'},
+  {key:'Subscriptions', color:'#2F9E8F'},
+  {key:'Shopping', color:'#B9D94D'},
+  {key:'Other', color:'#9A9384'},
+];
+const GOAL_CAT = 'Goal Contribution';
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function daysAgo(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+
+function defaultState(){
+  return {
+    profile:{ name:'', type:'student' },
+    goal:{ name:'New Laptop', target:45000, deadline: (function(){ const d=new Date(); d.setMonth(d.getMonth()+5); return d.toISOString().slice(0,10);})() },
+    income:[
+      {id:uid(), date:daysAgo(52), amount:3000, source:'Parents', note:'Monthly allowance'},
+      {id:uid(), date:daysAgo(38), amount:1200, source:'Tuition side gig', note:'Helped a junior with assignments'},
+      {id:uid(), date:daysAgo(29), amount:2500, source:'Parents', note:'Top-up before exams'},
+      {id:uid(), date:daysAgo(14), amount:800, source:'Grandparents', note:'Surprise gift'},
+      {id:uid(), date:daysAgo(6), amount:3200, source:'Parents', note:'Monthly allowance'},
+    ],
+    expenses:[
+      {id:uid(), date:daysAgo(48), category:'Food', amount:650, note:'Mess top-up + snacks'},
+      {id:uid(), date:daysAgo(44), category:'Subscriptions', amount:149, note:'Music streaming'},
+      {id:uid(), date:daysAgo(40), category:GOAL_CAT, amount:1000, note:'Laptop fund'},
+      {id:uid(), date:daysAgo(33), category:'Transport', amount:300, note:'Bus pass top-up'},
+      {id:uid(), date:daysAgo(27), category:'Entertainment', amount:400, note:'Movie with friends'},
+      {id:uid(), date:daysAgo(25), category:GOAL_CAT, amount:1500, note:'Laptop fund'},
+      {id:uid(), date:daysAgo(20), category:'Food', amount:520, note:'Weekend food run'},
+      {id:uid(), date:daysAgo(12), category:'Shopping', amount:899, note:'New earphones'},
+      {id:uid(), date:daysAgo(9), category:GOAL_CAT, amount:800, note:'Laptop fund'},
+      {id:uid(), date:daysAgo(4), category:'Food', amount:410, note:'Groceries + snacks'},
+    ],
+    budgets:{ Food:1800, Transport:600, Entertainment:800, Subscriptions:300, Shopping:1000, Other:500 },
+    checklist:{},
+    theme:'light',
+  };
+}
+
+let state = load();
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  }catch(e){ return defaultState(); }
+}
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+function fmt(n){
+  n = Math.round(n||0);
+  return '₹' + n.toLocaleString('en-IN');
+}
+function fmtShort(n){
+  n = n||0;
+  if(Math.abs(n) >= 1000) return '₹'+(n/1000).toFixed(1).replace(/\.0$/,'')+'k';
+  return '₹'+Math.round(n);
+}
+function monthKey(dateStr){ return dateStr.slice(0,7); }
+function isThisMonth(dateStr){ return monthKey(dateStr) === monthKey(todayISO()); }
+
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ============================================================
+   DERIVED DATA
+============================================================ */
+function totalIncome(){ return state.income.reduce((s,i)=>s+i.amount,0); }
+function totalSpentExcludingGoal(){ return state.expenses.filter(e=>e.category!==GOAL_CAT).reduce((s,e)=>s+e.amount,0); }
+function totalSaved(){ return state.expenses.filter(e=>e.category===GOAL_CAT).reduce((s,e)=>s+e.amount,0); }
+function availableBalance(){ return totalIncome() - totalSpentExcludingGoal() - totalSaved(); }
+
+function monthlyBuckets(n){
+  // returns array of {key, label, income, expense} for last n months including this one
+  const buckets = [];
+  const now = new Date();
+  for(let i=n-1;i>=0;i--){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const key = d.toISOString().slice(0,7);
+    const label = d.toLocaleDateString('en-IN',{month:'short'});
+    buckets.push({key,label,income:0,expense:0});
+  }
+  const map = {}; buckets.forEach(b=>map[b.key]=b);
+  state.income.forEach(i=>{ const k=monthKey(i.date); if(map[k]) map[k].income += i.amount; });
+  state.expenses.forEach(e=>{ const k=monthKey(e.date); if(map[k]) map[k].expense += e.amount; });
+  return buckets;
+}
+
+function avgDepositStats(){
+  const sorted = [...state.income].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(sorted.length===0) return {avgAmount:0, avgIntervalDays:30, stdevRatio:0};
+  const avgAmount = sorted.reduce((s,i)=>s+i.amount,0)/sorted.length;
+  let intervals = [];
+  for(let i=1;i<sorted.length;i++){
+    const d1=new Date(sorted[i-1].date), d2=new Date(sorted[i].date);
+    intervals.push((d2-d1)/(1000*3600*24));
+  }
+  const avgIntervalDays = intervals.length ? intervals.reduce((a,b)=>a+b,0)/intervals.length : 30;
+  const mean = avgAmount;
+  const variance = sorted.reduce((s,i)=>s+Math.pow(i.amount-mean,2),0)/sorted.length;
+  const stdev = Math.sqrt(variance);
+  const stdevRatio = mean ? stdev/mean : 0;
+  return {avgAmount, avgIntervalDays: Math.max(avgIntervalDays,3), stdevRatio};
+}
+
+function healthScore(){
+  const inc = totalIncome();
+  const saved = totalSaved();
+  const savingsRate = inc ? saved/inc : 0;
+  const s1 = Math.min(100, (savingsRate/0.20)*100);
+
+  const goalPct = state.goal.target ? Math.min(100, (saved/state.goal.target)*100) : 0;
+  const s2 = goalPct;
+
+  const budgetTotal = Object.values(state.budgets).reduce((a,b)=>a+b,0) || 1;
+  const spentMonth = state.expenses.filter(e=>e.category!==GOAL_CAT && isThisMonth(e.date)).reduce((s,e)=>s+e.amount,0);
+  let s3 = 100 - Math.max(0,((spentMonth-budgetTotal)/budgetTotal)*100);
+  s3 = Math.max(0, Math.min(100, s3));
+
+  const buckets = monthlyBuckets(3);
+  const avgMonthlyExpense = buckets.reduce((s,b)=>s+b.expense,0)/3 || 1;
+  const bal = availableBalance();
+  const s4 = Math.max(0, Math.min(100, (bal/avgMonthlyExpense)*50));
+
+  const overall = (s1+s2+s3+s4)/4;
+  let grade='F';
+  if(overall>=90) grade='A+'; else if(overall>=80) grade='A'; else if(overall>=70) grade='B';
+  else if(overall>=60) grade='C'; else if(overall>=50) grade='D'; else grade='F';
+
+  return {overall, grade, savingsRate, s1,s2,s3,s4, goalPct};
+}
+
+/* ============================================================
+   RENDER: OVERVIEW
+============================================================ */
+function renderOverview(){
+  const hs = healthScore();
+  document.getElementById('gradeBadge').textContent = hs.grade;
+  const lines = {
+    'A+':'Excellent — you\'re saving consistently and staying under budget.',
+    'A':'Strong footing. Keep the goal contributions steady.',
+    'B':'Solid, with room to tighten a category or two.',
+    'C':'Getting there — try nudging your goal contribution up slightly.',
+    'D':'A bit shaky. Check the Insights tab for specific fixes.',
+    'F':'Time for a reset — start with one small, repeatable habit.'
+  };
+  document.getElementById('gradeLine').textContent = lines[hs.grade];
+  document.getElementById('subscores').innerHTML = `
+    ${subscoreHtml('Savings rate', hs.s1)}
+    ${subscoreHtml('Goal progress', hs.s2)}
+    ${subscoreHtml('Budget discipline', hs.s3)}
+    ${subscoreHtml('Buffer', hs.s4)}
+  `;
+
+  const inc = totalIncome(), spent = totalSpentExcludingGoal(), saved = totalSaved(), bal = availableBalance();
+  const cards = [
+    {label:'Available balance', val:fmt(bal), sub:'income minus spending minus savings'},
+    {label:'Total received', val:fmt(inc), sub: state.income.length+' deposits logged'},
+    {label:'Saved toward goal', val:fmt(saved), sub: state.goal.target ? Math.round(saved/state.goal.target*100)+'% of '+fmt(state.goal.target) : '—'},
+    {label:'Spent this month', val:fmt(state.expenses.filter(e=>e.category!==GOAL_CAT && isThisMonth(e.date)).reduce((s,e)=>s+e.amount,0)), sub:'across all categories'},
+  ];
+  document.getElementById('statCards').innerHTML = cards.map(c=>`
+    <div class="card tilt">
+      <h3>${c.label}</h3>
+      <div class="stat-num">${c.val}</div>
+      <div class="stat-sub">${c.sub}</div>
+    </div>`).join('');
+
+  drawCashflowChart();
+  drawDonutChart();
+  renderRecent();
+}
+function subscoreHtml(label,val){
+  return `<div class="subscore">${label} <b>${Math.round(val)}</b><span class="bar-track"><span class="bar-fill" style="width:${Math.max(4,val)}%"></span></span></div>`;
+}
+
+function renderRecent(){
+  const all = [
+    ...state.income.map(i=>({...i, kind:'income', label:i.source})),
+    ...state.expenses.map(e=>({...e, kind:'expense', label:e.category}))
+  ].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,8);
+  if(all.length===0){ document.getElementById('recentList').innerHTML = '<div class="stat-sub">Nothing logged yet.</div>'; return; }
+  document.getElementById('recentList').innerHTML = all.map(item=>{
+    const isIncome = item.kind==='income';
+    const catObj = CATS.find(c=>c.key===item.label);
+    const dotColor = isIncome ? 'var(--lime-deep)' : (item.label===GOAL_CAT ? 'var(--gold)' : (catObj?catObj.color:'var(--ink-faint)'));
+    return `<div class="list-row">
+      <div class="lr-left">
+        <span class="cat-dot" style="background:${dotColor}"></span>
+        <div>
+          <div>${item.note||item.label}</div>
+          <div class="stat-sub">${item.date} · ${item.label}</div>
+        </div>
+      </div>
+      <div class="amt ${isIncome?'pos':'neg'}">${isIncome?'+':'-'}${fmt(item.amount)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---- canvas chart helpers ---- */
+function setupCanvas(canvas){
+  const ratio = window.devicePixelRatio || 1;
+  const cssW = canvas.clientWidth || canvas.parentElement.clientWidth;
+  const cssH = canvas.height;
+  canvas.width = cssW*ratio;
+  canvas.height = cssH*ratio;
+  canvas.style.height = cssH+'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(ratio,ratio);
+  return {ctx, w:cssW, h:cssH};
+}
+function css(varName){
+  return getComputedStyle(document.body).getPropertyValue(varName).trim();
+}
+
+function drawCashflowChart(){
+  const canvas = document.getElementById('cashflowChart');
+  const {ctx,w,h} = setupCanvas(canvas);
+  ctx.clearRect(0,0,w,h);
+  const buckets = monthlyBuckets(6);
+  const max = Math.max(1, ...buckets.map(b=>Math.max(b.income,b.expense)));
+  const padL=40, padB=26, padT=14;
+  const chartW = w-padL-10, chartH = h-padB-padT;
+  const groupW = chartW/buckets.length;
+  const barW = groupW*0.3;
+
+  // gridlines
+  ctx.strokeStyle = css('--line'); ctx.lineWidth=1;
+  for(let g=0; g<=4; g++){
+    const y = padT + chartH - (chartH*g/4);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-6,y); ctx.stroke();
+    ctx.fillStyle = css('--ink-faint'); ctx.font='10px sans-serif';
+    ctx.fillText(fmtShort(max*g/4), 2, y+3);
+  }
+
+  buckets.forEach((b,idx)=>{
+    const x0 = padL + idx*groupW + groupW*0.15;
+    const incH = (b.income/max)*chartH;
+    const expH = (b.expense/max)*chartH;
+    ctx.fillStyle = css('--lime');
+    ctx.fillRect(x0, padT+chartH-incH, barW, incH);
+    ctx.fillStyle = css('--rose');
+    ctx.fillRect(x0+barW+4, padT+chartH-expH, barW, expH);
+    ctx.fillStyle = css('--ink-soft'); ctx.font='11px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(b.label, x0+barW+2, h-8);
+  });
+  ctx.textAlign='start';
+
+  // legend
+  ctx.fillStyle=css('--lime'); ctx.fillRect(w-140,4,10,10);
+  ctx.fillStyle=css('--ink-soft'); ctx.font='11px sans-serif'; ctx.fillText('Income', w-125,13);
+  ctx.fillStyle=css('--rose'); ctx.fillRect(w-70,4,10,10);
+  ctx.fillStyle=css('--ink-soft'); ctx.fillText('Spend', w-55,13);
+}
+
+function categorySpendThisMonth(){
+  const totals = {};
+  CATS.forEach(c=>totals[c.key]=0);
+  state.expenses.filter(e=>e.category!==GOAL_CAT && isThisMonth(e.date)).forEach(e=>{
+    totals[e.category] = (totals[e.category]||0)+e.amount;
+  });
+  return totals;
+}
+
+function drawDonutChart(){
+  const canvas = document.getElementById('donutChart');
+  const {ctx,w,h} = setupCanvas(canvas);
+  ctx.clearRect(0,0,w,h);
+  const totals = categorySpendThisMonth();
+  const entries = CATS.map(c=>({key:c.key, color:c.color, val:totals[c.key]||0})).filter(e=>e.val>0);
+  const cx=w/2, cy=h/2, r=Math.min(w,h)/2-10, rInner=r*0.55;
+  const sum = entries.reduce((s,e)=>s+e.val,0);
+
+  document.getElementById('donutLegend').innerHTML = '';
+  if(sum===0){
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=r-rInner;
+    ctx.beginPath(); ctx.arc(cx,cy,(r+rInner)/2,0,Math.PI*2); ctx.stroke();
+    ctx.fillStyle=css('--ink-faint'); ctx.font='12px sans-serif'; ctx.textAlign='center';
+    ctx.fillText('No spending yet', cx, cy+4);
+    ctx.textAlign='start';
+    return;
+  }
+  let angle = -Math.PI/2;
+  entries.forEach(e=>{
+    const slice = (e.val/sum)*Math.PI*2;
+    ctx.strokeStyle = e.color; ctx.lineWidth = r-rInner;
+    ctx.beginPath(); ctx.arc(cx,cy,(r+rInner)/2, angle, angle+slice); ctx.stroke();
+    angle += slice;
+  });
+  ctx.fillStyle=css('--ink'); ctx.font='bold 15px sans-serif'; ctx.textAlign='center';
+  ctx.fillText(fmtShort(sum), cx, cy+5);
+  ctx.textAlign='start';
+
+  document.getElementById('donutLegend').innerHTML = entries.map(e=>`
+    <div class="list-row" style="padding:4px 0;">
+      <div class="lr-left"><span class="cat-dot" style="background:${e.color}"></span>${e.key}</div>
+      <div class="amt">${fmt(e.val)}</div>
+    </div>`).join('');
+}
+
+/* ============================================================
+   RENDER: GOAL JAR
+============================================================ */
+function renderGoal(){
+  const saved = totalSaved();
+  const target = state.goal.target || 1;
+  const pct = Math.max(0, Math.min(100, (saved/target)*100));
+
+  document.getElementById('jarGoalName').textContent = state.goal.name || 'Your goal';
+  document.getElementById('goalHeading').textContent = 'Goal Jar — ' + (state.goal.name||'');
+  document.getElementById('jarSaved').textContent = fmt(saved);
+  document.getElementById('jarTarget').textContent = fmt(target);
+  document.getElementById('jarPercentText').textContent = Math.round(pct)+'%';
+
+  const maxFillHeight = 178; // px inside jar
+  const fillH = (pct/100)*maxFillHeight;
+  const liquid = document.getElementById('jarLiquid');
+  liquid.setAttribute('y', 212-fillH);
+  liquid.setAttribute('height', fillH);
+  liquid.style.transition = 'y .6s ease, height .6s ease';
+
+  // ETA using deposit stats and current contribution rate
+  const {avgAmount, avgIntervalDays} = avgDepositStats();
+  const inc = totalIncome();
+  const contributionRate = inc ? saved/inc : 0;
+  const perDeposit = avgAmount * (contributionRate || 0.15);
+  const remaining = Math.max(0, target-saved);
+  let etaText = '';
+  if(remaining<=0){
+    etaText = 'Goal reached! Time to set a new one.';
+  } else if(perDeposit>0){
+    const depositsNeeded = remaining/Math.max(perDeposit,1);
+    const daysNeeded = depositsNeeded*avgIntervalDays;
+    const eta = new Date(); eta.setDate(eta.getDate()+Math.round(daysNeeded));
+    etaText = `At your current pace, projected to hit this around ${eta.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}.`;
+  } else {
+    etaText = 'Log a contribution to get a projected date.';
+  }
+  document.getElementById('jarEta').textContent = etaText;
+
+  // milestones
+  const stops = [25,50,75,100];
+  document.getElementById('milestoneRow').innerHTML = stops.map(s=>
+    `<span class="milestone ${pct>=s?'hit':''}">${s}%</span>`
+  ).join('');
+
+  // log
+  const contributions = state.expenses.filter(e=>e.category===GOAL_CAT).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('jarEmpty').style.display = contributions.length? 'none':'block';
+  document.getElementById('jarLogBody').innerHTML = contributions.map(c=>`
+    <tr>
+      <td>${c.date}</td>
+      <td>${c.note||'—'}</td>
+      <td style="text-align:right;" class="amt pos">+${fmt(c.amount)}</td>
+      <td><button class="del-btn" onclick="deleteExpense('${c.id}')">✕</button></td>
+    </tr>`).join('');
+}
+
+let _lastPct = 0;
+function maybeConfetti(newPct){
+  const stops=[25,50,75,100];
+  stops.forEach(s=>{ if(_lastPct<s && newPct>=s) fireConfetti(); });
+  _lastPct = newPct;
+}
+function fireConfetti(){
+  const colors = ['#B9D94D','#6E4E9E','#E1607A','#E8A33D','#2F9E8F'];
+  for(let i=0;i<40;i++){
+    const el = document.createElement('div');
+    el.className='confetti-piece';
+    el.style.left = Math.random()*100+'vw';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+    const duration = 1800+Math.random()*1200;
+    el.animate([
+      {transform:`translateY(0) rotate(0deg)`, opacity:1},
+      {transform:`translateY(${100+Math.random()*20}vh) rotate(${360+Math.random()*360}deg)`, opacity:0.2}
+    ], {duration, easing:'ease-in'});
+    setTimeout(()=>el.remove(), duration);
+  }
+}
+
+/* ============================================================
+   RENDER: INCOME
+============================================================ */
+function renderIncome(){
+  const thisMonthDeposits = state.income.filter(i=>isThisMonth(i.date));
+  document.getElementById('incThisMonth').textContent = fmt(thisMonthDeposits.reduce((s,i)=>s+i.amount,0));
+  document.getElementById('incCountMonth').textContent = thisMonthDeposits.length;
+
+  const {avgAmount, avgIntervalDays, stdevRatio} = avgDepositStats();
+  const weeklySafe = avgIntervalDays ? (avgAmount/avgIntervalDays)*7*0.85 : 0; // 85% of raw average as a safety buffer
+  document.getElementById('incSmoothed').textContent = fmt(weeklySafe);
+
+  let irregLabel = 'Low';
+  if(stdevRatio>0.6) irregLabel='High'; else if(stdevRatio>0.3) irregLabel='Medium';
+  document.getElementById('incIrregular').textContent = irregLabel;
+
+  drawPulseChart();
+
+  const sorted = [...state.income].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('incomeLogBody').innerHTML = sorted.map(i=>`
+    <tr>
+      <td>${i.date}</td><td>${i.source}</td><td>${i.note||'—'}</td>
+      <td style="text-align:right;" class="amt pos">+${fmt(i.amount)}</td>
+      <td><button class="del-btn" onclick="deleteIncome('${i.id}')">✕</button></td>
+    </tr>`).join('') || '<tr><td colspan="5" class="stat-sub">No deposits logged yet.</td></tr>';
+}
+
+function drawPulseChart(){
+  const canvas = document.getElementById('pulseChart');
+  const {ctx,w,h} = setupCanvas(canvas);
+  ctx.clearRect(0,0,w,h);
+  const sorted = [...state.income].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(sorted.length<1){
+    ctx.fillStyle=css('--ink-faint'); ctx.font='12px sans-serif';
+    ctx.fillText('Log a few deposits to see your pulse.', 10, h/2);
+    return;
+  }
+  const padL=44, padB=22, padT=14;
+  const max = Math.max(...sorted.map(i=>i.amount));
+  const chartW = w-padL-14, chartH=h-padB-padT;
+  const stepX = sorted.length>1 ? chartW/(sorted.length-1) : 0;
+
+  ctx.strokeStyle=css('--line');
+  for(let g=0;g<=3;g++){
+    const y = padT+chartH-(chartH*g/3);
+    ctx.beginPath(); ctx.moveTo(padL,y); ctx.lineTo(w-6,y); ctx.stroke();
+    ctx.fillStyle=css('--ink-faint'); ctx.font='10px sans-serif'; ctx.fillText(fmtShort(max*g/3),2,y+3);
+  }
+
+  ctx.beginPath();
+  sorted.forEach((it,idx)=>{
+    const x = padL+idx*stepX;
+    const y = padT+chartH-(it.amount/max)*chartH;
+    if(idx===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle=css('--grape'); ctx.lineWidth=2.4; ctx.stroke();
+
+  sorted.forEach((it,idx)=>{
+    const x = padL+idx*stepX;
+    const y = padT+chartH-(it.amount/max)*chartH;
+    ctx.fillStyle=css('--gold');
+    ctx.beginPath(); ctx.arc(x,y,4,0,Math.PI*2); ctx.fill();
+  });
+}
+
+/* ============================================================
+   RENDER: BUDGET
+============================================================ */
+function renderBudget(){
+  const totals = categorySpendThisMonth();
+  const container = document.getElementById('budgetBars');
+  container.innerHTML = CATS.map(c=>{
+    const limit = state.budgets[c.key]||0;
+    const spent = totals[c.key]||0;
+    const pct = limit ? Math.min(100,(spent/limit)*100) : 0;
+    const over = limit && spent>limit;
+    return `<div class="budget-row">
+      <div class="brow-top"><span>${c.key}</span><b style="color:${over?'var(--danger)':'inherit'}">${fmt(spent)} / ${fmt(limit)}</b></div>
+      <div class="budget-track"><div class="budget-fill" style="width:${pct}%; background:${over?'var(--danger)':c.color}"></div></div>
+    </div>`;
+  }).join('');
+
+  const spentTotal = Object.values(totals).reduce((a,b)=>a+b,0);
+  const budgetTotal = Object.values(state.budgets).reduce((a,b)=>a+b,0);
+  document.getElementById('spentThisMonth').textContent = fmt(spentTotal);
+  document.getElementById('spentVsBudget').textContent = budgetTotal ? `${Math.round(spentTotal/budgetTotal*100)}% of ${fmt(budgetTotal)} total envelope` : 'No budgets set';
+
+  drawBudgetDonut(totals);
+
+  const sorted = [...state.expenses].filter(e=>e.category!==GOAL_CAT).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  document.getElementById('expenseLogBody').innerHTML = sorted.map(e=>`
+    <tr>
+      <td>${e.date}</td><td>${e.category}</td><td>${e.note||'—'}</td>
+      <td style="text-align:right;" class="amt neg">-${fmt(e.amount)}</td>
+      <td><button class="del-btn" onclick="deleteExpense('${e.id}')">✕</button></td>
+    </tr>`).join('') || '<tr><td colspan="5" class="stat-sub">No expenses logged yet.</td></tr>';
+}
+function drawBudgetDonut(totals){
+  const canvas = document.getElementById('budgetDonut');
+  const {ctx,w,h} = setupCanvas(canvas);
+  ctx.clearRect(0,0,w,h);
+  const entries = CATS.map(c=>({key:c.key,color:c.color,val:totals[c.key]||0})).filter(e=>e.val>0);
+  const sum = entries.reduce((s,e)=>s+e.val,0);
+  const cx=w/2, cy=h/2, r=Math.min(w,h)/2-8, rInner=r*0.5;
+  if(sum===0){
+    ctx.strokeStyle=css('--line'); ctx.lineWidth=r-rInner;
+    ctx.beginPath(); ctx.arc(cx,cy,(r+rInner)/2,0,Math.PI*2); ctx.stroke();
+    return;
+  }
+  let angle=-Math.PI/2;
+  entries.forEach(e=>{
+    const slice=(e.val/sum)*Math.PI*2;
+    ctx.strokeStyle=e.color; ctx.lineWidth=r-rInner;
+    ctx.beginPath(); ctx.arc(cx,cy,(r+rInner)/2,angle,angle+slice); ctx.stroke();
+    angle+=slice;
+  });
+}
+
+/* ============================================================
+   RENDER: INSIGHTS
+============================================================ */
+function renderInsights(){
+  const insights = [];
+  const hs = healthScore();
+  const {avgAmount, avgIntervalDays, stdevRatio} = avgDepositStats();
+  const totals = categorySpendThisMonth();
+
+  if(hs.savingsRate < 0.10){
+    insights.push({type:'warn', text:`You're saving about ${Math.round(hs.savingsRate*100)}% of what comes in. Try routing a fixed slice — even 15% — of every deposit straight into the jar before spending anything.`});
+  } else {
+    insights.push({type:'good', text:`You're saving roughly ${Math.round(hs.savingsRate*100)}% of everything that comes in — that's a solid habit for irregular income.`});
+  }
+
+  CATS.filter(c=>c.key!==GOAL_CAT).forEach(c=>{
+    const limit = state.budgets[c.key]||0;
+    const spent = totals[c.key]||0;
+    if(limit && spent>limit){
+      insights.push({type:'warn', text:`${c.key} is over its envelope this month (${fmt(spent)} vs ${fmt(limit)}). Worth a closer look before next allowance.`});
+    }
+  });
+
+  if(stdevRatio>0.5){
+    insights.push({type:'warn', text:`Your deposits swing a lot in size — build a small buffer for the lean weeks instead of assuming every drop will be a big one.`});
+  } else if(state.income.length>=3){
+    insights.push({type:'good', text:`Your allowance amounts are fairly consistent even though the timing isn't — that makes budgeting easier than it might feel.`});
+  }
+
+  const goalPct = hs.goalPct;
+  if(goalPct>=100){
+    insights.push({type:'good', text:`You've hit your goal target for "${state.goal.name}" — time to lock it in or set the next one.`});
+  } else if(goalPct>=75){
+    insights.push({type:'good', text:`You're in the home stretch on "${state.goal.name}" at ${Math.round(goalPct)}%. A couple more contributions and you're there.`});
+  }
+
+  document.getElementById('insightsList').innerHTML = insights.map(i=>`
+    <div class="insight-card ${i.type}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v5"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>
+      <div>${i.text}</div>
+    </div>`).join('') || '<div class="stat-sub">Log a few more entries to unlock insights.</div>';
+
+  setupWhatIf();
+}
+
+function setupWhatIf(){
+  const slider = document.getElementById('whatifSlider');
+  const out = document.getElementById('whatifOut');
+  function recompute(){
+    const extra = parseInt(slider.value,10);
+    out.textContent = fmt(extra).replace('₹','₹');
+    const {avgAmount, avgIntervalDays} = avgDepositStats();
+    const saved = totalSaved(), target = state.goal.target||1, inc = totalIncome();
+    const contributionRate = inc ? saved/inc : 0.15;
+    const remaining = Math.max(0, target-saved);
+
+    const perDepositCurrent = avgAmount*(contributionRate||0.15);
+    const perDepositNew = perDepositCurrent+extra;
+
+    function projectedDate(perDeposit){
+      if(perDeposit<=0 || remaining<=0) return null;
+      const depositsNeeded = remaining/perDeposit;
+      const daysNeeded = depositsNeeded*avgIntervalDays;
+      const eta = new Date(); eta.setDate(eta.getDate()+Math.round(daysNeeded));
+      return eta;
+    }
+    const dCurrent = projectedDate(perDepositCurrent);
+    const dNew = projectedDate(perDepositNew);
+    document.getElementById('whatifCurrent').textContent = dCurrent ? dCurrent.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'Reached';
+    document.getElementById('whatifNew').textContent = dNew ? dNew.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'Reached';
+    if(dCurrent && dNew){
+      const deltaDays = Math.round((dCurrent-dNew)/(1000*3600*24));
+      document.getElementById('whatifDelta').textContent = deltaDays>0 ? `${deltaDays} days sooner` : 'No change';
+    } else {
+      document.getElementById('whatifDelta').textContent = '—';
+    }
+  }
+  slider.oninput = recompute;
+  recompute();
+}
+
+/* ============================================================
+   RENDER: TIPS
+============================================================ */
+const TIPS = [
+  {t:'Split it the moment it lands', d:'Before spending anything from a fresh deposit, move your goal share into the jar first. What\'s left is your real spending money.'},
+  {t:'Budget per week, not per month', d:'With irregular income, a weekly number is easier to hold onto than a monthly one that keeps shifting.'},
+  {t:'Keep a "no-deposit-week" buffer', d:'Set aside a small amount that you never touch, just for the weeks when nothing comes in at all.'},
+  {t:'Round up, don\'t round down', d:'When a gift or top-up arrives, round the goal contribution up to the nearest ₹100 instead of down.'},
+  {t:'Track subscriptions monthly', d:'Small recurring charges are the easiest thing to forget about — and the easiest thing to cancel.'},
+  {t:'Review, don\'t restrict', d:'A weekly 5-minute look at this dashboard beats a rigid rule you\'ll break by Friday.'},
+];
+function renderTips(){
+  document.getElementById('tipsGrid').innerHTML = TIPS.map((tip,idx)=>`
+    <div class="tip-card">
+      <div class="tip-num">Tip ${idx+1}</div>
+      <div style="font-weight:700; margin:4px 0;">${tip.t}</div>
+      <div class="stat-sub">${tip.d}</div>
+    </div>`).join('');
+
+  const items = [
+    'Log every deposit as soon as it lands',
+    'Move this week\'s goal share into the jar',
+    'Check all budget envelopes for overspend',
+    'Cancel or pause one unused subscription',
+    'Review progress toward your goal',
+    'Set next week\'s safe-spend number',
+  ];
+  document.getElementById('checklist').innerHTML = items.map((it,idx)=>{
+    const key = 'chk_'+idx;
+    const checked = state.checklist[key];
+    return `<div class="check-item ${checked?'done':''}">
+      <input type="checkbox" id="${key}" ${checked?'checked':''} onchange="toggleCheck('${key}')">
+      <label for="${key}">${it}</label>
+    </div>`;
+  }).join('');
+
+  const prompts = [
+    'Based on my saving pattern, how should I split irregular allowance deposits between spending, saving, and a buffer?',
+    'Explain the 50/30/20 budgeting rule and how I could adapt it for money that arrives at random times.',
+    'What\'s a simple way for a student to build a 1-month emergency buffer starting from ₹0?',
+    'Give me 3 questions I should ask myself before making an impulse purchase over ₹500.',
+  ];
+  document.getElementById('promptChips').innerHTML = prompts.map(p=>`
+    <button class="prompt-chip" onclick="copyPrompt(this)" data-prompt="${p.replace(/"/g,'&quot;')}">${p}</button>`).join('');
+}
+function toggleCheck(key){
+  state.checklist[key] = !state.checklist[key];
+  save();
+  renderTips();
+}
+function copyPrompt(btn){
+  const text = btn.getAttribute('data-prompt');
+  navigator.clipboard?.writeText(text).then(()=>toast('Prompt copied — paste it into Claude.')).catch(()=>toast('Copy this prompt: '+text));
+}
+
+/* ============================================================
+   ACTIONS: delete
+============================================================ */
+function deleteIncome(id){
+  state.income = state.income.filter(i=>i.id!==id);
+  save(); renderAll();
+}
+function deleteExpense(id){
+  state.expenses = state.expenses.filter(e=>e.id!==id);
+  save(); renderAll();
+}
+
+/* ============================================================
+   MODALS
+============================================================ */
+function openModal(html){
+  const root = document.getElementById('modalRoot');
+  root.innerHTML = `<div class="modal-backdrop" id="modalBackdrop"><div class="modal">${html}</div></div>`;
+  document.getElementById('modalBackdrop').addEventListener('click', (e)=>{
+    if(e.target.id==='modalBackdrop') closeModal();
+  });
+}
+function closeModal(){ document.getElementById('modalRoot').innerHTML=''; }
+
+function modalAddIncome(){
+  openModal(`
+    <h2>Log a deposit</h2>
+    <div class="field"><label>Amount (₹)</label><input type="number" id="mIncAmount" placeholder="1500"></div>
+    <div class="field"><label>Source</label>
+      <select id="mIncSource"><option>Parents</option><option>Grandparents</option><option>Tuition side gig</option><option>Scholarship</option><option>Gift</option><option>Other</option></select>
+    </div>
+    <div class="field"><label>Note (optional)</label><input type="text" id="mIncNote" placeholder="e.g. exam top-up"></div>
+    <div class="field"><label>Date</label><input type="date" id="mIncDate" value="${todayISO()}"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="submitIncome()">Save deposit</button>
+    </div>`);
+}
+function submitIncome(){
+  const amount = parseFloat(document.getElementById('mIncAmount').value);
+  if(!amount || amount<=0){ toast('Enter a valid amount'); return; }
+  state.income.push({
+    id:uid(),
+    amount,
+    source:document.getElementById('mIncSource').value,
+    note:document.getElementById('mIncNote').value,
+    date:document.getElementById('mIncDate').value||todayISO(),
+  });
+  save(); closeModal(); renderAll(); toast('Deposit logged');
+}
+
+function modalAddExpense(prefillCat){
+  const catOptions = CATS.map(c=>`<option value="${c.key}" ${c.key===prefillCat?'selected':''}>${c.key}</option>`).join('');
+  openModal(`
+    <h2>Log an expense</h2>
+    <div class="field"><label>Amount (₹)</label><input type="number" id="mExpAmount" placeholder="250"></div>
+    <div class="field"><label>Category</label><select id="mExpCat">${catOptions}</select></div>
+    <div class="field"><label>Note (optional)</label><input type="text" id="mExpNote" placeholder="e.g. weekend groceries"></div>
+    <div class="field"><label>Date</label><input type="date" id="mExpDate" value="${todayISO()}"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="submitExpense()">Save expense</button>
+    </div>`);
+}
+function submitExpense(){
+  const amount = parseFloat(document.getElementById('mExpAmount').value);
+  if(!amount || amount<=0){ toast('Enter a valid amount'); return; }
+  state.expenses.push({
+    id:uid(),
+    amount,
+    category:document.getElementById('mExpCat').value,
+    note:document.getElementById('mExpNote').value,
+    date:document.getElementById('mExpDate').value||todayISO(),
+  });
+  save(); closeModal();
+  const beforePct = healthScore().goalPct;
+  renderAll();
+  toast('Expense logged');
+}
+
+function modalAddToJar(){
+  openModal(`
+    <h2>Add to jar — ${state.goal.name}</h2>
+    <div class="field"><label>Amount (₹)</label><input type="number" id="mJarAmount" placeholder="500"></div>
+    <div class="field"><label>Note (optional)</label><input type="text" id="mJarNote" placeholder="e.g. from this week's allowance"></div>
+    <div class="field"><label>Date</label><input type="date" id="mJarDate" value="${todayISO()}"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="submitJar()">Add to jar</button>
+    </div>`);
+}
+function submitJar(){
+  const amount = parseFloat(document.getElementById('mJarAmount').value);
+  if(!amount || amount<=0){ toast('Enter a valid amount'); return; }
+  state.expenses.push({
+    id:uid(), amount, category:GOAL_CAT,
+    note:document.getElementById('mJarNote').value || 'Jar contribution',
+    date:document.getElementById('mJarDate').value||todayISO(),
+  });
+  save(); closeModal();
+  const pct = Math.min(100,(totalSaved()/(state.goal.target||1))*100);
+  renderAll();
+  maybeConfetti(pct);
+  toast('Added to the jar!');
+}
+
+function modalEditGoal(){
+  openModal(`
+    <h2>Edit your goal</h2>
+    <div class="field"><label>What are you saving for?</label><input type="text" id="mGoalName" value="${state.goal.name}"></div>
+    <div class="field"><label>Target amount (₹)</label><input type="number" id="mGoalTarget" value="${state.goal.target}"></div>
+    <div class="field"><label>Target date</label><input type="date" id="mGoalDeadline" value="${state.goal.deadline}"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="submitGoal()">Save goal</button>
+    </div>`);
+}
+function submitGoal(){
+  state.goal.name = document.getElementById('mGoalName').value || 'My goal';
+  state.goal.target = parseFloat(document.getElementById('mGoalTarget').value)||1;
+  state.goal.deadline = document.getElementById('mGoalDeadline').value;
+  save(); closeModal(); renderAll(); toast('Goal updated');
+}
+
+function modalEditBudgets(){
+  const rows = CATS.filter(c=>c.key!==GOAL_CAT).map(c=>`
+    <div class="field"><label>${c.key}</label><input type="number" id="mBudget_${c.key}" value="${state.budgets[c.key]||0}"></div>
+  `).join('');
+  openModal(`
+    <h2>Edit monthly envelopes</h2>
+    ${rows}
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn primary" onclick="submitBudgets()">Save limits</button>
+    </div>`);
+}
+function submitBudgets(){
+  CATS.filter(c=>c.key!==GOAL_CAT).forEach(c=>{
+    const val = parseFloat(document.getElementById('mBudget_'+c.key).value)||0;
+    state.budgets[c.key] = val;
+  });
+  save(); closeModal(); renderAll(); toast('Budgets updated');
+}
+
+function modalQuickAdd(){
+  openModal(`
+    <h2>What would you like to log?</h2>
+    <div class="modal-actions" style="justify-content:stretch; flex-direction:column; gap:10px;">
+      <button class="btn primary" style="width:100%; justify-content:center;" onclick="closeModal(); modalAddIncome();">Money in (deposit)</button>
+      <button class="btn ghost" style="width:100%; justify-content:center;" onclick="closeModal(); modalAddExpense();">Money out (expense)</button>
+      <button class="btn ghost" style="width:100%; justify-content:center;" onclick="closeModal(); modalAddToJar();">Add to goal jar</button>
+    </div>`);
+}
+
+/* ============================================================
+   NAV / THEME / PRINT / RESET
+============================================================ */
+function renderAll(){
+  renderOverview();
+  renderGoal();
+  renderIncome();
+  renderBudget();
+  renderInsights();
+  renderTips();
+}
+
+document.getElementById('navTabs').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+});
+
+document.getElementById('themeToggle').addEventListener('click', ()=>{
+  state.theme = state.theme==='dark' ? 'light' : 'dark';
+  applyTheme();
+  save();
+});
+function applyTheme(){
+  document.body.setAttribute('data-theme', state.theme);
+  document.getElementById('themeLabel').textContent = state.theme==='dark' ? 'Light mode' : 'Dark mode';
+  // redraw charts to pick up new CSS var colors
+  setTimeout(renderAll, 50);
+}
+
+document.getElementById('printBtn').addEventListener('click', ()=>window.print());
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm("This clears everything you've logged and restores the sample data. Continue?")){
+    localStorage.removeItem(STORAGE_KEY);
+    state = defaultState();
+    save();
+    applyTheme();
+  }
+});
+
+document.getElementById('btnQuickAdd').addEventListener('click', modalQuickAdd);
+document.getElementById('btnAddIncome').addEventListener('click', modalAddIncome);
+document.getElementById('btnAddExpense').addEventListener('click', ()=>modalAddExpense());
+document.getElementById('btnAddToJar').addEventListener('click', modalAddToJar);
+document.getElementById('btnEditGoal').addEventListener('click', modalEditGoal);
+document.getElementById('btnEditBudgets').addEventListener('click', modalEditBudgets);
+
+window.addEventListener('resize', ()=>{ clearTimeout(window._rz); window._rz=setTimeout(renderAll,150); });
+
+/* ============================================================
+   INIT
+============================================================ */
+_lastPct = Math.min(100,(totalSaved()/(state.goal.target||1))*100);
+applyTheme();
+renderAll();
+</script>
+</body>
+</html>
