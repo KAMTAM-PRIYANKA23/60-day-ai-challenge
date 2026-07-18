@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>LinkedIn Profile Audit — Kamtam Priyanka</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0D1117;
+    --panel: #161B22;
+    --panel-2: #1C2128;
+    --border: #30363D;
+    --text: #C9D1D9;
+    --text-dim: #7D8590;
+    --text-bright: #F0F6FC;
+    --red: #F85149;
+    --red-bg: rgba(248,81,73,0.08);
+    --green: #3FB950;
+    --green-bg: rgba(63,185,80,0.08);
+    --amber: #E3B341;
+    --blue: #58A6FF;
+    --purple: #BC8CFF;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Space Grotesk', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family: var(--mono); line-height:1.6; font-size:14.5px;
+  }
+  .wrap{max-width:960px; margin:0 auto; padding:28px 20px 80px;}
+
+  /* Header */
+  .header{margin-bottom:22px;}
+  .repo-line{font-size:12px; color:var(--text-dim); display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+  .repo-line .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);}
+  h1{
+    font-family: var(--display); font-weight:700; font-size:28px; color:var(--text-bright);
+    margin:0 0 6px; letter-spacing:-0.02em;
+  }
+  .subtitle{color:var(--text-dim); font-size:13.5px; margin-bottom:18px;}
+  .headline-badge{
+    background:var(--panel); border:1px solid var(--border); border-radius:6px;
+    padding:10px 14px; font-size:12.5px; color:var(--text-dim); margin-bottom:20px;
+  }
+  .headline-badge b{color:var(--text-bright); font-weight:600;}
+
+  /* score summary bar */
+  .score-bar{
+    display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom:24px;
+  }
+  .score-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px;
+    text-align:center;
+  }
+  .score-card .label{font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;}
+  .score-card .val{font-family:var(--display); font-size:30px; font-weight:700;}
+  .score-card.before .val{color:var(--red);}
+  .score-card.after .val{color:var(--green);}
+  .score-card.delta .val{color:var(--amber);}
+  .score-card .sub{font-size:11px; color:var(--text-dim); margin-top:4px;}
+
+  /* Tabs */
+  .tabs{
+    display:flex; gap:4px; border-bottom:1px solid var(--border); margin-bottom:22px;
+    overflow-x:auto; scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{
+    background:transparent; border:none; color:var(--text-dim); font-family:var(--mono);
+    font-size:13px; font-weight:500; padding:10px 16px; cursor:pointer; white-space:nowrap;
+    border-bottom:2px solid transparent; transition:all .15s ease;
+  }
+  .tab-btn:hover{color:var(--text-bright);}
+  .tab-btn.active{color:var(--blue); border-bottom-color:var(--blue);}
+  .tab-panel{display:none;}
+  .tab-panel.active{display:block; animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  h2{
+    font-family:var(--display); font-size:19px; color:var(--text-bright); font-weight:600;
+    margin:0 0 4px; display:flex; align-items:center; gap:8px;
+  }
+  .section-desc{color:var(--text-dim); font-size:12.5px; margin-bottom:16px;}
+
+  /* Report card items */
+  .rc-item{
+    background:var(--panel); border:1px solid var(--border); border-radius:8px;
+    margin-bottom:14px; overflow:hidden;
+  }
+  .rc-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 16px; cursor:pointer; user-select:none;
+  }
+  .rc-head:hover{background:var(--panel-2);}
+  .rc-title{font-weight:600; color:var(--text-bright); font-size:13.5px;}
+  .rc-score{
+    font-family:var(--display); font-weight:700; font-size:15px; padding:2px 10px; border-radius:12px;
+  }
+  .rc-score.s-low{color:var(--red); background:var(--red-bg); border:1px solid rgba(248,81,73,0.3);}
+  .rc-score.s-mid{color:var(--amber); background:rgba(227,179,65,0.08); border:1px solid rgba(227,179,65,0.3);}
+  .rc-score.s-high{color:var(--green); background:var(--green-bg); border:1px solid rgba(63,185,80,0.3);}
+  .rc-body{padding:0 16px 16px; display:none; font-size:13px;}
+  .rc-body.open{display:block;}
+  .rc-quote{
+    background:var(--bg); border-left:3px solid var(--red); padding:8px 12px; margin:8px 0;
+    font-size:12.5px; color:var(--text-dim); font-style:italic; border-radius:0 4px 4px 0;
+  }
+  .rc-row{margin:10px 0;}
+  .rc-tag{font-weight:600; font-size:12px; margin-bottom:3px; display:block;}
+  .tag-problem{color:var(--red);}
+  .tag-hurt{color:var(--amber);}
+  .tag-cost{color:var(--purple);}
+
+  /* Diff blocks */
+  .diff-block{
+    background:var(--bg); border:1px solid var(--border); border-radius:6px; overflow:hidden; margin:10px 0;
+    font-size:12.5px;
+  }
+  .diff-line{padding:8px 12px; display:flex; gap:10px; border-bottom:1px solid var(--border);}
+  .diff-line:last-child{border-bottom:none;}
+  .diff-line.minus{background:var(--red-bg);}
+  .diff-line.plus{background:var(--green-bg);}
+  .diff-sym{color:var(--text-dim); font-weight:700; flex-shrink:0; width:14px;}
+  .diff-line.minus .diff-sym{color:var(--red);}
+  .diff-line.plus .diff-sym{color:var(--green);}
+  .diff-text{flex:1;}
+  .placeholder{color:var(--amber); font-weight:600;}
+
+  /* Headline options */
+  .opt-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:14px 16px; margin-bottom:12px;
+  }
+  .opt-label{
+    display:inline-block; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;
+    padding:2px 8px; border-radius:4px; margin-bottom:8px;
+  }
+  .opt-label.k1{background:rgba(88,166,255,0.12); color:var(--blue);}
+  .opt-label.k2{background:rgba(188,140,255,0.12); color:var(--purple);}
+  .opt-label.k3{background:rgba(227,179,65,0.12); color:var(--amber);}
+  .opt-text{color:var(--text-bright); font-weight:600; font-size:13.5px; margin-bottom:6px;}
+  .opt-when{color:var(--text-dim); font-size:12px;}
+  .copy-btn{
+    background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:var(--mono);
+    font-size:11px; padding:4px 10px; border-radius:5px; cursor:pointer; margin-top:8px; transition:all .15s;
+  }
+  .copy-btn:hover{border-color:var(--blue); color:var(--blue);}
+  .copy-btn.copied{border-color:var(--green); color:var(--green);}
+
+  /* About rebuild */
+  .about-block{background:var(--panel); border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:14px;}
+  .about-line-label{font-size:11px; color:var(--purple); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:6px;}
+  .about-text{color:var(--text-bright); font-size:13.5px; line-height:1.7; white-space:pre-line;}
+  .keyword-chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+  .chip{background:rgba(88,166,255,0.1); color:var(--blue); border:1px solid rgba(88,166,255,0.25); border-radius:12px; padding:3px 10px; font-size:11px;}
+
+  /* Skills */
+  .skills-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:640px){.skills-grid{grid-template-columns:1fr;}}
+  .skill-col h3{font-size:12.5px; text-transform:uppercase; letter-spacing:0.05em; margin:0 0 10px;}
+  .skill-col.add h3{color:var(--green);}
+  .skill-col.remove h3{color:var(--red);}
+  .skill-list{list-style:none; margin:0; padding:0;}
+  .skill-list li{
+    background:var(--panel); border:1px solid var(--border); border-radius:6px; padding:8px 12px; margin-bottom:6px;
+    font-size:12.5px; display:flex; align-items:center; gap:8px;
+  }
+  .skill-num{color:var(--text-dim); font-weight:700; width:16px; flex-shrink:0;}
+  .pin-note{background:rgba(227,179,65,0.08); border:1px solid rgba(227,179,65,0.3); border-radius:6px; padding:10px 14px; margin-top:14px; font-size:12.5px; color:var(--amber);}
+
+  /* Scorecard table */
+  .sc-table{width:100%; border-collapse:collapse; margin-top:8px;}
+  .sc-table th{text-align:left; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em; padding:8px 10px; border-bottom:1px solid var(--border);}
+  .sc-table td{padding:12px 10px; border-bottom:1px solid var(--border); font-size:13px;}
+  .sc-table tr:last-child td{border-bottom:none;}
+  .sc-name{color:var(--text-bright); font-weight:600;}
+  .sc-num{font-family:var(--display); font-weight:700;}
+  .sc-num.before{color:var(--red);}
+  .sc-num.after{color:var(--green);}
+  .sc-delta{color:var(--amber); font-weight:700;}
+  .bar-track{background:var(--bg); border-radius:4px; height:6px; overflow:hidden; margin-top:4px; border:1px solid var(--border);}
+  .bar-fill{height:100%; border-radius:4px; transition:width 1s ease;}
+  .bar-fill.before{background:var(--red); width:0%;}
+  .bar-fill.after{background:var(--green); width:0%;}
+
+  .overall-box{
+    background:linear-gradient(135deg, rgba(63,185,80,0.08), rgba(88,166,255,0.06));
+    border:1px solid var(--border); border-radius:10px; padding:24px; margin-top:20px; text-align:center;
+  }
+  .overall-box .big-num{font-family:var(--display); font-size:42px; font-weight:700;}
+  .overall-box .big-num .before{color:var(--red);}
+  .overall-box .big-num .arrow{color:var(--text-dim); font-size:28px; margin:0 10px;}
+  .overall-box .big-num .after{color:var(--green);}
+  .overall-box .big-label{color:var(--text-dim); font-size:12px; margin-top:8px; text-transform:uppercase; letter-spacing:0.06em;}
+
+  /* Day plan */
+  .day-card{background:var(--panel); border:1px solid var(--border); border-radius:8px; margin-bottom:12px; overflow:hidden;}
+  .day-head{display:flex; align-items:center; gap:12px; padding:14px 16px; cursor:pointer;}
+  .day-head:hover{background:var(--panel-2);}
+  .day-num{
+    font-family:var(--display); font-weight:700; font-size:13px; color:var(--bg); background:var(--blue);
+    width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .day-title{font-weight:600; color:var(--text-bright); font-size:13.5px; flex:1;}
+  .chevron{color:var(--text-dim); transition:transform .2s;}
+  .day-card.open .chevron{transform:rotate(90deg);}
+  .day-body{display:none; padding:0 16px 16px 56px; font-size:12.5px;}
+  .day-card.open .day-body{display:block;}
+  .checklist{list-style:none; margin:0; padding:0;}
+  .checklist li{display:flex; align-items:flex-start; gap:8px; margin-bottom:8px; cursor:pointer;}
+  .checklist input{margin-top:2px; accent-color:var(--green);}
+  .checklist label{cursor:pointer; flex:1;}
+  .checklist input:checked + label{color:var(--text-dim); text-decoration:line-through;}
+  .post-draft{
+    background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:12px; margin-top:8px;
+    white-space:pre-line; font-size:12px; color:var(--text-bright); line-height:1.6;
+  }
+  .char-count{color:var(--text-dim); font-size:11px; margin-top:6px;}
+  .formula-box{background:rgba(188,140,255,0.08); border:1px solid rgba(188,140,255,0.25); border-radius:6px; padding:10px 12px; margin:8px 0; font-size:12px; color:var(--purple);}
+
+  /* Summary card */
+  .summary-card{
+    background:linear-gradient(135deg, #1C2128, #161B22); border:1px solid var(--border); border-radius:12px;
+    padding:28px; margin-top:10px;
+  }
+  .summary-card .sc-heading{font-family:var(--display); font-size:16px; color:var(--text-bright); font-weight:700; margin-bottom:16px;}
+  .summary-scores{display:flex; gap:16px; margin-bottom:18px;}
+  .summary-scores .box{flex:1; text-align:center; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px;}
+  .summary-scores .box .n{font-family:var(--display); font-weight:700; font-size:26px;}
+  .summary-scores .box.b .n{color:var(--red);}
+  .summary-scores .box.a .n{color:var(--green);}
+  .summary-scores .box .l{font-size:10px; color:var(--text-dim); text-transform:uppercase; margin-top:4px;}
+  .mistake-list{margin:0 0 16px; padding-left:20px; font-size:12.5px;}
+  .mistake-list li{margin-bottom:8px;}
+  .diff-maker{background:rgba(63,185,80,0.08); border:1px solid rgba(63,185,80,0.3); border-radius:6px; padding:12px; font-size:12.5px;}
+  .diff-maker b{color:var(--green);}
+
+  .footer-note{text-align:center; color:var(--text-dim); font-size:11px; margin-top:36px; padding-top:16px; border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="repo-line"><span class="dot"></span> profile-audit / kamtam-priyanka / run #1</div>
+    <h1>LinkedIn Profile Audit</h1>
+    <div class="subtitle">CSIT Undergrad @ KLH University → targeting Full Stack / Software / Backend internships & roles</div>
+    <div class="headline-badge">Reviewed like a recruiter with 6 seconds and 200 other tabs open. Every rewrite below uses <b>only</b> what you gave me — CGPA, real projects, real skills. No invented metrics.</div>
+  </div>
+
+  <div class="score-bar">
+    <div class="score-card before"><div class="label">Before</div><div class="val">46</div><div class="sub">out of 100</div></div>
+    <div class="score-card delta"><div class="label">Change</div><div class="val">+36</div><div class="sub">points gained</div></div>
+    <div class="score-card after"><div class="label">After</div><div class="val">82</div><div class="sub">out of 100</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="roast">01 Roast</button>
+    <button class="tab-btn" data-tab="rebuild">02 Rebuild</button>
+    <button class="tab-btn" data-tab="scorecard">03 Scorecard</button>
+    <button class="tab-btn" data-tab="plan">04 7-Day Plan</button>
+    <button class="tab-btn" data-tab="summary">05 Summary Card</button>
+  </div>
+
+  <!-- ================= TAB 1: ROAST ================= -->
+  <div class="tab-panel active" id="roast">
+    <h2>Profile Report Card — Before</h2>
+    <div class="section-desc">Click each row to see the full breakdown. Overall Strength: <b style="color:var(--amber)">46/100</b></div>
+
+    <div class="rc-item">
+      <div class="rc-head" onclick="toggleRC(this)">
+        <span class="rc-title">Headline</span>
+        <span class="rc-score s-mid">5/10</span>
+      </div>
+      <div class="rc-body">
+        <div class="rc-quote">"Turning Ideas into Software | CSIT Undergraduate @ KLH University | Java • React • DSA • AI | Aspiring Full Stack & Software Engineer"</div>
+        <div class="rc-row"><span class="rc-tag tag-problem">❌ The problem</span>"Turning Ideas into Software" is a phrase recruiters have read a thousand times — it says nothing specific about you. You also identify as three things at once (student / keyword list / aspiring engineer), and "Aspiring" quietly tells the reader you don't think you're ready yet.</div>
+        <div class="rc-row"><span class="rc-tag tag-hurt">🧠 Why it hurts</span>Recruiters scan headlines in under 2 seconds. Yours front-loads a cliché instead of your strongest proof point — your 9.91 CGPA doesn't even appear here, and it's the single most differentiating number on your whole profile.</div>
+        <div class="rc-row"><span class="rc-tag tag-cost">🔍 Invisible cost</span>LinkedIn search ranks headlines heavily for keyword relevance. "Aspiring" and generic phrases dilute your match rate against searches like "full stack developer intern" — you may not be showing up in recruiter searches at all.</div>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-head" onclick="toggleRC(this)">
+        <span class="rc-title">About — First 2 Lines (the hook)</span>
+        <span class="rc-score s-mid">5/10</span>
+      </div>
+      <div class="rc-body">
+        <div class="rc-quote">"I am a Computer Science and Information Technology student at KLH University with a strong academic record (CGPA: 9.91/10) and a passion for Software Engineering, Full Stack Development, and Artificial Intelligence."</div>
+        <div class="rc-row"><span class="rc-tag tag-problem">❌ The problem</span>Your 9.91 CGPA is buried mid-sentence inside a formula recruiters have seen from thousands of students: "I am a [X] student with a passion for [Y, Z, W]." The structure is generic even though the content is strong.</div>
+        <div class="rc-row"><span class="rc-tag tag-hurt">🧠 Why it hurts</span>This is the ONLY text visible before someone taps "see more." If the first line reads like every other student's About section, most recruiters never click further — you lose the rest of your story, including your actual projects.</div>
+        <div class="rc-row"><span class="rc-tag tag-cost">🔍 Invisible cost</span>A 9.91/10 CGPA is top-1%-of-the-room material. Burying it in a subordinate clause instead of leading with it means people scroll past your biggest credibility signal without registering it.</div>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-head" onclick="toggleRC(this)">
+        <span class="rc-title">About — Full Section</span>
+        <span class="rc-score s-mid">6/10</span>
+      </div>
+      <div class="rc-body">
+        <div class="rc-quote">"...I have developed projects spanning AI-powered simulations, workflow automation, analytics dashboards, and modern web applications... Feel free to connect if you enjoy discussing technology..."</div>
+        <div class="rc-row"><span class="rc-tag tag-problem">❌ The problem</span>The project list (AI simulations, automation, dashboards) is genuinely good material — but it's summarized in one dense sentence instead of given room to land. The closing line "feel free to connect if you enjoy discussing technology" is a passive, low-stakes CTA with no clear next action for a recruiter.</div>
+        <div class="rc-row"><span class="rc-tag tag-hurt">🧠 Why it hurts</span>Recruiters skim for "what can this person do for my team" — a vague closing line makes them do the work of figuring out if you're job-seeking at all. Nowhere in your About does it say you're open to internships/roles.</div>
+        <div class="rc-row"><span class="rc-tag tag-cost">🔍 Invisible cost</span>A recruiter actively sourcing for internships may read your whole About, like what they see, and still not message you — because nothing told them you're actively looking.</div>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-head" onclick="toggleRC(this)">
+        <span class="rc-title">Experience (Campus Ambassador @ UNLOX)</span>
+        <span class="rc-score s-low">3/10</span>
+      </div>
+      <div class="rc-body">
+        <div class="rc-quote">"Promoted AI and technology learning initiatives among university students through peer engagement and awareness activities."</div>
+        <div class="rc-row"><span class="rc-tag tag-problem">❌ The problem</span>All four bullets describe responsibilities ("promoted," "guided," "encouraged," "strengthened") with zero outcomes. There isn't a single number — no student count, no % increase, no event count.</div>
+        <div class="rc-row"><span class="rc-tag tag-hurt">🧠 Why it hurts</span>Recruiters are trained to read bullets for impact, not duties. "Promoted initiatives" tells them what you were assigned to do; it doesn't tell them you did it well. This is the classic pattern that makes a candidate blend into the pile.</div>
+        <div class="rc-row"><span class="rc-tag tag-cost">🔍 Invisible cost</span>This is your only listed experience — the one entry recruiters will actually read closely. Right now it reads like a copy-pasted role description, not evidence of real impact.</div>
+      </div>
+    </div>
+
+    <div class="rc-item">
+      <div class="rc-head" onclick="toggleRC(this)">
+        <span class="rc-title">Skills & Keywords</span>
+        <span class="rc-score s-mid">4/10</span>
+      </div>
+      <div class="rc-body">
+        <div class="rc-quote">Listed: Java • React.js • Responsive Web Design • Software Development • Prompt Engineering</div>
+        <div class="rc-row"><span class="rc-tag tag-problem">❌ The problem</span>"Software Development" is a filler skill — too broad to help you rank for anything specific. Meanwhile, your About section name-drops Python, SQL, REST APIs, Data Structures & Algorithms, and System Design — none of which appear in your actual Skills list.</div>
+        <div class="rc-row"><span class="rc-tag tag-hurt">🧠 Why it hurts</span>LinkedIn's search and "People You May Want to Hire" algorithms weight the Skills section heavily. A mismatch between what you say in About and what's listed in Skills confuses the algorithm and the human reader.</div>
+        <div class="rc-row"><span class="rc-tag tag-cost">🔍 Invisible cost</span>A recruiter searching "SQL" or "DSA" or "Python" for a backend-adjacent internship will never surface your profile — even though you're actively learning all three — because the keyword isn't where the algorithm looks.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TAB 2: REBUILD ================= -->
+  <div class="tab-panel" id="rebuild">
+    <h2>Headline — 3 Options</h2>
+    <div class="section-desc">Formula: [Role/Identity] | [Who I Help or What I Do] | [Proof or Differentiator]</div>
+
+    <div class="opt-card">
+      <span class="opt-label k1">Option 1 · Keyword-optimized</span>
+      <div class="opt-text">Full-Stack Developer in Training | Java • React.js • DSA • AI | CSIT @ KLH University | CGPA 9.91/10</div>
+      <div class="opt-when">Use this when: you want maximum visibility in recruiter search. Leads with role + stack keywords, closes with a hard proof number instead of "Aspiring."</div>
+      <button class="copy-btn" onclick="copyText(this, 'Full-Stack Developer in Training | Java • React.js • DSA • AI | CSIT @ KLH University | CGPA 9.91/10')">Copy</button>
+    </div>
+
+    <div class="opt-card">
+      <span class="opt-label k2">Option 2 · Value-proposition</span>
+      <div class="opt-text">I turn Data Structures into Deployed Products | Full Stack & AI-Assisted Development | Open to Internships</div>
+      <div class="opt-when">Use this when: you want a human reading your feed to stop scrolling. Trades keyword density for a memorable, specific line — and states you're open to internships directly.</div>
+      <button class="copy-btn" onclick="copyText(this, 'I turn Data Structures into Deployed Products | Full Stack & AI-Assisted Development | Open to Internships')">Copy</button>
+    </div>
+
+    <div class="opt-card">
+      <span class="opt-label k3">Option 3 · Authority / thought-leadership</span>
+      <div class="opt-text">Building in Public: Full Stack + AI Projects | CSIT Undergrad, KLH University | Java, React, Python</div>
+      <div class="opt-when">Use this when: you plan to post regularly (see Day 2 & 5 of your plan below) and want your headline to signal "I document my work," which pulls people into your posts.</div>
+      <button class="copy-btn" onclick="copyText(this, 'Building in Public: Full Stack + AI Projects | CSIT Undergrad, KLH University | Java, React, Python')">Copy</button>
+    </div>
+
+    <h2 style="margin-top:32px">About Section — Full Rewrite</h2>
+    <div class="section-desc">Structure: Hook → Story → Proof → CTA</div>
+
+    <div class="about-block">
+      <div class="about-line-label">Line 1–2 · The Hook</div>
+      <div class="about-text">CGPA: 9.91/10. But the number I'm actually proudest of is the projects I've shipped outside the classroom.</div>
+    </div>
+    <div class="about-block">
+      <div class="about-line-label">Line 3–5 · The Story</div>
+      <div class="about-text">I'm a Computer Science & IT undergrad at KLH University who learns by building, not just studying. Over the past year I've built AI-powered simulations, workflow automation tools, analytics dashboards, and full-stack web apps — using Java, React.js, Python, and JavaScript, while sharpening my problem-solving through Data Structures & Algorithms and competitive programming.</div>
+    </div>
+    <div class="about-block">
+      <div class="about-line-label">Line 6–8 · Proof</div>
+      <div class="about-text">I'm currently deepening my skills in backend development, SQL, REST APIs, and system design — the pieces that turn a working app into a production-ready one. I'm also part of the Claude 60-Day AI Challenge, exploring how AI tools change the way software gets built.</div>
+    </div>
+    <div class="about-block">
+      <div class="about-line-label">Last Line · CTA</div>
+      <div class="about-text">I'm actively looking for Full Stack / Software / Backend internship opportunities. If you're hiring, building something interesting, or just want to talk code — message me, I'd love to connect.</div>
+    </div>
+
+    <div class="keyword-chips">
+      <span class="chip">Computer Science</span><span class="chip">Full Stack Development</span><span class="chip">Software Engineering</span>
+      <span class="chip">Java</span><span class="chip">React.js</span><span class="chip">Python</span><span class="chip">JavaScript</span>
+      <span class="chip">Data Structures & Algorithms</span><span class="chip">Backend Development</span><span class="chip">SQL</span>
+      <span class="chip">REST APIs</span><span class="chip">System Design</span><span class="chip">Artificial Intelligence</span><span class="chip">Internship</span>
+    </div>
+    <div class="pin-note">💡 Why this works: the hook leads with your strongest proof point instead of a generic self-description. Every project category from your original About is kept — nothing invented — just given room to land. The CTA finally tells recruiters you're actively looking, which your original never did.</div>
+
+    <h2 style="margin-top:32px">Experience — Campus Ambassador @ UNLOX</h2>
+    <div class="section-desc">Rule: lead with achievement, not duty. Numbers in <span class="placeholder">amber</span> are placeholders — fill in your real figures before publishing. Never invent them.</div>
+
+    <div class="diff-block">
+      <div class="diff-line minus"><span class="diff-sym">−</span><span class="diff-text">Promoted AI and technology learning initiatives among university students through peer engagement and awareness activities.</span></div>
+      <div class="diff-line plus"><span class="diff-sym">+</span><span class="diff-text">Drove awareness of AI and tech learning programs across <span class="placeholder">[ADD: department / number of students reached]</span> through targeted peer engagement campaigns.</span></div>
+    </div>
+    <div class="diff-block">
+      <div class="diff-line minus"><span class="diff-sym">−</span><span class="diff-text">Guided students in identifying technical courses aligned with their interests and career goals.</span></div>
+      <div class="diff-line plus"><span class="diff-sym">+</span><span class="diff-text">Advised <span class="placeholder">[ADD: number]</span> students 1:1 on course selection, mapping their interests to relevant technical learning paths.</span></div>
+    </div>
+    <div class="diff-block">
+      <div class="diff-line minus"><span class="diff-sym">−</span><span class="diff-text">Encouraged participation in AI, programming, and software development learning programs while fostering a collaborative learning environment.</span></div>
+      <div class="diff-line plus"><span class="diff-sym">+</span><span class="diff-text">Increased participation in AI and programming learning programs by <span class="placeholder">[ADD: % or count]</span> through community-building initiatives and peer-led sessions.</span></div>
+    </div>
+    <div class="diff-block">
+      <div class="diff-line minus"><span class="diff-sym">−</span><span class="diff-text">Strengthened communication, leadership, and community-building skills by acting as a liaison between the organization and students.</span></div>
+      <div class="diff-line plus"><span class="diff-sym">+</span><span class="diff-text">Served as the primary liaison between UNLOX and the KLH student community, coordinating <span class="placeholder">[ADD: specific events/activities]</span> between org and campus.</span></div>
+    </div>
+    <div class="pin-note">💡 Before you publish: go find the real numbers — how many students you actually reached, advised, or engaged. Even a rough estimate ("~50 students") beats no number. Recruiters trust specific-but-honest over vague-but-safe.</div>
+
+    <h2 style="margin-top:32px">Skills Recommendations</h2>
+    <div class="skills-grid">
+      <div class="skill-col add">
+        <h3>Add (priority order)</h3>
+        <ul class="skill-list">
+          <li><span class="skill-num">1</span>Data Structures & Algorithms</li>
+          <li><span class="skill-num">2</span>SQL</li>
+          <li><span class="skill-num">3</span>Python</li>
+          <li><span class="skill-num">4</span>REST APIs</li>
+          <li><span class="skill-num">5</span>Git & GitHub</li>
+          <li><span class="skill-num">6</span>Backend Development</li>
+          <li><span class="skill-num">7</span>System Design (Fundamentals)</li>
+          <li><span class="skill-num">8</span>JavaScript</li>
+          <li><span class="skill-num">9</span>HTML/CSS</li>
+          <li><span class="skill-num">10</span>Problem Solving</li>
+        </ul>
+      </div>
+      <div class="skill-col remove">
+        <h3>Remove / deprioritize</h3>
+        <ul class="skill-list">
+          <li><span class="skill-num">×</span>"Software Development" — too generic, replace with specific stack skills above</li>
+          <li><span class="skill-num">×</span>Prompt Engineering — keep only if you're also targeting AI/ML-adjacent roles; deprioritize for core SWE/backend search</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pin-note">📌 Pin these 3 to the top: <b>Java, React.js, Data Structures & Algorithms</b> — the combination recruiters filter for when searching "full stack" + "backend-ready" candidates.</div>
+  </div>
+
+  <!-- ================= TAB 3: SCORECARD ================= -->
+  <div class="tab-panel" id="scorecard">
+    <h2>Before vs After Scorecard</h2>
+    <table class="sc-table">
+      <thead><tr><th>Section</th><th>Before</th><th>After</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="sc-name">Headline</td>
+          <td><span class="sc-num before">5</span>/10<div class="bar-track"><div class="bar-fill before" data-w="50"></div></div></td>
+          <td><span class="sc-num after">9</span>/10<div class="bar-track"><div class="bar-fill after" data-w="90"></div></div></td>
+          <td class="sc-delta">+4</td>
+        </tr>
+        <tr>
+          <td class="sc-name">About (Hook)</td>
+          <td><span class="sc-num before">5</span>/10<div class="bar-track"><div class="bar-fill before" data-w="50"></div></div></td>
+          <td><span class="sc-num after">9</span>/10<div class="bar-track"><div class="bar-fill after" data-w="90"></div></div></td>
+          <td class="sc-delta">+4</td>
+        </tr>
+        <tr>
+          <td class="sc-name">About (Full)</td>
+          <td><span class="sc-num before">6</span>/10<div class="bar-track"><div class="bar-fill before" data-w="60"></div></div></td>
+          <td><span class="sc-num after">8</span>/10<div class="bar-track"><div class="bar-fill after" data-w="80"></div></div></td>
+          <td class="sc-delta">+2</td>
+        </tr>
+        <tr>
+          <td class="sc-name">Experience</td>
+          <td><span class="sc-num before">3</span>/10<div class="bar-track"><div class="bar-fill before" data-w="30"></div></div></td>
+          <td><span class="sc-num after">7</span>/10<div class="bar-track"><div class="bar-fill after" data-w="70"></div></div></td>
+          <td class="sc-delta">+4</td>
+        </tr>
+        <tr>
+          <td class="sc-name">Skills / Keywords</td>
+          <td><span class="sc-num before">4</span>/10<div class="bar-track"><div class="bar-fill before" data-w="40"></div></div></td>
+          <td><span class="sc-num after">8</span>/10<div class="bar-track"><div class="bar-fill after" data-w="80"></div></div></td>
+          <td class="sc-delta">+4</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="section-desc" style="margin-top:10px">Note: Experience caps at 7/10 (not 10) until you add real numbers to the bullets — see the placeholders in the Rebuild tab.</div>
+
+    <div class="overall-box">
+      <div class="big-num"><span class="before" id="ov-before">46</span><span class="arrow">→</span><span class="after" id="ov-after">82</span></div>
+      <div class="big-label">Overall Profile Strength · out of 100 · +36</div>
+    </div>
+  </div>
+
+  <!-- ================= TAB 4: 7-DAY PLAN ================= -->
+  <div class="tab-panel" id="plan">
+    <h2>7-Day LinkedIn Activation Plan</h2>
+    <div class="section-desc">Profile edits alone don't get results — these actions do. Click each day to expand.</div>
+
+    <div class="day-card open">
+      <div class="day-head" onclick="toggleDay(this)"><span class="day-num">1</span><span class="day-title">Make all profile changes</span><span class="chevron">▸</span></div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li><input type="checkbox" id="d1-1"><label for="d1-1">Replace headline with Option 1, 2, or 3 from Rebuild tab</label></li>
+          <li><input type="checkbox" id="d1-2"><label for="d1-2">Replace About section with the 4-part rewrite</label></li>
+          <li><input type="checkbox" id="d1-3"><label for="d1-3">Update Campus Ambassador bullets — fill in real numbers first</label></li>
+          <li><input type="checkbox" id="d1-4"><label for="d1-4">Reorder skills list, add the 10 recommended skills</label></li>
+          <li><input type="checkbox" id="d1-5"><label for="d1-5">Pin Java, React.js, and DSA to the top of Skills</label></li>
+          <li><input type="checkbox" id="d1-6"><label for="d1-6">Turn on "Open to Work" — Internship + Full Stack/Backend/Software Engineer roles</label></li>
+          <li><input type="checkbox" id="d1-7"><label for="d1-7">Add a Featured section with your GitHub/portfolio/project links (if you don't have one, this is your #1 next project)</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head" onclick="toggleDay(this)"><span class="day-num">2</span><span class="day-title">Publish Post #1 — "I rebuilt my LinkedIn"</span><span class="chevron">▸</span></div>
+      <div class="day-body">
+        <div class="post-draft">I just spent a weekend rebuilding my LinkedIn profile from scratch.
+
+Turns out my biggest mistake wasn't my skills — it was hiding them.
+
+My About section opened with "I am a student with a passion for..." — a line every recruiter has read a thousand times. My 9.91 CGPA was buried in the middle of a sentence instead of leading the page.
+
+My experience bullets described what I was *assigned* to do, not what I actually *achieved*. Zero numbers, anywhere.
+
+Here's what I fixed:
+→ Led with proof, not platitudes
+→ Rewrote every bullet to show impact, not duty
+→ Matched my skills list to the keywords recruiters actually search
+
+Still a work in progress — but if you're a fellow CS student, what's the one line on your profile you'd rewrite first?
+
+#OpenToWork #FullStackDeveloper #CampusToCode</div>
+        <div class="char-count">~980 characters · under the 1300 limit</div>
+        <button class="copy-btn" onclick="copyPost(this)">Copy post</button>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head" onclick="toggleDay(this)"><span class="day-num">3</span><span class="day-title">Send 10 strategic connection requests</span><span class="chevron">▸</span></div>
+      <div class="day-body">
+        <div class="rc-row"><span class="rc-tag tag-hurt">Who to target:</span> University recruiters/talent partners at 3-5 companies you'd want an internship at · SDE/backend engineers at those same companies (1-2 levels above you) · KLH University alumni now working as software engineers · People actively posting about "hiring intern" or "full stack" in your feed.</div>
+        <div class="post-draft">Hi [Name], I'm a CS undergrad building full-stack + AI projects and prepping for SWE internships. Really admire [something specific about their work/company]. Would love to connect and follow your journey — thanks!</div>
+        <div class="char-count">~260 characters · under the 300 limit</div>
+        <button class="copy-btn" onclick="copyConn(this)">Copy template</button>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head" onclick="toggleDay(this)"><span class="day-num">4</span><span class="day-title">Comment on 5 posts in your target space</span><span class="chevron">▸</span></div>
+      <div class="day-body">
+        <div class="formula-box">The Value Comment formula: <b>Agree</b> (one line acknowledging their point) + <b>Add Insight</b> (something from your own experience/project) + <b>Ask a Question</b> (invites a reply, boosts visibility).</div>
+        <div class="rc-row">Example, on a post about AI-assisted coding: "This matches what I've seen too — I've been using AI tools as part of a 60-day challenge, and the biggest shift for me was in how I debug, not how I write code. Curious how you're seeing it change code review workflows on your end?"</div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head" onclick="toggleDay(this)"><span class="day-num">5</span><span class="day-title">Publish Post #2 — lessons-learned / hot take</span><span class="chevron">▸</span></div>
+      <div class="day-body">
+        <div class="post-draft">Unpopular opinion: "Aspiring Software Engineer" is holding students back.
+
+I had it on my headline for months. It sounds humble. It's actually just hedging.
+
+If you've shipped a project — even a small one, even one only your professor saw — you're not "aspiring." You're building. Say that instead.
+
+I've spent the last year building AI-powered simulations, automation tools, and dashboards while still in undergrad. None of that makes me any less of a student. But it does make me more than "aspiring."
+
+Small wording change. Different energy entirely.
+
+What's a phrase you removed from your profile that instantly made you sound more confident?</div>
+        <div class="char-count">~780 characters · under the 1300 limit</div>
+        <button class="copy-btn" onclick="copyPost2(this)">Copy post</button>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head" onclick="toggleDay(this)"><span class="day-num">6</span><span class="day-title">Engage with every comment + 5 more connections</span><span class="chevron">▸</span></div>
+      <div class="day-body">
+        <div class="rc-row">Reply to every single comment on your Day 2 and Day 5 posts within a few hours — this is what LinkedIn's algorithm rewards most, and it's also how conversations turn into DMs. Send 5 more connection requests using the Day 3 template, this time targeting people who engaged with your posts.</div>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-head" onclick="toggleDay(this)"><span class="day-num">7</span><span class="day-title">Review profile views & connection acceptance rate</span><span class="chevron">▸</span></div>
+      <div class="day-body">
+        <div class="rc-row"><b style="color:var(--text-bright)">Profile views up?</b> Your headline/keywords are working — recruiters are finding you in search.</div>
+        <div class="rc-row"><b style="color:var(--text-bright)">Profile views flat, low connection acceptance?</b> Your headline or photo isn't earning trust at a glance — revisit Option 1 vs 2 vs 3.</div>
+        <div class="rc-row"><b style="color:var(--text-bright)">Views up but no messages?</b> Your About's CTA needs to be more direct, or your Featured section needs actual project links.</div>
+        <div class="rc-row">Adjust one variable at a time next week — headline, photo, or CTA — so you know what moved the needle.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= TAB 5: SUMMARY CARD ================= -->
+  <div class="tab-panel" id="summary">
+    <h2>What I Learned Today</h2>
+    <div class="section-desc">Shareable summary — screenshot this and post it, or use the copy button.</div>
+
+    <div class="summary-card" id="summary-capture">
+      <div class="sc-heading">I let AI roast my LinkedIn profile today. Here's what changed:</div>
+      <div class="summary-scores">
+        <div class="box b"><div class="n">46</div><div class="l">Before</div></div>
+        <div class="box a"><div class="n">82</div><div class="l">After</div></div>
+      </div>
+      <div style="font-size:12.5px; color:var(--text-dim); margin-bottom:10px; font-weight:600;">Top 3 mistakes I was making:</div>
+      <ol class="mistake-list">
+        <li>My About section opened with "I am a student with a passion for..." instead of leading with my 9.91 CGPA — my strongest proof point.</li>
+        <li>My experience bullets described responsibilities, not achievements — zero numbers anywhere.</li>
+        <li>My Skills list didn't match my own About section — Python, SQL, REST APIs, and DSA were mentioned in my story but missing from Skills, so I wasn't showing up in recruiter searches for them.</li>
+      </ol>
+      <div class="diff-maker"><b>The #1 thing that made the biggest difference:</b> Rewriting the first two lines of my About section to lead with proof (9.91 CGPA) instead of a generic self-introduction — that's the only text visible before "see more."</div>
+    </div>
+    <button class="copy-btn" style="margin-top:14px" onclick="copySummary(this)">Copy summary text</button>
+  </div>
+
+  <div class="footer-note">Built from your original profile content only — no invented achievements, companies, or metrics. Fill in the placeholders, then ship it.</div>
+</div>
+
+<script>
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+      if(btn.dataset.tab==='scorecard'){ animateBars(); }
+    });
+  });
+
+  function toggleRC(el){
+    const body = el.nextElementSibling;
+    const isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+  }
+  function toggleDay(el){
+    const card = el.parentElement;
+    card.classList.toggle('open');
+  }
+
+  function animateBars(){
+    document.querySelectorAll('.bar-fill').forEach(bar=>{
+      const w = bar.getAttribute('data-w');
+      requestAnimationFrame(()=>{ bar.style.width = w+'%'; });
+    });
+  }
+
+  function copyText(btn, text){
+    navigator.clipboard.writeText(text).then(()=>{
+      const orig = btn.textContent;
+      btn.textContent = 'Copied ✓'; btn.classList.add('copied');
+      setTimeout(()=>{btn.textContent=orig; btn.classList.remove('copied');}, 1800);
+    });
+  }
+  function copyPost(btn){
+    const text = btn.parentElement.querySelector('.post-draft').innerText;
+    copyText(btn, text);
+    btn.textContent='Copy post';
+  }
+  function copyConn(btn){
+    const text = btn.parentElement.querySelector('.post-draft').innerText;
+    copyText(btn, text);
+  }
+  function copyPost2(btn){
+    const text = btn.parentElement.querySelector('.post-draft').innerText;
+    copyText(btn, text);
+  }
+  function copySummary(btn){
+    const text = document.getElementById('summary-capture').innerText;
+    copyText(btn, text);
+  }
+
+  // open first roast item by default
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const firstBody = document.querySelector('.rc-body');
+    if(firstBody) firstBody.classList.add('open');
+  });
+  const firstBody = document.querySelector('.rc-body');
+  if(firstBody) firstBody.classList.add('open');
+</script>
+</body>
+</html>
