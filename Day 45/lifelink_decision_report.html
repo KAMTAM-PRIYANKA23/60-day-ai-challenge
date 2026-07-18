@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeLink — Decision Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-main:#0f0f14;
+    --bg-card:#1a1a24;
+    --bg-card-alt:#1e1e2e;
+    --text-primary:#f0f0f5;
+    --text-secondary:#8888a0;
+    --accent-green:#34d399;
+    --accent-red:#f87171;
+    --accent-blue:#60a5fa;
+    --accent-gold:#fbbf24;
+    --accent-purple:#a78bfa;
+    --border-subtle:rgba(255,255,255,0.06);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg-main);
+    color:var(--text-primary);
+    font-family:'Inter','Segoe UI',system-ui,sans-serif;
+    padding:24px 0 60px;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px;}
+  header.banner{
+    text-align:center;
+    padding:32px 20px 20px;
+  }
+  header.banner h1{
+    font-size:28px;font-weight:800;margin:0 0 8px;letter-spacing:0.5px;
+  }
+  header.banner .subtitle{color:var(--text-secondary);font-size:16px;margin-bottom:6px;}
+  header.banner .date{color:var(--text-secondary);font-size:12px;}
+  .gradient-line{
+    height:2px;width:100%;margin-top:20px;
+    background:linear-gradient(90deg,var(--accent-blue),var(--accent-purple),var(--accent-gold));
+    border-radius:2px;
+  }
+  .card{
+    background:var(--bg-card);
+    border:1px solid var(--border-subtle);
+    border-radius:16px;
+    padding:28px;
+    margin-top:28px;
+    box-shadow:0 4px 24px rgba(0,0,0,0.3);
+    transition:transform 0.2s ease;
+  }
+  .card:hover{transform:translateY(-2px);}
+  .section-title{
+    font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 16px;
+  }
+  p{font-size:15px;line-height:1.7;margin:0 0 8px;color:var(--text-primary);}
+  .label{font-size:12px;font-weight:500;text-transform:uppercase;color:var(--text-secondary);letter-spacing:0.5px;margin-bottom:4px;}
+
+  #sec1{border-left:4px solid var(--accent-blue);}
+  #sec1 .section-title{color:var(--accent-blue);}
+
+  #sec2{border-left:4px solid var(--accent-green);}
+  #sec2 .section-title{color:var(--accent-green);}
+  .option-card{
+    background:var(--bg-card-alt);
+    border-radius:12px;
+    padding:18px 20px;
+    margin-bottom:16px;
+    border:1px solid var(--border-subtle);
+  }
+  .option-card:last-child{margin-bottom:0;}
+  .option-card h3{margin:0 0 10px;font-size:16px;font-weight:700;}
+  .opt-a h3{color:var(--accent-blue);}
+  .opt-b h3{color:var(--accent-green);}
+  .opt-c h3{color:var(--accent-purple);}
+  .opt-line{margin-bottom:8px;}
+  .opt-line .label{margin-bottom:2px;}
+
+  #sec3{border-left:4px solid var(--accent-purple);}
+  #sec3 .section-title{color:var(--accent-purple);}
+  ul{padding-left:20px;margin:0 0 14px;}
+  li{font-size:15px;line-height:1.7;margin-bottom:4px;}
+  .bias-tag{
+    display:inline-block;background:rgba(167,139,250,0.15);color:var(--accent-purple);
+    padding:2px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:4px 6px 0 0;
+  }
+
+  #sec4{border-left:4px solid var(--accent-blue);}
+  #sec4 .section-title{color:var(--accent-blue);}
+  .matrix-row{display:flex;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+  .matrix-label{width:40%;font-size:13px;color:var(--text-secondary);font-weight:500;padding-right:10px;}
+  .matrix-bars{width:60%;display:flex;flex-direction:column;gap:6px;}
+  .bar-container{
+    height:28px;background:rgba(255,255,255,0.05);border-radius:8px;position:relative;overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;
+    padding-right:10px;color:#fff;font-weight:700;font-size:13px;width:0;
+    animation:growBar 0.8s ease-out forwards;
+  }
+  .bar-a{background:linear-gradient(90deg,#60a5fa,#3b82f6);}
+  .bar-b{background:linear-gradient(90deg,#34d399,#10b981);}
+  .bar-c{background:linear-gradient(90deg,#a78bfa,#8b5cf6);}
+  @keyframes growBar{from{width:0;}to{width:var(--w);}}
+  .legend{display:flex;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text-secondary);}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot-a{background:#60a5fa;}
+  .dot-b{background:#34d399;}
+  .dot-c{background:#a78bfa;}
+  .total-row{
+    margin-top:8px;padding:14px 16px;border-radius:10px;background:rgba(255,255,255,0.04);
+    font-weight:700;font-size:15px;
+  }
+  .winner-badge{color:var(--accent-gold);font-weight:800;}
+
+  #sec5{border-left:4px solid var(--accent-red);}
+  #sec5 .section-title{color:var(--accent-red);}
+  .premortem-block{margin-bottom:18px;}
+  .premortem-block:last-child{margin-bottom:0;}
+  .premortem-block h4{margin:0 0 8px;font-size:15px;color:var(--accent-red);}
+
+  #sec6{border-left:4px solid var(--accent-green);}
+  #sec6 .section-title{color:var(--accent-green);}
+  .day-row{display:flex;gap:12px;margin-bottom:10px;align-items:baseline;}
+  .day-tag{
+    flex-shrink:0;font-size:12px;font-weight:700;color:var(--accent-green);
+    background:rgba(52,211,153,0.12);padding:4px 10px;border-radius:20px;min-width:78px;text-align:center;
+  }
+
+  #sec7{
+    border-left:4px solid var(--accent-gold);
+    background:var(--bg-card-alt);
+    padding:32px;
+    box-shadow:0 0 20px rgba(251,191,36,0.15), 0 4px 24px rgba(0,0,0,0.3);
+  }
+  #sec7 .section-title{color:var(--accent-gold);}
+  .verdict-name{font-size:30px;font-weight:800;color:var(--accent-gold);margin:6px 0 14px;}
+  .hard-truth{font-style:italic;color:var(--text-secondary);margin-top:14px;}
+
+  #sec8{border-left:4px solid var(--accent-gold);}
+  #sec8 .section-title{color:var(--accent-gold);}
+  .mini-cards{display:flex;gap:14px;flex-wrap:wrap;}
+  .mini-card{
+    flex:1 1 200px;
+    background:var(--bg-card-alt);
+    padding:16px;border-radius:12px;border:1px solid var(--border-subtle);
+    display:flex;flex-direction:column;justify-content:space-between;min-height:170px;
+  }
+  .mini-card h4{margin:0 0 10px;font-size:13px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.5px;}
+  .mini-score-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;}
+  .mini-score-row span:last-child{font-weight:700;}
+  .mini-watermark{font-size:10px;color:var(--text-secondary);margin-top:10px;text-align:right;opacity:0.7;}
+  .mini-verdict{font-size:18px;font-weight:800;color:var(--accent-gold);margin-bottom:8px;}
+  .mini-caption{font-size:13px;line-height:1.5;color:var(--text-primary);margin-bottom:10px;}
+  .mini-cta{font-size:12px;font-weight:700;color:var(--accent-blue);}
+
+  footer{
+    text-align:center;color:var(--text-secondary);font-size:12px;margin-top:40px;
+  }
+
+  @media(max-width:600px){
+    .card{padding:20px 16px;}
+    .section-title{font-size:18px;}
+    p, li{font-size:14px;}
+    .matrix-label{width:100%;margin-bottom:6px;}
+    .matrix-bars{width:100%;}
+    .mini-cards{flex-direction:column;}
+    .verdict-name{font-size:26px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="banner">
+    <h1>DECISION REPORT</h1>
+    <div class="subtitle">LifeLink — What should the first MVP focus on?</div>
+    <div class="date">Generated · July 18, 2026</div>
+    <div class="gradient-line"></div>
+  </header>
+
+  <!-- SECTION 1 -->
+  <section class="card" id="sec1">
+    <div class="section-title">The Real Decision</div>
+    <p>The real question isn't "ambulance vs. blood bank vs. everything" — it's how narrow you're willing to go for a demo that actually works in a few weeks.</p>
+    <p>The trade-off: a full platform signals vision but risks arriving unfinished; a narrow slice ships polished but risks looking "small" next to the pitch.</p>
+    <p>It's emotionally hard because the scope isn't just a technical choice — it's tied to how impressive you'll look to recruiters and judges.</p>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="card" id="sec2">
+    <div class="section-title">The Case For Each Option</div>
+
+    <div class="option-card opt-a">
+      <h3>Option A — Full Platform</h3>
+      <div class="opt-line"><div class="label">Strongest Case</div><p>Shows the entire vision in one shot — ambulance, hospitals, blood banks, AI triage, dashboards — maximum "wow" if it works.</p></div>
+      <div class="opt-line"><div class="label">Hidden Upside</div><p>Breadth can win hackathon spectacle points if judges only see a 3-minute demo.</p></div>
+      <div class="opt-line"><div class="label">Biggest Weakness</div><p>High risk of shipping eight half-built features instead of one working product.</p></div>
+      <div class="opt-line"><div class="label">Best If You Value</div><p>Breadth over depth, and you're optimizing for a single high-stakes pitch moment.</p></div>
+    </div>
+
+    <div class="option-card opt-b">
+      <h3>Option B — Ambulance Booking + Live Tracking + Hospital Coordination</h3>
+      <div class="opt-line"><div class="label">Strongest Case</div><p>Directly attacks the "emergency" core of LifeLink and forces you to build real-time systems (GPS, live tracking, dispatch logic) — the hardest, most recruiter-relevant skills.</p></div>
+      <div class="opt-line"><div class="label">Hidden Upside</div><p>Hospital coordination is the piece that separates this from a generic "ride booking clone" — it signals systems thinking.</p></div>
+      <div class="opt-line"><div class="label">Biggest Weakness</div><p>Needs believable mock hospital/ambulance data, or it can feel staged.</p></div>
+      <div class="opt-line"><div class="label">Best If You Value</div><p>Technical depth, real-time engineering, and staying closest to LifeLink's actual mission.</p></div>
+    </div>
+
+    <div class="option-card opt-c">
+      <h3>Option C — AI Blood Donor & Blood Bank Matching</h3>
+      <div class="opt-line"><div class="label">Strongest Case</div><p>Smaller, self-contained scope makes it realistic to finish and polish fully — and it's a clean showcase of matching/AI logic.</p></div>
+      <div class="opt-line"><div class="label">Hidden Upside</div><p>"Blood donation saves lives" is an emotionally strong interview story even at small scale.</p></div>
+      <div class="opt-line"><div class="label">Biggest Weakness</div><p>Feels like a niche side feature rather than "an emergency coordination platform," diluting the bigger pitch.</p></div>
+      <div class="opt-line"><div class="label">Best If You Value</div><p>Fast completion, a clean AI/algorithm showcase, and low build complexity.</p></div>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section class="card" id="sec3">
+    <div class="section-title">Assumption Buster</div>
+    <div class="label">3 Assumptions You May Be Making</div>
+    <ul>
+      <li>That a bigger scope automatically reads as more impressive to recruiters — usually the opposite is true.</li>
+      <li>That a full platform is realistically buildable, solo, at working quality, in a few weeks.</li>
+      <li>That a narrow MVP can't show the bigger vision — it can, through a roadmap slide or pitch, without being coded.</li>
+    </ul>
+    <div class="label">Biases At Play</div>
+    <div>
+      <span class="bias-tag">Sunk Cost Bias</span>
+      <span class="bias-tag">Loss Aversion / Status Quo Bias</span>
+    </div>
+    <p style="margin-top:10px;">You're attached to the big vision you've already imagined, and scoping down feels like "losing" the ambitious version — even though nothing is actually lost, it's just sequenced later.</p>
+    <div class="label">One Thing You're Definitely Ignoring</div>
+    <p>A demo that works cleanly twice beats a slide describing eight features every single time — recruiters and judges evaluate execution, not idea size.</p>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section class="card" id="sec4">
+    <div class="section-title">Decision Matrix</div>
+    <div class="legend">
+      <div class="legend-item"><span class="dot dot-a"></span> Option A — Full Platform</div>
+      <div class="legend-item"><span class="dot dot-b"></span> Option B — Ambulance + Tracking</div>
+      <div class="legend-item"><span class="dot dot-c"></span> Option C — Blood Matching</div>
+    </div>
+
+    <div id="matrix"></div>
+
+    <div class="total-row">
+      Totals — A: 35/70 &nbsp;|&nbsp; <span class="winner-badge">B: 53/70 (winner)</span> &nbsp;|&nbsp; C: 47/70
+    </div>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section class="card" id="sec5">
+    <div class="section-title">Premortem</div>
+
+    <div class="premortem-block">
+      <h4>Option B — Failed After 12 Months</h4>
+      <ul>
+        <li>Never moved past fake demo data — no realistic hospital/ambulance workflow validation.</li>
+        <li>Scope crept back in ("let's just add blood bank too") and diluted the polish.</li>
+        <li>Real-time infrastructure (maps, live sockets) ate all the build time, leaving no time for UI polish.</li>
+      </ul>
+      <div class="label">Early Warning Sign</div>
+      <p>Still building backend infrastructure with zero working end-to-end demo by the end of week 2.</p>
+      <div class="label">Prevention Action</div>
+      <p>Write the scope down and freeze it before writing code; build one trivial end-to-end flow on day one.</p>
+    </div>
+
+    <div class="premortem-block">
+      <h4>Option C — Failed After 12 Months</h4>
+      <ul>
+        <li>Read as a "cute" small project rather than something memorable to recruiters.</li>
+        <li>Matching logic stayed oversimplified without real geolocation, felt gimmicky.</li>
+        <li>No clear differentiation from the many existing donor-matching apps already out there.</li>
+      </ul>
+      <div class="label">Early Warning Sign</div>
+      <p>Your pitch takes more than 30 seconds to explain why this matters versus a generic donor app.</p>
+      <div class="label">Prevention Action</div>
+      <p>Anchor the pitch in a real emergency scenario upfront, not just "AI matches donors."</p>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section class="card" id="sec6">
+    <div class="section-title">7-Day Test Plan</div>
+    <div class="day-row"><div class="day-tag">Day 1-2</div><p>Research realistic ambulance/hospital data structures and sketch the core user flow end-to-end.</p></div>
+    <div class="day-row"><div class="day-tag">Day 3-4</div><p>Build one small experiment: live location tracking between a dummy patient and ambulance, fully working.</p></div>
+    <div class="day-row"><div class="day-tag">Day 5-6</div><p>Have one conversation with a paramedic, hospital staffer, or knowledgeable contact about real dispatch workflow.</p></div>
+    <div class="day-row"><div class="day-tag">Day 7</div><p>Decision day: if request → assign → track → arrive works reliably, commit to the full Option B build; if not, cut scope further.</p></div>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section class="card" id="sec7">
+    <div class="section-title">The Verdict</div>
+    <div class="verdict-name">Option B — Ambulance Booking + Live Tracking + Hospital Coordination</div>
+    <p>It wins because it matches LifeLink's actual "emergency" identity, forces the hardest and most recruiter-relevant skills (real-time systems), and is genuinely finishable — with clean polish — in a few weeks. The rest of the vision becomes your roadmap slide, not unfinished code.</p>
+    <div class="label">What Could Flip It</div>
+    <p>If you gain a technical co-founder or teammate that expands your realistic capacity, or if you're specifically targeting AI/ML roles over full-stack roles, Option C becomes more competitive.</p>
+    <p class="hard-truth">A demo that works twice in front of a recruiter beats a slide deck describing eight features.</p>
+  </section>
+
+  <!-- SECTION 8 -->
+  <section class="card" id="sec8">
+    <div class="section-title">Shareable Cards</div>
+    <div class="mini-cards">
+      <div class="mini-card">
+        <div>
+          <h4>Matrix Summary</h4>
+          <div class="mini-score-row"><span>Option A</span><span>35/70</span></div>
+          <div class="mini-score-row"><span>Option B</span><span style="color:var(--accent-gold);">53/70</span></div>
+          <div class="mini-score-row"><span>Option C</span><span>47/70</span></div>
+        </div>
+        <div class="mini-watermark">Built with Claude AI</div>
+      </div>
+
+      <div class="mini-card">
+        <div>
+          <div class="mini-verdict">B wins</div>
+          <p class="mini-caption">Ambulance booking + live tracking + hospital coordination — the fastest path to a working, mission-true MVP.</p>
+        </div>
+        <div class="mini-watermark">Built with Claude AI</div>
+      </div>
+
+      <div class="mini-card">
+        <div>
+          <h4>LinkedIn Hook</h4>
+          <p class="mini-caption">I almost built 8 features for my emergency-tech startup idea. I built 1 instead — and it actually works.</p>
+          <p class="mini-caption" style="color:var(--text-secondary);">Scope is a decision, not a compromise. Ship the core, roadmap the rest.</p>
+          <div class="mini-cta">→ Follow the build: LifeLink</div>
+        </div>
+        <div class="mini-watermark">Built with Claude AI</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>Built with Claude AI | ABTalks 60-Day Challenge</footer>
+</div>
+
+<script>
+  const dims = [
+    {label:"Life/Career Upside", a:6, b:8, c:6},
+    {label:"Financial Safety", a:3, b:7, c:8},
+    {label:"Growth & Learning", a:8, b:8, c:6},
+    {label:"Stress Level (10=low)", a:2, b:6, c:8},
+    {label:"Reversibility (10=easy)", a:4, b:8, c:8},
+    {label:"Long-term Alignment", a:9, b:8, c:5},
+    {label:"Regret Risk (10=low)", a:3, b:8, c:6},
+  ];
+
+  const matrixEl = document.getElementById('matrix');
+  let delay = 0;
+  dims.forEach(d => {
+    const row = document.createElement('div');
+    row.className = 'matrix-row';
+    row.innerHTML = `
+      <div class="matrix-label">${d.label}</div>
+      <div class="matrix-bars">
+        <div class="bar-container">
+          <div class="bar-fill bar-a" style="--w:${d.a*10}%; animation-delay:${delay}s;">${d.a}</div>
+        </div>
+        <div class="bar-container">
+          <div class="bar-fill bar-b" style="--w:${d.b*10}%; animation-delay:${delay+0.1}s;">${d.b}</div>
+        </div>
+        <div class="bar-container">
+          <div class="bar-fill bar-c" style="--w:${d.c*10}%; animation-delay:${delay+0.2}s;">${d.c}</div>
+        </div>
+      </div>
+    `;
+    matrixEl.appendChild(row);
+    delay += 0.15;
+  });
+</script>
+
+</body>
+</html>
