@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Content Intelligence Studio</title>
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root[data-theme="dark"]{
+  --bg:#0F1214;
+  --bg-alt:#14181B;
+  --panel:#181D20;
+  --panel-2:#1F262A;
+  --border:#2A3236;
+  --border-soft:#20272B;
+  --text:#EDEAE2;
+  --text-dim:#9BA3A0;
+  --text-faint:#5F6764;
+  --brass:#C9A15C;
+  --brass-bright:#E4BE7E;
+  --brass-dim:#8C7442;
+  --sage:#7FAE93;
+  --sage-dim:#3E5548;
+  --amber:#D98B4A;
+  --amber-dim:#5B4128;
+  --brick:#C0604D;
+  --brick-dim:#502F29;
+  --shadow: 0 20px 60px -20px rgba(0,0,0,0.6);
+  --ring-track: #262E32;
+}
+:root[data-theme="light"]{
+  --bg:#EEF0EE;
+  --bg-alt:#E6E9E5;
+  --panel:#FFFFFF;
+  --panel-2:#F5F6F3;
+  --border:#DADFDA;
+  --border-soft:#E4E7E2;
+  --text:#171A17;
+  --text-dim:#5A625C;
+  --text-faint:#93998F;
+  --brass:#9A6F2F;
+  --brass-bright:#B5872F;
+  --brass-dim:#C9A15C;
+  --sage:#3E7A5C;
+  --sage-dim:#DCEBE2;
+  --amber:#B3661E;
+  --amber-dim:#F3DFC7;
+  --brick:#A5432F;
+  --brick-dim:#F1D8D0;
+  --shadow: 0 20px 50px -25px rgba(20,25,20,0.25);
+  --ring-track: #E0E4DF;
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,Roboto,sans-serif;
+  line-height:1.5;
+  transition:background .4s ease, color .4s ease;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:80px;
+}
+::selection{ background:var(--brass); color:#12100A; }
+.serif{ font-family:Georgia,'Iowan Old Style','Palatino Linotype','URW Palladio',P052,serif; }
+.mono{ font-family:'SF Mono','JetBrains Mono',Consolas,'Courier New',monospace; }
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+}
+
+a{ color:inherit; }
+button{ font-family:inherit; cursor:pointer; }
+textarea, input, select{ font-family:inherit; }
+
+/* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+.shell{ max-width:1180px; margin:0 auto; padding:0 28px; }
+
+/* ---- Masthead ---- */
+.masthead{
+  border-bottom:1px solid var(--border);
+  padding:34px 0 26px;
+  position:relative;
+}
+.masthead-row{ display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+.eyebrow{
+  font-family:'SF Mono','JetBrains Mono',Consolas,monospace;
+  font-size:11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--brass);
+  display:flex; align-items:center; gap:8px;
+  margin-bottom:10px;
+}
+.eyebrow .dot{ width:6px; height:6px; border-radius:50%; background:var(--sage); box-shadow:0 0 0 3px var(--sage-dim); }
+.masthead h1{
+  font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif;
+  font-weight:400;
+  font-size:clamp(32px,5vw,50px);
+  letter-spacing:-.01em;
+  line-height:1.05;
+}
+.masthead h1 em{ font-style:italic; color:var(--brass); }
+.masthead .tagline{
+  margin-top:10px; color:var(--text-dim); font-size:15px; max-width:520px;
+}
+.theme-toggle{
+  border:1px solid var(--border); background:var(--panel); color:var(--text-dim);
+  border-radius:100px; padding:8px 14px; font-size:12px; letter-spacing:.04em;
+  display:flex; align-items:center; gap:8px; white-space:nowrap;
+  transition:.2s;
+}
+.theme-toggle:hover{ border-color:var(--brass); color:var(--text); }
+
+/* ---- Section frame ---- */
+.section{ padding:52px 0; border-bottom:1px solid var(--border-soft); }
+.section:last-child{ border-bottom:none; }
+.section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:16px; margin-bottom:26px; flex-wrap:wrap; }
+.section-num{
+  font-family:'SF Mono',Consolas,monospace; font-size:12px; color:var(--brass); letter-spacing:.1em;
+}
+.section-title{
+  font-family:Georgia,serif; font-size:26px; font-weight:400; margin-top:4px;
+}
+.section-sub{ color:var(--text-dim); font-size:14px; max-width:560px; }
+
+/* ============================================================
+   INTAKE PANEL
+   ============================================================ */
+.intake-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:22px; }
+@media (max-width:860px){ .intake-grid{ grid-template-columns:1fr; } }
+
+.panel{
+  background:var(--panel); border:1px solid var(--border); border-radius:14px;
+  padding:22px; box-shadow:var(--shadow);
+}
+.field-label{
+  font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-faint);
+  margin-bottom:8px; display:block; font-family:'SF Mono',Consolas,monospace;
+}
+textarea#postText{
+  width:100%; min-height:180px; resize:vertical; background:var(--bg-alt);
+  border:1px solid var(--border); color:var(--text); border-radius:10px;
+  padding:14px; font-size:14.5px; line-height:1.55; transition:border-color .2s;
+}
+textarea#postText:focus{ outline:none; border-color:var(--brass); }
+.char-count{ text-align:right; font-size:11px; color:var(--text-faint); margin-top:6px; font-family:'SF Mono',Consolas,monospace; }
+
+.select-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-top:16px; }
+@media (max-width:600px){ .select-row{ grid-template-columns:1fr; } }
+.select-wrap select{
+  width:100%; background:var(--bg-alt); border:1px solid var(--border); color:var(--text);
+  padding:11px 12px; border-radius:8px; font-size:13.5px; appearance:none;
+  background-image:linear-gradient(45deg, transparent 50%, var(--text-dim) 50%), linear-gradient(135deg, var(--text-dim) 50%, transparent 50%);
+  background-position: calc(100% - 18px) center, calc(100% - 13px) center;
+  background-size:5px 5px, 5px 5px; background-repeat:no-repeat;
+}
+
+.dropzone{
+  border:1.5px dashed var(--border); border-radius:12px; padding:22px;
+  text-align:center; color:var(--text-dim); font-size:13px; cursor:pointer;
+  transition:.2s; min-height:150px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
+}
+.dropzone:hover, .dropzone.drag{ border-color:var(--brass); background:var(--panel-2); color:var(--text); }
+.dropzone svg{ opacity:.6; }
+.dropzone .hint{ font-size:11px; color:var(--text-faint); }
+.preview-wrap{ margin-top:14px; position:relative; }
+.preview-wrap img{ width:100%; border-radius:10px; border:1px solid var(--border); display:block; }
+.preview-remove{
+  position:absolute; top:8px; right:8px; background:rgba(10,10,10,.7); color:#fff;
+  border:none; border-radius:100px; width:26px; height:26px; font-size:14px; line-height:1;
+}
+
+.run-bar{ display:flex; align-items:center; justify-content:center; gap:14px; margin-top:26px; }
+.btn-run{
+  background:var(--brass); color:#151107; border:none; border-radius:100px;
+  padding:15px 34px; font-size:14.5px; font-weight:600; letter-spacing:.02em;
+  display:flex; align-items:center; gap:10px; transition:.2s; box-shadow:0 12px 30px -12px rgba(201,161,92,.5);
+}
+.btn-run:hover{ transform:translateY(-1px); box-shadow:0 16px 36px -12px rgba(201,161,92,.65); }
+.btn-run:disabled{ opacity:.5; cursor:not-allowed; transform:none; }
+.btn-run .spinner{ display:none; }
+.btn-run.loading .spinner{ display:inline-block; }
+.btn-run.loading .arrow{ display:none; }
+.run-note{ font-size:12px; color:var(--text-faint); }
+
+.spinner{
+  width:14px; height:14px; border-radius:50%; border:2px solid rgba(0,0,0,.25); border-top-color:#151107;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+/* ============================================================
+   WORKFLOW / ACTIVITY
+   ============================================================ */
+.reviewer-rail{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; margin-bottom:18px; }
+.reviewer-chip{
+  border:1px solid var(--border); background:var(--panel); border-radius:10px; padding:12px 14px;
+  display:flex; align-items:center; gap:10px; transition:.25s;
+}
+.reviewer-chip .status-dot{ width:8px; height:8px; border-radius:50%; background:var(--text-faint); flex-shrink:0; transition:.3s; }
+.reviewer-chip.running .status-dot{ background:var(--amber); box-shadow:0 0 0 4px var(--amber-dim); animation:pulse 1.1s infinite; }
+.reviewer-chip.done .status-dot{ background:var(--sage); box-shadow:0 0 0 4px var(--sage-dim); }
+.reviewer-chip.error .status-dot{ background:var(--brick); box-shadow:0 0 0 4px var(--brick-dim); }
+@keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+.reviewer-chip .rname{ font-size:12.5px; font-weight:600; }
+.reviewer-chip .rstate{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; }
+
+.console{
+  background:#0A0C0D; border:1px solid var(--border); border-radius:12px; padding:16px 18px;
+  height:190px; overflow-y:auto; font-family:'SF Mono',Consolas,monospace; font-size:12px;
+  color:#9FE8B8;
+}
+:root[data-theme="light"] .console{ background:#111614; color:#8FE0AC; }
+.console .line{ margin-bottom:5px; opacity:0; animation:fadein .3s forwards; }
+@keyframes fadein{ to{ opacity:1; } }
+.console .line .t{ color:#57625C; margin-right:8px; }
+.console .line.err{ color:#F0958A; }
+.console .line.ok{ color:#8FE0AC; }
+.console .cursor{ display:inline-block; width:6px; height:12px; background:var(--brass); animation:blink 1s step-start infinite; vertical-align:middle; }
+@keyframes blink{ 50%{ opacity:0; } }
+
+/* ============================================================
+   SCORE HERO
+   ============================================================ */
+.hero-grid{ display:grid; grid-template-columns:260px 1fr; gap:34px; align-items:center; }
+@media (max-width:760px){ .hero-grid{ grid-template-columns:1fr; } }
+.ring-wrap{ position:relative; width:220px; height:220px; margin:0 auto; }
+.ring-wrap svg{ transform:rotate(-90deg); }
+.ring-track{ fill:none; stroke:var(--ring-track); stroke-width:12; }
+.ring-fill{ fill:none; stroke:var(--brass); stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1); }
+.ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-score{ font-family:Georgia,serif; font-size:52px; line-height:1; }
+.ring-label{ font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint); margin-top:6px; }
+
+.cat-list{ display:flex; flex-direction:column; gap:16px; }
+.cat-row .cat-top{ display:flex; justify-content:space-between; font-size:13.5px; margin-bottom:6px; }
+.cat-row .cat-name{ color:var(--text); font-weight:600; }
+.cat-row .cat-score{ font-family:'SF Mono',Consolas,monospace; color:var(--text-dim); }
+.cat-bar{ height:7px; border-radius:100px; background:var(--panel-2); overflow:hidden; border:1px solid var(--border-soft); }
+.cat-bar-fill{ height:100%; border-radius:100px; width:0%; transition:width 1.1s cubic-bezier(.2,.8,.2,1); }
+
+.exec-summary-box{
+  margin-top:26px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:24px;
+  font-size:15px; line-height:1.7; color:var(--text); box-shadow:var(--shadow);
+}
+.exec-summary-box .qmark{ color:var(--brass); font-family:Georgia,serif; font-size:34px; line-height:0; vertical-align:-8px; margin-right:4px;}
+
+/* ============================================================
+   REVIEWER DETAIL CARDS
+   ============================================================ */
+.review-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+@media (max-width:820px){ .review-grid{ grid-template-columns:1fr; } }
+.rcard{ background:var(--panel); border:1px solid var(--border); border-radius:14px; overflow:hidden; box-shadow:var(--shadow); }
+.rcard-head{ padding:18px 20px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; }
+.rcard-head .htitle{ display:flex; flex-direction:column; gap:3px; }
+.rcard-head .hname{ font-weight:700; font-size:14.5px; }
+.rcard-head .hrole{ font-size:11.5px; color:var(--text-faint); }
+.rcard-score{
+  font-family:'SF Mono',Consolas,monospace; font-size:15px; font-weight:700;
+  border:1px solid var(--border); border-radius:100px; padding:4px 12px;
+}
+.rcard-chevron{ transition:.25s; color:var(--text-faint); margin-left:10px; }
+.rcard.open .rcard-chevron{ transform:rotate(180deg); }
+.rcard-body{ max-height:0; overflow:hidden; transition:max-height .35s ease; border-top:1px solid transparent; }
+.rcard.open .rcard-body{ max-height:1400px; border-top:1px solid var(--border-soft); }
+.rcard-inner{ padding:18px 20px 22px; }
+.rcard-inner p.summary{ font-size:13.5px; color:var(--text-dim); margin-bottom:16px; line-height:1.65; }
+.tag-block{ margin-bottom:14px; }
+.tag-block h4{ font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.tag-block h4.strength{ color:var(--sage); }
+.tag-block h4.weakness{ color:var(--brick); }
+.tag-block h4.opportunity{ color:var(--amber); }
+.tag-block h4.reco{ color:var(--brass); }
+.tag-block ul{ list-style:none; display:flex; flex-direction:column; gap:7px; }
+.tag-block li{ font-size:13px; color:var(--text); padding-left:16px; position:relative; line-height:1.5; }
+.tag-block li:before{ content:"—"; position:absolute; left:0; color:var(--text-faint); }
+
+/* ============================================================
+   ANALYTICS CARD
+   ============================================================ */
+.analytics-card{ display:grid; grid-template-columns:200px 1fr; gap:22px; }
+@media (max-width:700px){ .analytics-card{ grid-template-columns:1fr; } }
+.analytics-thumb{ border-radius:10px; overflow:hidden; border:1px solid var(--border); }
+.analytics-thumb img{ width:100%; display:block; }
+.metric-chips{ display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 16px; }
+.metric-chip{ background:var(--panel-2); border:1px solid var(--border-soft); border-radius:8px; padding:8px 12px; font-size:12px; }
+.metric-chip b{ display:block; font-family:'SF Mono',Consolas,monospace; font-size:14px; color:var(--brass); }
+
+/* ============================================================
+   REWRITE STUDIO
+   ============================================================ */
+.rewrite-grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+@media (max-width:820px){ .rewrite-grid{ grid-template-columns:1fr; } }
+.post-card{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px; box-shadow:var(--shadow); position:relative; }
+.post-card .label{ font-size:10.5px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-faint); margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;}
+.post-card .label.after{ color:var(--sage); }
+.post-card .body-text{ font-size:14px; line-height:1.7; white-space:pre-wrap; color:var(--text); }
+.copy-btn{
+  border:1px solid var(--border); background:var(--panel-2); color:var(--text-dim); border-radius:100px;
+  padding:5px 12px; font-size:11px; transition:.2s;
+}
+.copy-btn:hover{ border-color:var(--brass); color:var(--text); }
+
+.hooks-panel{ margin-top:18px; background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:20px; box-shadow:var(--shadow); }
+.hook-item{ display:flex; gap:14px; padding:14px 0; border-bottom:1px solid var(--border-soft); align-items:flex-start; }
+.hook-item:last-child{ border-bottom:none; }
+.hook-num{ font-family:Georgia,serif; font-size:22px; color:var(--brass); width:28px; flex-shrink:0; }
+.hook-text{ font-size:14px; line-height:1.6; flex:1; }
+.why-it-works{ margin-top:22px; padding-top:18px; border-top:1px dashed var(--border); font-size:13.5px; color:var(--text-dim); line-height:1.7; }
+.why-it-works b{ color:var(--text); }
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.checklist{ background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:6px; box-shadow:var(--shadow); }
+.check-item{ display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border-soft); }
+.check-item:last-child{ border-bottom:none; }
+.check-item input{ width:18px; height:18px; accent-color:var(--brass); flex-shrink:0; }
+.check-item label{ font-size:13.5px; }
+.check-item.checked label{ color:var(--text-faint); text-decoration:line-through; }
+
+/* ============================================================
+   FINAL REPORT
+   ============================================================ */
+.report-wrap{ background:var(--panel); border:1px solid var(--border); border-radius:18px; padding:0; overflow:hidden; box-shadow:var(--shadow); }
+.report-top{ padding:30px 32px; border-bottom:1px solid var(--border); background:linear-gradient(180deg, var(--panel-2), var(--panel)); }
+.report-top .stamp{
+  display:inline-flex; align-items:center; gap:8px; border:1px solid var(--brass); color:var(--brass);
+  border-radius:100px; padding:5px 14px; font-size:11px; letter-spacing:.12em; text-transform:uppercase; font-family:'SF Mono',Consolas,monospace;
+  margin-bottom:14px;
+}
+.report-top h3{ font-family:Georgia,serif; font-size:24px; font-weight:400; }
+.report-body{ padding:30px 32px; display:grid; grid-template-columns:1fr 1fr; gap:30px; }
+@media (max-width:820px){ .report-body{ grid-template-columns:1fr; } }
+.report-block h4{ font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--brass); margin-bottom:10px; }
+.report-block p, .report-block li{ font-size:14px; line-height:1.7; color:var(--text); }
+.report-block ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+.report-block li{ padding-left:16px; position:relative; }
+.report-block li:before{ content:"◆"; font-size:7px; position:absolute; left:0; top:6px; color:var(--brass); }
+.report-block.full{ grid-column:1/-1; }
+
+.predicted-box{
+  background:var(--panel-2); border:1px dashed var(--border); border-radius:12px; padding:16px 18px; font-size:13px; color:var(--text-dim);
+  margin-top:6px;
+}
+.predicted-box .disclaimer{ font-size:11px; color:var(--text-faint); margin-top:10px; font-style:italic; }
+
+.deeper-prompts{ padding:26px 32px 32px; }
+.deeper-prompts h4{ font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--brass); margin-bottom:14px; }
+.prompt-chips{ display:flex; flex-wrap:wrap; gap:10px; }
+.prompt-chip{
+  background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:100px;
+  padding:10px 16px; font-size:12.5px; transition:.2s; text-align:left;
+}
+.prompt-chip:hover{ border-color:var(--brass); color:var(--brass); transform:translateY(-1px); }
+
+/* ============================================================
+   MISC UTILITY
+   ============================================================ */
+.hidden{ display:none !important; }
+.fade-in{ animation:fadeUp .5s ease both; }
+@keyframes fadeUp{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+
+.error-box{
+  background:var(--brick-dim); border:1px solid var(--brick); color:var(--text); border-radius:10px;
+  padding:14px 16px; font-size:13px; margin-top:10px; display:flex; justify-content:space-between; align-items:center; gap:12px;
+}
+.retry-btn{ background:var(--brick); color:#fff; border:none; border-radius:100px; padding:7px 14px; font-size:12px; flex-shrink:0; }
+
+.skeleton{ background:linear-gradient(90deg, var(--panel-2) 25%, var(--border-soft) 37%, var(--panel-2) 63%); background-size:400% 100%; animation:shimmer 1.4s ease infinite; border-radius:8px; }
+@keyframes shimmer{ 0%{ background-position:100% 50%; } 100%{ background-position:0 50%; } }
+
+.footnote{ text-align:center; font-size:11.5px; color:var(--text-faint); margin-top:60px; }
+
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--brass); color:#151107; padding:12px 22px; border-radius:100px; font-size:13px; font-weight:600;
+  opacity:0; pointer-events:none; transition:.3s; z-index:999; box-shadow:0 12px 30px -10px rgba(0,0,0,.4);
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ===================== MASTHEAD ===================== -->
+  <header class="masthead">
+    <div class="masthead-row">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> AI EDITORIAL REVIEW DESK</div>
+        <h1>Content Intelligence <em>Studio</em></h1>
+        <p class="tagline">A panel of specialist AI reviewers reads your LinkedIn post the way a thought‑leadership editor would — line by line, metric by metric — then hands back a full editorial report. Runs entirely offline as a local simulation, no API connection required.</p>
+      </div>
+      <button class="theme-toggle" id="themeToggle">🌙 <span id="themeLabel">Dark desk</span></button>
+    </div>
+  </header>
+
+  <!-- ===================== INTAKE ===================== -->
+  <section class="section" id="intakeSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">01 — INTAKE</div>
+        <div class="section-title">Submit your post for review</div>
+        <div class="section-sub">Paste the post text and, if you have it, drop in an analytics screenshot. The desk reads both.</div>
+      </div>
+    </div>
+
+    <div class="intake-grid">
+      <div class="panel">
+        <span class="field-label">Post text</span>
+        <textarea id="postText" placeholder="Paste your LinkedIn post text here…">Most people think thought leadership on LinkedIn means posting more.
+
+It doesn't.
+
+After analyzing 200+ posts from top voices in my industry, I found the real pattern: the best performers post LESS but with more specificity.
+
+Here's what changed when I stopped writing "5 tips for success" and started writing about the one deal I lost and why:
+
+→ Comments went from 3 to 47
+→ Profile views tripled
+→ Two inbound client conversations
+
+The lesson: nobody trusts generic advice anymore. They trust specific, slightly uncomfortable stories.
+
+What's one "uncomfortable" story in your industry you've been avoiding sharing?</textarea>
+        <div class="char-count" id="charCount">0 characters</div>
+
+        <div class="select-row">
+          <div class="select-wrap">
+            <span class="field-label">Platform</span>
+            <select id="platformSelect">
+              <option value="LinkedIn" selected>LinkedIn</option>
+              <option value="Instagram">Instagram</option>
+              <option value="Twitter/X">Twitter / X</option>
+              <option value="TikTok">TikTok</option>
+            </select>
+          </div>
+          <div class="select-wrap">
+            <span class="field-label">Primary goal</span>
+            <select id="goalSelect">
+              <option value="Build authority/thought leadership" selected>Build authority</option>
+              <option value="Maximize reach/virality">Maximize reach</option>
+              <option value="Drive engagement (comments/shares)">Drive engagement</option>
+              <option value="Drive traffic/conversions (clicks, leads)">Drive conversions</option>
+            </select>
+          </div>
+          <div class="select-wrap">
+            <span class="field-label">Review rigor</span>
+            <select id="rigorSelect">
+              <option value="light" selected>Light touch</option>
+              <option value="balanced">Balanced</option>
+              <option value="rigorous">Rigorous</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <span class="field-label">Analytics screenshot (optional)</span>
+        <div class="dropzone" id="dropzone">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 16V4M12 4l-4 4M12 4l4 4"/><path d="M4 16v3a1 1 0 001 1h14a1 1 0 001-1v-3"/></svg>
+          <div>Drop an impressions/engagement screenshot</div>
+          <div class="hint">or click to browse · PNG / JPG</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" class="hidden">
+        <div id="previewWrap"></div>
+      </div>
+    </div>
+
+    <div class="run-bar">
+      <button class="btn-run" id="runBtn">
+        <span class="arrow">▸</span><span class="spinner"></span>
+        <span id="runBtnLabel">Run full review</span>
+      </button>
+    </div>
+    <div style="text-align:center;"><div class="run-note">Runs entirely offline · local simulation engine · ~6 specialist passes · no network, no API key</div></div>
+  </section>
+
+  <!-- ===================== WORKFLOW ===================== -->
+  <section class="section hidden" id="workflowSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">02 — REVIEW DESK</div>
+        <div class="section-title">The panel is reading your post</div>
+        <div class="section-sub">Each reviewer works independently, then a senior editor synthesizes the findings.</div>
+      </div>
+    </div>
+    <div class="reviewer-rail" id="reviewerRail"></div>
+    <div class="console" id="console"></div>
+  </section>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <section class="section hidden" id="dashboardSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">03 — SCORECARD</div>
+        <div class="section-title">Content health at a glance</div>
+      </div>
+    </div>
+    <div class="hero-grid">
+      <div class="ring-wrap">
+        <svg width="220" height="220" viewBox="0 0 220 220">
+          <circle class="ring-track" cx="110" cy="110" r="94"/>
+          <circle class="ring-fill" id="ringFill" cx="110" cy="110" r="94" stroke-dasharray="590" stroke-dashoffset="590"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-score" id="ringScore">--</div>
+          <div class="ring-label">Overall score</div>
+        </div>
+      </div>
+      <div class="cat-list" id="catList"></div>
+    </div>
+    <div class="exec-summary-box hidden" id="execSummaryBox"></div>
+  </section>
+
+  <!-- ===================== REVIEWER DETAILS ===================== -->
+  <section class="section hidden" id="reviewsSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">04 — REVIEWER NOTES</div>
+        <div class="section-title">Full reasoning, panel by panel</div>
+        <div class="section-sub">Click a card to expand each specialist's findings.</div>
+      </div>
+    </div>
+    <div class="review-grid" id="reviewGrid"></div>
+  </section>
+
+  <!-- ===================== ANALYTICS ===================== -->
+  <section class="section hidden" id="analyticsSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">05 — PERFORMANCE READ</div>
+        <div class="section-title">What your analytics screenshot says</div>
+      </div>
+    </div>
+    <div class="panel analytics-card">
+      <div class="analytics-thumb" id="analyticsThumb"></div>
+      <div>
+        <div class="metric-chips" id="metricChips"></div>
+        <p class="summary" id="analyticsSummary" style="font-size:13.5px;color:var(--text-dim);line-height:1.7;"></p>
+        <div class="tag-block">
+          <h4 class="opportunity">Benchmark read</h4>
+          <p id="analyticsBenchmark" style="font-size:13px;color:var(--text);line-height:1.6;"></p>
+        </div>
+        <div class="tag-block">
+          <h4 class="reco">Recommendations</h4>
+          <ul id="analyticsRecos"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REWRITE STUDIO ===================== -->
+  <section class="section hidden" id="rewriteSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">06 — REWRITE STUDIO</div>
+        <div class="section-title">Before vs. after</div>
+        <div class="section-sub">A rewritten version built from the panel's findings, plus alternative hooks.</div>
+      </div>
+    </div>
+    <div class="rewrite-grid">
+      <div class="post-card">
+        <div class="label">Before <span></span></div>
+        <div class="body-text" id="beforeText"></div>
+      </div>
+      <div class="post-card">
+        <div class="label after">After <button class="copy-btn" id="copyAfterBtn">Copy text</button></div>
+        <div class="body-text" id="afterText"></div>
+      </div>
+    </div>
+    <div class="hooks-panel">
+      <span class="field-label">Alternative opening hooks</span>
+      <div id="hooksList"></div>
+      <div class="why-it-works" id="whyItWorks"></div>
+    </div>
+  </section>
+
+  <!-- ===================== CHECKLIST ===================== -->
+  <section class="section hidden" id="checklistSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">07 — PUBLISHING CHECKLIST</div>
+        <div class="section-title">Before you hit publish</div>
+      </div>
+    </div>
+    <div class="checklist" id="checklist"></div>
+  </section>
+
+  <!-- ===================== FINAL REPORT ===================== -->
+  <section class="section hidden" id="reportSection">
+    <div class="section-head">
+      <div>
+        <div class="section-num">08 — FINAL REPORT</div>
+        <div class="section-title">Executive summary</div>
+      </div>
+    </div>
+    <div class="report-wrap">
+      <div class="report-top">
+        <div class="stamp">✎ Reviewed by the desk</div>
+        <h3 id="reportHeadline">Content Health Report</h3>
+      </div>
+      <div class="report-body">
+        <div class="report-block full">
+          <h4>Executive summary</h4>
+          <p id="reportExecSummary"></p>
+        </div>
+        <div class="report-block">
+          <h4>Highest‑impact improvements</h4>
+          <ul id="reportImprovements"></ul>
+        </div>
+        <div class="report-block">
+          <h4>Predicted performance potential</h4>
+          <div class="predicted-box">
+            <div id="reportPredicted"></div>
+            <div class="disclaimer">AI estimate only — not a guarantee. Based on post structure and stated goal, not platform data.</div>
+          </div>
+        </div>
+        <div class="report-block full">
+          <h4>Before → after, in one line</h4>
+          <p id="reportBeforeAfter"></p>
+        </div>
+      </div>
+      <div class="deeper-prompts">
+        <h4>Go deeper</h4>
+        <div class="prompt-chips" id="deeperPrompts"></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footnote">Content Intelligence Studio — every score and recommendation above was generated by a local simulation engine running entirely in your browser. No network calls, no API key, no data leaves your device.</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  postText: '',
+  platform: 'LinkedIn',
+  goal: 'Build authority/thought leadership',
+  rigor: 'light',
+  image: null,        // {base64, mediaType, name}
+  results: {}         // reviewerId -> parsed sections
+};
+
+/* ============================================================
+   DOM REFS
+   ============================================================ */
+const $ = (id) => document.getElementById(id);
+const postTextEl = $('postText');
+const charCountEl = $('charCount');
+const dropzone = $('dropzone');
+const fileInput = $('fileInput');
+const previewWrap = $('previewWrap');
+const runBtn = $('runBtn');
+const runBtnLabel = $('runBtnLabel');
+const consoleEl = $('console');
+const reviewerRail = $('reviewerRail');
+const toastEl = $('toast');
+
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
+$('themeToggle').addEventListener('click', () => {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  $('themeToggle').firstChild.textContent = isDark ? '☀️ ' : '🌙 ';
+  $('themeLabel').textContent = isDark ? 'Light desk' : 'Dark desk';
+});
+
+/* ============================================================
+   INTAKE INTERACTIONS
+   ============================================================ */
+function updateCharCount(){
+  charCountEl.textContent = postTextEl.value.length + ' characters';
+}
+postTextEl.addEventListener('input', updateCharCount);
+updateCharCount();
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault(); dropzone.classList.remove('drag');
+  if(e.dataTransfer.files && e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', (e) => {
+  if(e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+});
+
+function handleFile(file){
+  if(!file.type.startsWith('image/')){ showToast('Please upload an image file'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    const base64 = dataUrl.split(',')[1];
+    state.image = { base64, mediaType: file.type, name: file.name, dataUrl };
+    renderPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderPreview(){
+  if(!state.image){ previewWrap.innerHTML=''; return; }
+  previewWrap.innerHTML = `
+    <div class="preview-wrap fade-in">
+      <img src="${state.image.dataUrl}" alt="Analytics screenshot preview">
+      <button class="preview-remove" id="removeImgBtn">✕</button>
+    </div>`;
+  $('removeImgBtn').addEventListener('click', () => { state.image = null; previewWrap.innerHTML=''; });
+}
+
+function showToast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 2400);
+}
+
+/* ============================================================
+   LOCAL AI SIMULATION ENGINE
+   No network calls, no API key. All scores, copy, and rewrites
+   below are generated on-device from features of the actual
+   input text (and, for the analytics card, a seeded simulation).
+   ============================================================ */
+
+/* ---- seeded PRNG so the same input produces stable, repeatable
+   analysis, with a touch of jitter so re-runs feel alive ---- */
+function hashSeed(str){
+  let h = 1779033703 ^ str.length;
+  for(let i=0; i<str.length; i++){
+    h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return (h ^ (h >>> 16)) >>> 0;
+}
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function makeRng(seedStr){ return mulberry32(hashSeed(seedStr)); }
+function pick(rng, arr){ return arr[Math.floor(rng() * arr.length)]; }
+function pickN(rng, arr, n){
+  const copy = [...arr]; const out = [];
+  n = Math.min(n, copy.length);
+  for(let i=0; i<n; i++){ const idx = Math.floor(rng() * copy.length); out.push(copy.splice(idx,1)[0]); }
+  return out;
+}
+function jitter(rng, range){ return Math.round((rng() - 0.5) * 2 * range); }
+function clampScore(n){ return Math.max(18, Math.min(97, Math.round(n))); }
+function truncate(s, n){ s = (s||'').trim(); return s.length > n ? s.slice(0, n-1).trim() + '…' : s; }
+
+function toList(section){
+  if(!section) return [];
+  if(Array.isArray(section)) return section.filter(Boolean);
+  return String(section).split(/\r?\n/)
+    .map(l => l.trim())
+    .filter(l => l.length > 0)
+    .map(l => l.replace(/^[-•*]\s*/, '').replace(/^\[\s?\]\s*/,''))
+    .filter(l => l.length > 0);
+}
+function toScore(section, fallback = 70){
+  if(typeof section === 'number') return Math.max(0, Math.min(100, Math.round(section)));
+  const m = String(section || '').match(/\d{1,3}/);
+  if(!m) return fallback;
+  return Math.max(0, Math.min(100, parseInt(m[0], 10)));
+}
+
+const STOPWORDS = new Set(['the','and','a','to','of','in','on','for','is','are','was','were','it','this','that','i','my','me','you','your','we','our','they','their','he','she','with','as','at','by','be','have','has','had','not','but','or','so','if','what','when','who','how','why','from','about','into','more','most','than','then','after','before','one','two','three','because','just','like','get','got','been','can','could','would','should','will','out','up','down','over','under','again','also','very','some','all','any','no','yes','do','does','did','am','an','its','there','here','them','than']);
+
+const PREVIEW_LIMIT = { LinkedIn: 210, Instagram: 125, 'Twitter/X': 280, TikTok: 150 };
+const BENCHMARK_RANGE = { LinkedIn: [1, 3], Instagram: [1, 4], 'Twitter/X': [0.5, 2], TikTok: [4, 9] };
+
+/* ---- feature extraction from the actual post text ---- */
+function analyzeContent(text, platform){
+  const trimmed = text.trim();
+  const lines = trimmed.split(/\n/);
+  const words = trimmed.split(/\s+/).filter(Boolean);
+  const sentences = trimmed.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
+  const previewLimit = PREVIEW_LIMIT[platform] || 200;
+  const preview = trimmed.slice(0, previewLimit);
+  const firstLine = (lines[0] || '').trim();
+  const hasQuestion = /\?/.test(trimmed);
+  const endsWithQuestion = /\?\s*$/.test(trimmed);
+  const numberMatches = trimmed.match(/\d+%?/g) || [];
+  const hasEmoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(trimmed);
+  const hashtags = trimmed.match(/#\w+/g) || [];
+  const hasArrowBullets = /→|▸|●/.test(trimmed);
+  const hasDashBullets = /^[-*]\s+/m.test(trimmed);
+  const personalPronouns = (trimmed.match(/\b(I|my|me|I've|I'm|I'll)\b/g) || []).length;
+  const storyMarkers = /\b(when I|I learned|I realized|the lesson|I lost|I failed|I used to|last year|last week|last month|years ago|months ago|I noticed)\b/i.test(trimmed);
+  const genericAdviceMarkers = /(\d+\s*tips|top\s*\d+|things you need|here'?s how to|unlock your|game.?changer|synerg|in today'?s fast-paced|leverage)/i.test(trimmed);
+  const ctaPresence = endsWithQuestion || /(comment below|what would you|let me know|share your|drop a|tag someone)/i.test(trimmed);
+  const avgSentenceLength = words.length / Math.max(1, sentences.length);
+  const wordCount = words.length;
+  const lineCount = lines.length;
+  const avgLineLen = trimmed.length / Math.max(1, lineCount);
+  return { trimmed, lines, words, sentences, preview, previewLimit, firstLine, hasQuestion, endsWithQuestion, numberMatches, hasEmoji, hashtags, hasArrowBullets, hasDashBullets, personalPronouns, storyMarkers, genericAdviceMarkers, ctaPresence, avgSentenceLength, avgLineLen, wordCount, lineCount };
+}
+
+function extractTopic(text){
+  const words = (text.toLowerCase().match(/[a-z']+/g) || []);
+  const freq = {};
+  words.forEach(w => { if(w.length > 4 && !STOPWORDS.has(w)) freq[w] = (freq[w] || 0) + 1; });
+  const sorted = Object.entries(freq).sort((a,b) => b[1]-a[1]);
+  return sorted.length ? sorted[0][0] : 'this';
+}
+
+function buildSummary(sentences){ return sentences.filter(Boolean).join(' '); }
+
+/* ---- specialist reviewer #1: Hook & Opening Analyst ---- */
+function genHookReview(f, rng, platform){
+  let score = 58;
+  const openingLen = f.firstLine.length || f.preview.length;
+  if(openingLen >= 8 && openingLen <= 100) score += 10;
+  if(openingLen > 140) score -= 10;
+  if(f.hasQuestion && f.trimmed.indexOf('?') < f.previewLimit) score += 6;
+  if(f.storyMarkers) score += 10;
+  if(f.genericAdviceMarkers) score -= 12;
+  if(f.numberMatches.length > 0 && /\d/.test(f.trimmed.slice(0, f.previewLimit))) score += 6;
+  score = clampScore(score + jitter(rng, 6));
+
+  const strengths = [];
+  if(f.storyMarkers) strengths.push(`The opening signals a real, specific experience rather than generic advice — readers can tell within one line this isn't a listicle.`);
+  if(openingLen <= 100 && openingLen >= 8) strengths.push(`The first line ("${truncate(f.firstLine || f.preview, 70)}") is short enough to render before the "…see more" cutoff on ${platform}, so the hook doesn't get chopped off.`);
+  if(f.hasQuestion) strengths.push(`Using a question early creates an open loop that pulls the reader into the rest of the post.`);
+  if(f.numberMatches.length > 0) strengths.push(`A concrete number appears early, which reads as more credible than a vague claim.`);
+  if(strengths.length === 0) strengths.push(`The post gets to its point without much throat-clearing before the topic is introduced.`);
+
+  const weaknesses = [];
+  if(openingLen > 140) weaknesses.push(`The opening line runs about ${openingLen} characters — on ${platform} that's likely to get truncated before the reader reaches the interesting part.`);
+  if(f.genericAdviceMarkers) weaknesses.push(`Phrases that read as generic listicle language will make some readers scroll past before giving the post a chance.`);
+  if(!f.storyMarkers && f.numberMatches.length === 0) weaknesses.push(`The opening doesn't yet promise something specific — no story, stat, or concrete claim to earn the next second of attention.`);
+  if(openingLen < 8) weaknesses.push(`The first line is very short and doesn't give a scrolling reader enough to grab onto before deciding whether to stop.`);
+  if(weaknesses.length === 0) weaknesses.push(`Even a strong hook can be sharpened further — right now it eases in rather than interrupting the normal feed scroll.`);
+
+  const opportunities = pickN(rng, [
+    `Isolate the first sentence on its own line, with a blank line after it — that whitespace alone increases the odds someone pauses.`,
+    `Open with the moment of tension in the story (the mistake, the surprise, the loss) rather than the lesson already drawn from it — save the lesson for the payoff.`,
+    `A number or timeframe in the first ${Math.min(15, f.previewLimit)} characters tends to out-perform an abstract claim.`,
+    `Reading the first line out loud is a fast test — if it could sit atop any post on ${platform}, it needs one more specific, unshareable detail.`,
+  ], 2);
+
+  const recommendations = [];
+  if(openingLen > 140) recommendations.push(`Cut the opening line to under 100 characters — move setup detail to line two or three.`);
+  if(!f.storyMarkers) recommendations.push(`Rewrite the first line as a single concrete moment rather than a general statement.`);
+  if(!f.hasQuestion) recommendations.push(`Test an opening framed as the exact question the reader is already asking themselves.`);
+  recommendations.push(`Draft two alternate first lines and compare which one still makes sense completely out of context.`);
+
+  return {
+    SCORE: score,
+    SUMMARY: buildSummary([
+      openingLen <= f.previewLimit ? `The opening fits cleanly within ${platform}'s preview window before "see more" kicks in.` : `The opening runs a little long for ${platform}'s preview window before "see more" kicks in.`,
+      f.storyMarkers ? `It leans on a real, specific moment rather than generic advice, which is exactly what stops a scroll.` : `It reads more like a general statement than a specific moment, which is the main thing holding the hook back.`,
+      score >= 75 ? `Overall this is a strong, scroll-stopping open.` : score >= 55 ? `It's a workable open with a couple of clear upgrades available.` : `There's real room to sharpen this into a genuine pattern interrupt.`,
+    ]),
+    STRENGTHS: pickN(rng, strengths, Math.min(3, strengths.length)),
+    WEAKNESSES: pickN(rng, weaknesses, Math.min(2, weaknesses.length)),
+    OPPORTUNITIES: opportunities,
+    RECOMMENDATIONS: pickN(rng, recommendations, Math.min(3, recommendations.length)),
+  };
+}
+
+/* ---- specialist reviewer #2: Authority & Thought-Leadership Reviewer ---- */
+function genAuthorityReview(f, rng, platform, goal){
+  let score = 60;
+  if(f.storyMarkers) score += 14;
+  if(f.genericAdviceMarkers) score -= 16;
+  if(f.numberMatches.length >= 2) score += 8;
+  if(f.wordCount > 250 && !f.storyMarkers) score -= 6;
+  if(f.ctaPresence) score += 4;
+  const pronounRatio = f.personalPronouns / Math.max(1, f.wordCount);
+  if(pronounRatio > 0.15) score -= 5;
+  score = clampScore(score + jitter(rng, 6));
+
+  const strengths = [];
+  if(f.storyMarkers) strengths.push(`A specific, lived experience anchors the post — that's what separates a credible practitioner's voice from recycled advice.`);
+  if(f.numberMatches.length >= 2) strengths.push(`Concrete numbers give the claim something to stand on, which reads as evidence rather than opinion.`);
+  if(!f.genericAdviceMarkers) strengths.push(`The post avoids generic "top tips" framing, which helps it read as an original point of view rather than recycled content.`);
+  if(f.ctaPresence) strengths.push(`Inviting a response signals confidence in the point of view — it's not afraid of disagreement.`);
+  if(strengths.length === 0) strengths.push(`The topic itself is relevant to the stated goal of ${goal.toLowerCase()}, which is a reasonable foundation to build on.`);
+
+  const weaknesses = [];
+  if(f.genericAdviceMarkers) weaknesses.push(`Listicle-style phrasing ("tips," "here's how to") tends to blend into the feed rather than build a distinct point of view.`);
+  if(!f.storyMarkers && f.numberMatches.length < 2) weaknesses.push(`Without a specific data point or lived moment, the claim currently reads as an opinion rather than earned expertise.`);
+  if(pronounRatio > 0.15) weaknesses.push(`The post leans heavily on first-person framing — useful for authenticity, but past a point it can read as self-focused rather than insight-focused.`);
+  if(f.wordCount > 250 && !f.storyMarkers) weaknesses.push(`At this length, readers expect a payoff proportional to the investment — right now the specific proof isn't quite carrying the length.`);
+  if(weaknesses.length === 0) weaknesses.push(`The point of view is present but could be stated more directly and earlier, rather than emerging gradually.`);
+
+  const opportunities = pickN(rng, [
+    `Naming the actual mechanism behind the claim (not just the outcome) is usually what separates "thought leadership" from "motivational post" in a reader's mind.`,
+    `A single sharp, quotable sentence mid-post — the kind someone would screenshot — tends to do more for authority than several softer ones.`,
+    `Referencing a specific number, timeframe, or named example makes the expertise feel current rather than generic.`,
+  ], 2);
+
+  const recommendations = [];
+  if(f.genericAdviceMarkers) recommendations.push(`Replace generic advice phrasing with the actual mechanism or reasoning behind the claim.`);
+  if(!f.storyMarkers) recommendations.push(`Add one specific, dated example the reader can picture — a real deal, project, or conversation.`);
+  if(pronounRatio > 0.15) recommendations.push(`Trim a few first-person references and let the insight, not the narrator, carry more of the weight.`);
+  recommendations.push(`Since the goal is ${goal.toLowerCase()}, make sure the single most defensible claim in the post appears in the first three lines, not buried near the end.`);
+
+  return {
+    SCORE: score,
+    SUMMARY: buildSummary([
+      f.storyMarkers ? `The post is grounded in a specific experience, which is the strongest lever for durable credibility.` : `The post currently reads closer to general advice than to demonstrated expertise.`,
+      f.genericAdviceMarkers ? `Some listicle-style phrasing works against the authority goal here.` : `It avoids the generic "tips" framing that tends to blend into the feed.`,
+      score >= 75 ? `This is a solid authority-building post as written.` : score >= 55 ? `The point of view is there; it just needs to be stated a little more directly.` : `Right now this reads more like commentary than earned expertise — worth tightening.`,
+    ]),
+    STRENGTHS: pickN(rng, strengths, Math.min(3, strengths.length)),
+    WEAKNESSES: pickN(rng, weaknesses, Math.min(2, weaknesses.length)),
+    OPPORTUNITIES: opportunities,
+    RECOMMENDATIONS: pickN(rng, recommendations, Math.min(3, recommendations.length)),
+  };
+}
+
+/* ---- specialist reviewer #3: Format & Algorithm Specialist ---- */
+function genFormatReview(f, rng, platform){
+  let score = 65;
+  if(f.avgLineLen < 90 && f.lineCount >= 4) score += 12;
+  if(f.hasArrowBullets || f.hasDashBullets) score += 10;
+  if(f.hashtags.length === 0) score += 3;
+  else if(f.hashtags.length <= 3) score += 2;
+  else score -= 10;
+  if(f.ctaPresence) score += 10;
+  if(f.wordCount < 50) score -= 8;
+  else if(f.wordCount > 400) score -= 10;
+  else if(f.wordCount >= 120 && f.wordCount <= 300) score += 8;
+  score = clampScore(score + jitter(rng, 6));
+
+  const strengths = [];
+  if(f.avgLineLen < 90 && f.lineCount >= 4) strengths.push(`Short lines and visible whitespace make this easy to scan on mobile, where most ${platform} traffic happens.`);
+  if(f.hasArrowBullets || f.hasDashBullets) strengths.push(`The bulleted structure breaks up the argument into digestible pieces instead of one dense block.`);
+  if(f.ctaPresence) strengths.push(`Ending on a clear prompt gives the algorithm an early signal to work with — comments are the strongest early ranking signal on most platforms.`);
+  if(f.wordCount >= 120 && f.wordCount <= 300) strengths.push(`The length sits in the range that tends to maximize dwell time without losing the reader halfway through.`);
+  if(strengths.length === 0) strengths.push(`The structure is simple and direct, which at minimum avoids confusing the reader.`);
+
+  const weaknesses = [];
+  if(f.avgLineLen >= 90) weaknesses.push(`Longer, denser lines make this harder to skim on a phone screen, where most of the audience will see it.`);
+  if(f.hashtags.length > 3) weaknesses.push(`${f.hashtags.length} hashtags is more than the platform's algorithm tends to reward — it can read as reach-chasing rather than native.`);
+  if(!f.ctaPresence) weaknesses.push(`There's no explicit prompt at the end, so the post is leaving an easy comment-driving opportunity on the table.`);
+  if(f.wordCount < 50) weaknesses.push(`At this length there isn't much for the algorithm to measure dwell time against — short posts often get judged in under two seconds.`);
+  if(f.wordCount > 400) weaknesses.push(`At ${f.wordCount} words, a meaningful share of readers will drop off before the ending, which limits how much of the message actually lands.`);
+  if(weaknesses.length === 0) weaknesses.push(`Structurally this is close to ideal — remaining gains are likely to come from wording rather than layout.`);
+
+  const opportunities = pickN(rng, [
+    `Breaking the densest paragraph into two shorter ones tends to lift completion rate noticeably.`,
+    `A one-line "so what" right before the ending helps readers feel the payoff was worth the scroll.`,
+    `Testing the post with and without hashtags over a few sends is the most reliable way to see what this specific audience rewards.`,
+  ], 2);
+
+  const recommendations = [];
+  if(f.avgLineLen >= 90) recommendations.push(`Break the longest paragraph into two or three shorter lines with a blank line between each.`);
+  if(f.hashtags.length > 3) recommendations.push(`Trim hashtags down to 2-3 that are most specific to the topic.`);
+  if(!f.ctaPresence) recommendations.push(`Close with a direct question that invites a specific kind of comment, not just "thoughts?"`);
+  if(f.wordCount > 400) recommendations.push(`Cut the post by roughly a third — look for the sentence that restates a point already made.`);
+  if(recommendations.length === 0) recommendations.push(`Consider testing the posting time — structure is solid, so timing may be the next lever.`);
+
+  return {
+    SCORE: score,
+    SUMMARY: buildSummary([
+      f.avgLineLen < 90 ? `The line rhythm and whitespace are well suited to how people actually read ${platform} on mobile.` : `The line rhythm runs denser than ideal for how people scan ${platform} on mobile.`,
+      f.ctaPresence ? `A closing prompt gives the algorithm an early comment signal to work with.` : `There's no explicit closing prompt, which is a missed algorithmic signal.`,
+      score >= 75 ? `Structurally this is in strong shape for native distribution.` : score >= 55 ? `The structure is workable with a couple of adjustments.` : `Structure is the fastest lever to pull here — several small formatting fixes should move the needle.`,
+    ]),
+    STRENGTHS: pickN(rng, strengths, Math.min(3, strengths.length)),
+    WEAKNESSES: pickN(rng, weaknesses, Math.min(2, weaknesses.length)),
+    OPPORTUNITIES: opportunities,
+    RECOMMENDATIONS: pickN(rng, recommendations, Math.min(3, recommendations.length)),
+  };
+}
+
+/* ---- specialist reviewer #4: Analytics Interpreter (simulated read) ---- */
+function genAnalyticsReview(imageMeta, rng, platform){
+  const [lo, hi] = BENCHMARK_RANGE[platform] || [1, 3];
+  const impressions = Math.round(3000 + rng() * 15000);
+  const reactions = Math.round(impressions * (0.01 + rng() * 0.03));
+  const comments = Math.round(reactions * (0.08 + rng() * 0.25));
+  const reposts = Math.round(reactions * (0.02 + rng() * 0.08));
+  const profileVisits = Math.round(reactions * (0.15 + rng() * 0.25));
+  const engagementRate = ((reactions + comments + reposts) / Math.max(1, impressions)) * 100;
+
+  let tier;
+  if(engagementRate < lo) tier = 'below';
+  else if(engagementRate > hi) tier = 'above';
+  else tier = 'within';
+
+  const benchmarkText = tier === 'above'
+    ? `At ${engagementRate.toFixed(1)}%, engagement rate sits above the typical ${lo}-${hi}% range for ${platform} posts of this kind — a strong signal the content is resonating beyond the immediate network.`
+    : tier === 'within'
+    ? `At ${engagementRate.toFixed(1)}%, engagement rate sits within the typical ${lo}-${hi}% range for ${platform} — solid, unremarkable performance with room to grow.`
+    : `At ${engagementRate.toFixed(1)}%, engagement rate sits below the typical ${lo}-${hi}% range for ${platform} — the impression count isn't translating into interaction as efficiently as it could.`;
+
+  const opportunities = pickN(rng, [
+    `Comment-to-reaction ratio is often a better read on content quality than raw volume — a post with fewer reactions but proportionally more comments is usually doing more for authority.`,
+    `Profile visits relative to reactions hint at how many people are curious enough to check the author out — that's a leading indicator for follower growth.`,
+    `Impressions without a proportional lift in reactions often points to a hook that isn't converting scrolls into stops.`,
+  ], 2);
+
+  const recommendations = [];
+  if(tier === 'below') recommendations.push(`Since engagement rate is trailing the typical range, prioritize the hook and closing-question fixes from the other reviewers before publishing similar posts.`);
+  if(comments < reactions * 0.15) recommendations.push(`Comments are running low relative to reactions — a sharper closing question is the fastest lever to pull.`);
+  recommendations.push(`Track this same post's engagement rate over the next few sends to see whether the pattern holds or was a one-off.`);
+
+  return {
+    SUMMARY: `This is a local simulation — this offline build doesn't perform real image recognition on "${imageMeta.name}", so the numbers below are a representative, internally-consistent model of what a screenshot like this typically shows, used to demonstrate how the reviewer would reason about real analytics.`,
+    KEY_METRICS: [
+      `Impressions: ${impressions.toLocaleString()}`,
+      `Reactions: ${reactions.toLocaleString()}`,
+      `Comments: ${comments.toLocaleString()}`,
+      `Reposts: ${reposts.toLocaleString()}`,
+      `Engagement rate: ${engagementRate.toFixed(1)}%`,
+      `Est. profile visits: ${profileVisits.toLocaleString()}`,
+    ],
+    BENCHMARK: benchmarkText,
+    OPPORTUNITIES: opportunities,
+    RECOMMENDATIONS: pickN(rng, recommendations, Math.min(3, recommendations.length)),
+  };
+}
+
+/* ---- rewrite + alternative hooks, derived from the real post text ---- */
+function genRewrite(f, rng, platform, goal, topic){
+  const changes = [];
+  let hook = (f.sentences[0] || f.trimmed.slice(0, 100)).trim();
+  if(hook.length > 110){ hook = hook.slice(0, 107).trim() + '…'; changes.push('tightened the opening line so it lands before the platform truncates it'); }
+
+  const restSentences = f.sentences.slice(1).map(s => s.trim()).filter(Boolean);
+  let bodyLines = restSentences.map(s => /^[-*]\s+/.test(s) ? '→ ' + s.replace(/^[-*]\s+/, '') : s);
+  if(f.hasDashBullets) changes.push('converted flat dash bullets into arrow bullets for stronger visual rhythm');
+  if(bodyLines.length === 0) bodyLines = restSentences;
+
+  let grouped = []; let buffer = '';
+  bodyLines.forEach(line => {
+    if((buffer + ' ' + line).trim().length <= 90){ buffer = (buffer ? buffer + ' ' : '') + line; }
+    else { if(buffer) grouped.push(buffer); buffer = line; }
+  });
+  if(buffer) grouped.push(buffer);
+  if(grouped.length !== bodyLines.length && bodyLines.length > 0) changes.push('broke dense passages into shorter, single-idea lines for easier mobile scanning');
+
+  let closing = '';
+  if(!f.ctaPresence){
+    closing = pick(rng, [
+      `What's your experience with ${topic}?`,
+      `Curious where you land on this — agree or disagree?`,
+      `What would you add to this?`,
+    ]);
+    changes.push('added a closing question, since the original had no explicit prompt for comments');
+  }
+
+  let hashtagLine = '';
+  if(f.hashtags.length > 3){
+    hashtagLine = f.hashtags.slice(0, 2).join(' ');
+    changes.push(`trimmed hashtags from ${f.hashtags.length} down to 2 focused tags`);
+  } else if(f.hashtags.length > 0){
+    hashtagLine = f.hashtags.join(' ');
+  }
+
+  const parts = [hook, '', ...grouped];
+  if(closing){ parts.push(''); parts.push(closing); }
+  if(hashtagLine){ parts.push(''); parts.push(hashtagLine); }
+  const rewrittenPost = parts.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+
+  if(changes.length === 0) changes.push('preserved the existing structure — it was already close to ideal, so this pass focused on word-level tightening only');
+
+  const hook1 = pick(rng, [
+    `I almost didn't post this, but here's what I learned about ${topic}:`,
+    `Nobody talks about this part of ${topic}. Here's what happened.`,
+    `I got ${topic} wrong for years. Here's the moment that changed it.`,
+  ]);
+  const hook2 = pick(rng, [
+    `Unpopular opinion: most advice about ${topic} is backwards.`,
+    `Everything you've been told about ${topic} skips the hard part.`,
+    `Hot take: most ${topic} advice online is noise.`,
+  ]);
+  const hook3Source = f.sentences.find(s => /\d/.test(s)) || f.sentences[0] || hook;
+  const hook3 = truncate(hook3Source.trim(), 140);
+
+  return {
+    REWRITTEN_POST: rewrittenPost,
+    HOOK_1: hook1,
+    HOOK_2: hook2,
+    HOOK_3: hook3,
+    WHY_IT_WORKS: `Key changes: ${changes.join('; ')}. Since the goal is ${goal.toLowerCase()}, the structure now front-loads the specific moment, breaks the body into scannable single-idea lines, and closes with a clear prompt for ${platform} readers to respond to.`,
+  };
+}
+
+/* ---- senior-editor synthesis, weighted by the stated goal ---- */
+function genSynthesis(results, f, rng, goal, platform){
+  const scores = {
+    hook: toScore(results.hook && results.hook.SCORE, 65),
+    authority: toScore(results.authority && results.authority.SCORE, 65),
+    format: toScore(results.format && results.format.SCORE, 65),
+  };
+  let weights;
+  const g = goal.toLowerCase();
+  if(g.includes('authority')) weights = { hook: 0.30, authority: 0.45, format: 0.25 };
+  else if(g.includes('virality') || g.includes('reach')) weights = { hook: 0.45, authority: 0.20, format: 0.35 };
+  else if(g.includes('engagement')) weights = { hook: 0.35, authority: 0.20, format: 0.45 };
+  else weights = { hook: 0.34, authority: 0.33, format: 0.33 };
+
+  let overall = scores.hook * weights.hook + scores.authority * weights.authority + scores.format * weights.format;
+  overall = clampScore(overall + jitter(rng, 3));
+
+  const labels = { hook: 'the opening hook', authority: 'authority-building', format: 'structure and formatting' };
+  const sortedCats = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
+  const strongest = sortedCats[0];
+  const weakest = sortedCats[sortedCats.length - 1];
+
+  const tier = overall >= 80 ? 'publish-ready' : overall >= 60 ? 'solid, needs light polish' : overall >= 45 ? 'needs revision before publishing' : 'needs a structural rework';
+
+  const execSummary = `The strongest asset here is ${labels[strongest]} (scoring ${scores[strongest]}), while ${labels[weakest]} (scoring ${scores[weakest]}) is the clearest lever to pull next. Given the goal of ${g}, fixing ${labels[weakest]} first is likely to move the overall outcome more than any other single change. Overall, this post is ${tier} — the rewrite in the studio below already applies the panel's highest-leverage fixes, so it's a good starting point for a second draft.`;
+
+  const healthReport = `Overall content health: ${tier}. Combined panel score is ${overall}/100, built from a hook score of ${scores.hook}, an authority score of ${scores.authority}, and a format score of ${scores.format}${results.analytics ? ', with the analytics read informing the performance estimate below' : ''}.`;
+
+  const allRecos = [
+    ...toList(results.hook && results.hook.RECOMMENDATIONS),
+    ...toList(results.authority && results.authority.RECOMMENDATIONS),
+    ...toList(results.format && results.format.RECOMMENDATIONS),
+  ];
+  const weakestRecos = toList(results[weakest] && results[weakest].RECOMMENDATIONS);
+  const topImprovements = [...new Set([...weakestRecos, ...allRecos])].slice(0, 3);
+  while(topImprovements.length < 3) topImprovements.push(`Re-read the post as if you were the target reader on ${platform} and note the first sentence you'd skip — cut or fix it.`);
+
+  const liftLow = Math.max(5, Math.round((overall - 50) * 0.7));
+  const liftHigh = liftLow + 8 + Math.round(rng() * 10);
+  const predicted = `Applying the top recommendations above is directionally likely to lift comment and share activity by roughly ${liftLow}-${liftHigh}% relative to the original draft, based on the structural and hook improvements identified — this is an AI estimate grounded in the post's own features, not a guarantee, and it doesn't account for network size, timing, or algorithm changes.`;
+
+  const beforeAfter = `The original leans on ${labels[weakest]} as its weak point; the rewrite addresses that directly while preserving the original story and voice.`;
+
+  const deeperPrompts = [
+    `Write 5 more alternative hooks in a punchier, more contrarian tone.`,
+    `Rewrite this post specifically to appeal to senior executives rather than peers.`,
+    `Turn this post into a 3-part content series for ${platform}.`,
+  ];
+
+  const checklist = [];
+  if(f.hashtags.length > 3) checklist.push(`Trim hashtags down to 2-3 focused tags before publishing.`);
+  if(!f.ctaPresence) checklist.push(`Add a closing question or explicit prompt for comments.`);
+  if(f.wordCount > 400) checklist.push(`Consider trimming length — dense posts lose readers past ~300 words on most feeds.`);
+  if(!f.storyMarkers) checklist.push(`Add one concrete, specific detail (a number, date, or moment) to the body.`);
+  checklist.push(`Preview how the first two lines render before the "…see more" cutoff.`);
+  checklist.push(`Proofread for typos and confirm every claim or number is accurate.`);
+  while(checklist.length < 4) checklist.push(`Read the post out loud once before publishing — awkward phrasing is easier to hear than see.`);
+
+  return {
+    OVERALL_SCORE: overall,
+    EXECUTIVE_SUMMARY: execSummary,
+    HEALTH_REPORT: healthReport,
+    TOP_IMPROVEMENTS: topImprovements,
+    PREDICTED_PERFORMANCE: predicted,
+    BEFORE_AFTER: beforeAfter,
+    DEEPER_PROMPTS: deeperPrompts,
+    CHECKLIST: checklist.slice(0, 6),
+  };
+}
+
+/* ---- follow-up "go deeper" responses, generated locally ---- */
+function generateDeeperResponse(promptText, rng){
+  const lower = promptText.toLowerCase();
+  if(lower.includes('hook')){
+    return `A few sharper directions for the opening: lead with the single most surprising number or outcome from the story, or open mid-scene at the moment of tension rather than after it's resolved. Keep the very first line under 100 characters so it survives the "see more" cutoff on ${state.platform}, and resist summarizing the lesson before it's been earned.`;
+  }
+  if(lower.includes('executive') || lower.includes('senior')){
+    return `To speak to a more senior audience, trade emotional specificity for stakes-based specificity: name the business metric that moved (revenue, retention, time-to-close) rather than the feeling, and shorten the personal framing so the post reads as an operating lesson rather than a personal essay. Executives skim for the decision or principle, so surface the "lesson" line earlier and use the story as supporting evidence.`;
+  }
+  if(lower.includes('series') || lower.includes('thread')){
+    return `This post naturally splits into a short series: part one is the surprising result, part two is the specific mistake or turning point behind it, and part three is the generalizable principle others can apply. Publishing them 2-3 days apart lets each post stand alone while building a throughline, and each entry can close by teasing the next one.`;
+  }
+  return pick(rng, [
+    `The biggest unexploited lever here is specificity — every generic phrase replaced with an exact number, date, or quote does more for credibility than any structural change. Start with the sentence that currently makes the broadest claim and rewrite it with a concrete detail.`,
+    `One more angle worth testing: post this same core story with the outcome moved to the very first line, rather than revealed partway through — readers who already know the payoff often stay to learn *how* you got there, which changes the entire hook mechanics.`,
+    `Consider testing this post framed two different ways over time — once around the mistake, once around the result — and compare comment quality rather than just count. For a goal like ${state.goal.toLowerCase()}, comment quality is usually the better signal.`,
+  ]);
+}
+
+/* ============================================================
+   REVIEWER PIPELINE DEFINITION
+   ============================================================ */
+function buildReviewers(){
+  const reviewers = [
+    { id:'hook', name:'Hook & Opening Analyst', role:'First 2–3 lines, scroll-stopping power', needsImage:false },
+    { id:'authority', name:'Authority & Thought-Leadership Reviewer', role:'Credibility, expertise signaling, POV strength', needsImage:false },
+    { id:'format', name:'Format & Algorithm Specialist', role:'Structure, dwell time, native platform mechanics', needsImage:false },
+  ];
+  if(state.image){
+    reviewers.push({ id:'analytics', name:'Analytics Interpreter', role:'Reads the performance screenshot (simulated)', needsImage:true });
+  }
+  reviewers.push({ id:'rewrite', name:'Rewrite & Hook Generator', role:'Produces the improved version and alt hooks', isRewrite:true });
+  reviewers.push({ id:'synthesis', name:'Senior Editor (Synthesis)', role:'Combines all findings into the final report', isSynthesis:true });
+  return reviewers;
+}
+
+/* ============================================================
+   CONSOLE / STATUS UI HELPERS
+   ============================================================ */
+function logLine(msg, cls=''){
+  const div = document.createElement('div');
+  div.className = 'line ' + cls;
+  const t = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  div.innerHTML = `<span class="t">${t}</span>${msg}`;
+  consoleEl.appendChild(div);
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+
+function buildReviewerRail(reviewers){
+  reviewerRail.innerHTML = reviewers.map(r => `
+    <div class="reviewer-chip" id="chip-${r.id}">
+      <div class="status-dot"></div>
+      <div>
+        <div class="rname">${r.name}</div>
+        <div class="rstate" id="chipstate-${r.id}">Queued</div>
+      </div>
+    </div>`).join('');
+}
+
+function setChipState(id, state_, label){
+  const chip = $('chip-' + id);
+  if(!chip) return;
+  chip.classList.remove('running','done','error');
+  if(state_) chip.classList.add(state_);
+  $('chipstate-' + id).textContent = label;
+}
+
+function sleep(ms){ return new Promise(r => setTimeout(r, ms)); }
+
+/* ============================================================
+   MAIN PIPELINE RUNNER (local simulation, no network)
+   ============================================================ */
+async function runPipeline(){
+  state.postText = postTextEl.value.trim();
+  state.platform = $('platformSelect').value;
+  state.goal = $('goalSelect').value;
+  state.rigor = $('rigorSelect').value;
+
+  if(!state.postText){ showToast('Add your post text first'); return; }
+
+  runBtn.disabled = true;
+  runBtn.classList.add('loading');
+  runBtnLabel.textContent = 'Reviewing…';
+  consoleEl.innerHTML = '';
+  state.results = {};
+
+  $('workflowSection').classList.remove('hidden');
+  $('dashboardSection').classList.add('hidden');
+  $('reviewsSection').classList.add('hidden');
+  $('analyticsSection').classList.add('hidden');
+  $('rewriteSection').classList.add('hidden');
+  $('checklistSection').classList.add('hidden');
+  $('reportSection').classList.add('hidden');
+  $('workflowSection').scrollIntoView({ behavior:'smooth', block:'start' });
+
+  const reviewers = buildReviewers();
+  buildReviewerRail(reviewers);
+  logLine('Initializing review desk — ' + reviewers.length + ' specialists assigned, running locally<span class="cursor"></span>');
+
+  const f = analyzeContent(state.postText, state.platform);
+  const topic = extractTopic(state.postText);
+  state.features = f;
+  state.topic = topic;
+
+  const baseSeed = state.postText + '|' + state.platform + '|' + state.goal + '|' + state.rigor;
+  const analysisReviewers = reviewers.filter(r => !r.isRewrite && !r.isSynthesis);
+  const rewriteReviewer = reviewers.find(r => r.isRewrite);
+  const synthesisReviewer = reviewers.find(r => r.isSynthesis);
+
+  for(const r of analysisReviewers){
+    await runSingleReviewer(r, f, topic, baseSeed);
+  }
+  await runSingleReviewer(rewriteReviewer, f, topic, baseSeed);
+  await runSingleReviewer(synthesisReviewer, f, topic, baseSeed);
+
+  logLine('Review desk complete. Compiling final report.', 'ok');
+  runBtn.disabled = false;
+  runBtn.classList.remove('loading');
+  runBtnLabel.textContent = 'Run full review';
+
+  renderDashboard(analysisReviewers);
+  renderReviewCards(analysisReviewers);
+  if(state.results.analytics) renderAnalytics();
+  renderRewrite();
+  renderChecklist();
+  renderFinalReport();
+
+  $('dashboardSection').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+async function runSingleReviewer(r, f, topic, baseSeed){
+  setChipState(r.id, 'running', 'Reading…');
+  logLine('→ ' + r.name + ' is reading the post…');
+  try{
+    await sleep(450 + Math.random() * 500); // simulated think time, preserves the premium pacing
+    const rng = makeRng(baseSeed + '|' + r.id);
+    let result;
+    if(r.isRewrite){
+      result = genRewrite(f, rng, state.platform, state.goal, topic);
+    } else if(r.isSynthesis){
+      result = genSynthesis(state.results, f, rng, state.goal, state.platform);
+    } else if(r.id === 'analytics'){
+      result = genAnalyticsReview(state.image, rng, state.platform);
+    } else if(r.id === 'hook'){
+      result = genHookReview(f, rng, state.platform);
+    } else if(r.id === 'authority'){
+      result = genAuthorityReview(f, rng, state.platform, state.goal);
+    } else if(r.id === 'format'){
+      result = genFormatReview(f, rng, state.platform);
+    }
+    state.results[r.id] = result;
+    setChipState(r.id, 'done', 'Complete');
+    logLine(r.name + ' finished.', 'ok');
+  }catch(err){
+    setChipState(r.id, 'error', 'Failed');
+    logLine(r.name + ' failed: ' + escapeHtml(err.message || 'unknown error'), 'err');
+    state.results[r.id] = null;
+    const retryDiv = document.createElement('div');
+    retryDiv.className = 'error-box';
+    retryDiv.innerHTML = `<span>${r.name} could not complete.</span><button class="retry-btn">Retry</button>`;
+    retryDiv.querySelector('button').addEventListener('click', async () => {
+      retryDiv.remove();
+      await runSingleReviewer(r, f, topic, baseSeed);
+    });
+    consoleEl.parentElement.insertBefore(retryDiv, consoleEl.nextSibling);
+  }
+}
+
+function escapeHtml(s){
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ============================================================
+   RENDER: DASHBOARD (score ring + category bars)
+   ============================================================ */
+function scoreColor(score){
+  if(score >= 75) return 'var(--sage)';
+  if(score >= 50) return 'var(--amber)';
+  return 'var(--brick)';
+}
+
+function renderDashboard(analysisReviewers){
+  $('dashboardSection').classList.remove('hidden');
+  const synth = state.results.synthesis;
+  const overall = synth ? toScore(synth.OVERALL_SCORE, 70) : Math.round(
+    analysisReviewers.reduce((sum, r) => sum + toScore(state.results[r.id] && state.results[r.id].SCORE, 70), 0) / Math.max(1, analysisReviewers.length)
+  );
+
+  const circumference = 2 * Math.PI * 94;
+  const ringFill = $('ringFill');
+  ringFill.setAttribute('stroke-dasharray', circumference.toFixed(1));
+  requestAnimationFrame(() => {
+    const offset = circumference * (1 - overall/100);
+    ringFill.style.stroke = scoreColor(overall);
+    ringFill.setAttribute('stroke-dashoffset', offset.toFixed(1));
+  });
+  $('ringScore').textContent = overall;
+
+  const catList = $('catList');
+  catList.innerHTML = '';
+  analysisReviewers.forEach(r => {
+    const res = state.results[r.id];
+    const score = res ? toScore(res.SCORE, 70) : 0;
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.innerHTML = `
+      <div class="cat-top"><span class="cat-name">${r.name}</span><span class="cat-score">${res ? score : 'N/A'}</span></div>
+      <div class="cat-bar"><div class="cat-bar-fill" style="background:${scoreColor(score)}"></div></div>`;
+    catList.appendChild(row);
+    requestAnimationFrame(() => {
+      row.querySelector('.cat-bar-fill').style.width = (res ? score : 0) + '%';
+    });
+  });
+
+  if(synth && synth.EXECUTIVE_SUMMARY){
+    const box = $('execSummaryBox');
+    box.classList.remove('hidden');
+    box.innerHTML = `<span class="qmark">“</span>${escapeHtml(synth.EXECUTIVE_SUMMARY)}`;
+  }
+}
+
+/* ============================================================
+   RENDER: REVIEWER CARDS
+   ============================================================ */
+function renderReviewCards(analysisReviewers){
+  const grid = $('reviewGrid');
+  grid.innerHTML = '';
+  $('reviewsSection').classList.remove('hidden');
+
+  analysisReviewers.forEach((r, idx) => {
+    const res = state.results[r.id];
+    const card = document.createElement('div');
+    card.className = 'rcard fade-in';
+    card.style.animationDelay = (idx * 0.06) + 's';
+
+    if(!res){
+      card.innerHTML = `<div class="rcard-head"><div class="htitle"><div class="hname">${r.name}</div><div class="hrole">${r.role}</div></div><div class="rcard-score" style="color:var(--brick);border-color:var(--brick)">—</div></div>`;
+      grid.appendChild(card);
+      return;
+    }
+    const score = toScore(res.SCORE, 70);
+    card.innerHTML = `
+      <div class="rcard-head">
+        <div class="htitle"><div class="hname">${r.name}</div><div class="hrole">${r.role}</div></div>
+        <div style="display:flex;align-items:center;">
+          <div class="rcard-score" style="color:${scoreColor(score)};border-color:${scoreColor(score)}">${score}</div>
+          <div class="rcard-chevron">▾</div>
+        </div>
+      </div>
+      <div class="rcard-body">
+        <div class="rcard-inner">
+          <p class="summary">${escapeHtml(res.SUMMARY || '')}</p>
+          ${tagBlock('Strengths','strength', toList(res.STRENGTHS))}
+          ${tagBlock('Weaknesses','weakness', toList(res.WEAKNESSES))}
+          ${tagBlock('Missed opportunities','opportunity', toList(res.OPPORTUNITIES))}
+          ${tagBlock('Recommendations','reco', toList(res.RECOMMENDATIONS))}
+        </div>
+      </div>`;
+    card.querySelector('.rcard-head').addEventListener('click', () => card.classList.toggle('open'));
+    grid.appendChild(card);
+  });
+  if(grid.firstElementChild) grid.firstElementChild.classList.add('open');
+}
+
+function tagBlock(title, cls, items){
+  if(!items.length) return '';
+  return `<div class="tag-block"><h4 class="${cls}">${title}</h4><ul>${items.map(i => `<li>${escapeHtml(i)}</li>`).join('')}</ul></div>`;
+}
+
+/* ============================================================
+   RENDER: ANALYTICS
+   ============================================================ */
+function renderAnalytics(){
+  const res = state.results.analytics;
+  if(!res) return;
+  $('analyticsSection').classList.remove('hidden');
+  $('analyticsThumb').innerHTML = state.image ? `<img src="${state.image.dataUrl}" alt="Analytics screenshot">` : '';
+  $('analyticsSummary').textContent = res.SUMMARY || '';
+  $('analyticsBenchmark').textContent = res.BENCHMARK || '';
+
+  const metrics = toList(res.KEY_METRICS);
+  $('metricChips').innerHTML = metrics.map(m => {
+    const parts = m.split(/:\s*/);
+    if(parts.length >= 2){
+      return `<div class="metric-chip"><b>${escapeHtml(parts.slice(1).join(': '))}</b>${escapeHtml(parts[0])}</div>`;
+    }
+    return `<div class="metric-chip">${escapeHtml(m)}</div>`;
+  }).join('');
+
+  $('analyticsRecos').innerHTML = toList(res.RECOMMENDATIONS).map(i => `<li>${escapeHtml(i)}</li>`).join('');
+}
+
+/* ============================================================
+   RENDER: REWRITE STUDIO
+   ============================================================ */
+function renderRewrite(){
+  const res = state.results.rewrite;
+  $('rewriteSection').classList.remove('hidden');
+  $('beforeText').textContent = state.postText;
+  if(!res){ $('afterText').textContent = 'Rewrite unavailable — try retrying that stage above.'; return; }
+  $('afterText').textContent = res.REWRITTEN_POST || '';
+  $('whyItWorks').innerHTML = res.WHY_IT_WORKS ? `<b>Why this works:</b> ${escapeHtml(res.WHY_IT_WORKS)}` : '';
+
+  const hooks = [res.HOOK_1, res.HOOK_2, res.HOOK_3].filter(Boolean);
+  $('hooksList').innerHTML = hooks.map((h, i) => `
+    <div class="hook-item">
+      <div class="hook-num">${i+1}</div>
+      <div class="hook-text">${escapeHtml(h)}</div>
+    </div>`).join('');
+
+  $('copyAfterBtn').addEventListener('click', () => {
+    navigator.clipboard.writeText(res.REWRITTEN_POST || '').then(() => showToast('Rewritten post copied'));
+  });
+}
+
+/* ============================================================
+   RENDER: CHECKLIST
+   ============================================================ */
+function renderChecklist(){
+  const res = state.results.synthesis;
+  const items = res ? toList(res.CHECKLIST) : [];
+  if(!items.length) return;
+  $('checklistSection').classList.remove('hidden');
+  const box = $('checklist');
+  box.innerHTML = items.map((item, i) => `
+    <div class="check-item" id="check-${i}">
+      <input type="checkbox" id="cb-${i}">
+      <label for="cb-${i}">${escapeHtml(item)}</label>
+    </div>`).join('');
+  items.forEach((_, i) => {
+    $('cb-' + i).addEventListener('change', (e) => {
+      $('check-' + i).classList.toggle('checked', e.target.checked);
+    });
+  });
+}
+
+/* ============================================================
+   RENDER: FINAL REPORT
+   ============================================================ */
+function renderFinalReport(){
+  const res = state.results.synthesis;
+  $('reportSection').classList.remove('hidden');
+  if(!res){
+    $('reportExecSummary').textContent = 'The synthesis stage could not complete — retry it above to generate the final report.';
+    return;
+  }
+  $('reportExecSummary').textContent = res.EXECUTIVE_SUMMARY || '';
+  $('reportHeadline').textContent = res.HEALTH_REPORT ? res.HEALTH_REPORT : 'Content Health Report';
+  $('reportImprovements').innerHTML = toList(res.TOP_IMPROVEMENTS).map(i => `<li>${escapeHtml(i)}</li>`).join('');
+  $('reportPredicted').textContent = res.PREDICTED_PERFORMANCE || '';
+  $('reportBeforeAfter').textContent = res.BEFORE_AFTER || '';
+
+  const prompts = toList(res.DEEPER_PROMPTS);
+  $('deeperPrompts').innerHTML = prompts.map(p => `<button class="prompt-chip">${escapeHtml(p)}</button>`).join('');
+  document.querySelectorAll('.prompt-chip').forEach(btn => {
+    btn.addEventListener('click', () => runDeeperPrompt(btn.textContent));
+  });
+}
+
+async function runDeeperPrompt(promptText){
+  showToast('Thinking it through locally…');
+  const box = $('execSummaryBox');
+  box.classList.remove('hidden');
+  box.innerHTML = `<span class="qmark">“</span><span class="skeleton" style="display:inline-block;width:100%;height:60px;border-radius:8px;"></span>`;
+  $('dashboardSection').scrollIntoView({ behavior:'smooth', block:'start' });
+  try{
+    await sleep(500 + Math.random() * 400); // simulated think time, same premium pacing as the main pipeline
+    const rng = makeRng(state.postText + '|deeper|' + promptText);
+    const response = generateDeeperResponse(promptText, rng);
+    box.innerHTML = `<span class="qmark">“</span>${escapeHtml(response)}`;
+  }catch(err){
+    box.innerHTML = `<div class="error-box"><span>Could not complete that request: ${escapeHtml(err.message||'error')}</span></div>`;
+  }
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+runBtn.addEventListener('click', () => { runPipeline().catch(err => { showToast('Something went wrong: ' + err.message); runBtn.disabled=false; runBtn.classList.remove('loading'); runBtnLabel.textContent='Run full review'; }); });
+</script>
+</body>
+</html>
