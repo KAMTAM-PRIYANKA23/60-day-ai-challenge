@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Hosting Decision Console</title>
+<style>
+  :root{
+    --bg:#0F1319;
+    --panel:#161B23;
+    --panel-alt:#1C232D;
+    --panel-raised:#212934;
+    --border:#2A323E;
+    --border-soft:#232A35;
+    --text:#E9EDF2;
+    --text-dim:#8D97A6;
+    --text-faint:#5C6675;
+    --accent:#E8A33D;
+    --accent-soft:rgba(232,163,61,0.14);
+    --estimate:#E8823D;
+    --good:#5FD3A6;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+    --aws:#E8A33D;
+    --gcp:#5FD3C4;
+    --azure:#7C93E8;
+    --do:#E85D75;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(232,163,61,0.06), transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, rgba(124,147,232,0.05), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px 100px;}
+
+  /* ---------- Header ---------- */
+  header{
+    border-bottom:1px solid var(--border-soft);
+    padding:44px 0 32px;
+  }
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);}
+  h1{
+    font-size:clamp(28px,4vw,42px);
+    line-height:1.08;
+    letter-spacing:-0.02em;
+    margin:0 0 14px;
+    font-weight:700;
+    max-width:760px;
+  }
+  header p.lede{
+    color:var(--text-dim);
+    font-size:15.5px;
+    max-width:640px;
+    margin:0;
+  }
+  .persona-strip{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:22px;
+  }
+  .chip{
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--text-dim);
+    border:1px solid var(--border);
+    background:var(--panel);
+    padding:6px 12px;
+    border-radius:20px;
+  }
+  .chip b{color:var(--text);font-weight:600;}
+
+  /* ---------- Section shell ---------- */
+  section{margin-top:44px;}
+  .section-head{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .section-head h2{
+    font-size:13px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    font-weight:700;
+    color:var(--text);
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .section-head h2 .num{
+    font-family:var(--mono);
+    color:var(--accent);
+    font-size:12px;
+  }
+  .section-head .hint{
+    font-size:12.5px;
+    color:var(--text-faint);
+  }
+
+  /* ---------- Weight sliders ---------- */
+  .weights-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px 8px;
+  }
+  .weight-row{
+    display:grid;
+    grid-template-columns:180px 1fr 56px;
+    align-items:center;
+    gap:18px;
+    padding:14px 0;
+    border-bottom:1px solid var(--border-soft);
+  }
+  .weight-row:last-child{border-bottom:none;}
+  .weight-label{
+    font-size:13.5px;
+    font-weight:600;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .weight-label .desc{font-size:11px;font-weight:400;color:var(--text-faint);}
+  input[type="range"]{
+    -webkit-appearance:none;
+    width:100%;
+    height:6px;
+    border-radius:4px;
+    background:var(--border);
+    outline:none;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:18px;height:18px;
+    border-radius:50%;
+    background:var(--accent);
+    border:3px solid #0F1319;
+    box-shadow:0 0 0 1px var(--accent);
+    cursor:pointer;
+    margin-top:-6px;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;
+    background:var(--accent);border:3px solid #0F1319;
+    box-shadow:0 0 0 1px var(--accent);cursor:pointer;
+  }
+  .weight-value{
+    font-family:var(--mono);
+    font-size:13px;
+    text-align:right;
+    color:var(--accent);
+    font-weight:600;
+  }
+  .weights-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 0 12px;
+    font-family:var(--mono);
+    font-size:11.5px;
+    color:var(--text-faint);
+  }
+  .reset-btn{
+    background:none;
+    border:1px solid var(--border);
+    color:var(--text-dim);
+    font-family:var(--mono);
+    font-size:11px;
+    padding:6px 12px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .reset-btn:hover{border-color:var(--accent);color:var(--accent);}
+
+  /* ---------- Ranking ---------- */
+  .ranking{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:22px 24px;
+  }
+  .rank-row{
+    display:grid;
+    grid-template-columns:34px 170px 1fr 90px;
+    align-items:center;
+    gap:16px;
+    padding:14px 0;
+    border-bottom:1px solid var(--border-soft);
+    transition:opacity .2s ease;
+  }
+  .rank-row:last-child{border-bottom:none;}
+  .rank-pos{
+    font-family:var(--mono);
+    font-size:19px;
+    font-weight:700;
+    color:var(--text-faint);
+  }
+  .rank-row.top .rank-pos{color:var(--accent);}
+  .rank-name{display:flex;flex-direction:column;gap:2px;}
+  .rank-name .n{font-weight:700;font-size:15px;}
+  .rank-name .s{font-size:11px;color:var(--text-faint);}
+  .bar-track{
+    height:10px;
+    background:var(--panel-alt);
+    border-radius:6px;
+    overflow:hidden;
+    position:relative;
+  }
+  .bar-fill{
+    height:100%;
+    border-radius:6px;
+    transition:width .35s cubic-bezier(.4,0,.2,1);
+  }
+  .rank-score{
+    font-family:var(--mono);
+    text-align:right;
+    font-size:16px;
+    font-weight:700;
+  }
+  .rank-score .of10{font-size:11px;color:var(--text-faint);font-weight:400;}
+
+  .empty-state{
+    text-align:center;
+    padding:36px 20px;
+    color:var(--text-dim);
+  }
+  .empty-state .glyph{font-size:26px;margin-bottom:10px;opacity:.6;}
+  .empty-state p{margin:4px 0;font-size:13.5px;}
+  .empty-state .sub{font-size:12px;color:var(--text-faint);}
+
+  .skeleton-row{
+    display:grid;
+    grid-template-columns:34px 170px 1fr 90px;
+    gap:16px;
+    padding:14px 0;
+    align-items:center;
+  }
+  .skel{
+    background:linear-gradient(90deg, var(--panel-alt) 25%, var(--panel-raised) 37%, var(--panel-alt) 63%);
+    background-size:400% 100%;
+    animation:shimmer 1.4s ease infinite;
+    border-radius:6px;
+  }
+  @keyframes shimmer{0%{background-position:100% 0;}100%{background-position:0 0;}}
+
+  /* ---------- Data table ---------- */
+  .table-scroll{overflow-x:auto;border:1px solid var(--border);border-radius:14px;background:var(--panel);}
+  table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px;}
+  thead th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--text-faint);
+    padding:14px 16px;
+    border-bottom:1px solid var(--border);
+    white-space:nowrap;
+  }
+  thead th.provider-col{color:var(--text);font-size:12px;}
+  tbody td{
+    padding:14px 16px;
+    border-bottom:1px solid var(--border-soft);
+    vertical-align:top;
+    color:var(--text-dim);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  td.criterion-cell{
+    color:var(--text);
+    font-weight:600;
+    font-size:12.5px;
+    white-space:nowrap;
+  }
+  td.criterion-cell .est-tag{
+    display:inline-block;
+    margin-left:6px;
+    font-family:var(--mono);
+    font-size:8.5px;
+    letter-spacing:0.05em;
+    color:var(--estimate);
+    border:1px solid rgba(232,130,61,0.4);
+    background:rgba(232,130,61,0.08);
+    padding:1px 5px;
+    border-radius:4px;
+    vertical-align:middle;
+    text-transform:uppercase;
+  }
+  .provider-th{display:flex;align-items:center;gap:8px;}
+  .swatch{width:9px;height:9px;border-radius:3px;flex:none;}
+  td .cell-score{
+    font-family:var(--mono);
+    font-weight:700;
+    color:var(--text);
+    font-size:12.5px;
+  }
+  td .cell-raw{font-size:12px;line-height:1.45;margin-top:2px;color:var(--text-faint);}
+
+  /* ---------- Sources ---------- */
+  .sources-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:6px 24px;
+  }
+  .source-item{
+    padding:16px 0;
+    border-bottom:1px solid var(--border-soft);
+    display:grid;
+    grid-template-columns:26px 1fr;
+    gap:14px;
+  }
+  .source-item:last-child{border-bottom:none;}
+  .source-idx{font-family:var(--mono);color:var(--accent);font-size:12px;padding-top:2px;}
+  .source-item .stitle{font-size:13.5px;font-weight:600;color:var(--text);}
+  .source-item .smeta{font-size:11.5px;color:var(--text-faint);margin-top:3px;}
+  .source-item .stag{
+    font-family:var(--mono);
+    font-size:9.5px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--text-dim);
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    padding:1px 6px;
+    border-radius:4px;
+    margin-right:6px;
+    display:inline-block;
+    margin-top:6px;
+  }
+  .source-item a{
+    color:var(--accent);
+    text-decoration:none;
+    font-size:11.5px;
+    word-break:break-all;
+  }
+  .source-item a:hover{text-decoration:underline;}
+
+  /* ---------- Collapsible research panel ---------- */
+  .research-panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .research-toggle{
+    width:100%;
+    background:none;
+    border:none;
+    color:var(--text);
+    padding:20px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    font-family:var(--sans);
+    font-size:14.5px;
+    font-weight:700;
+  }
+  .research-toggle .chev{
+    color:var(--text-faint);
+    transition:transform .25s ease;
+    font-family:var(--mono);
+  }
+  .research-toggle[aria-expanded="true"] .chev{transform:rotate(180deg);}
+  .research-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
+  }
+  .research-body-inner{
+    padding:0 24px 26px;
+    color:var(--text-dim);
+    font-size:13.5px;
+  }
+  .research-body-inner h4{
+    color:var(--text);
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    margin:20px 0 8px;
+  }
+  .research-body-inner h4:first-child{margin-top:0;}
+  .research-body-inner p{margin:6px 0;}
+  .research-body-inner ul{margin:6px 0;padding-left:20px;}
+  .research-body-inner li{margin:5px 0;}
+  .conflict-box{
+    background:var(--panel-alt);
+    border:1px solid var(--border);
+    border-left:3px solid var(--estimate);
+    border-radius:0 8px 8px 0;
+    padding:12px 16px;
+    margin:10px 0;
+    font-size:12.5px;
+  }
+
+  footer{
+    margin-top:60px;
+    padding-top:22px;
+    border-top:1px solid var(--border-soft);
+    color:var(--text-faint);
+    font-size:11.5px;
+    font-family:var(--mono);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  @media (max-width:720px){
+    .wrap{padding:0 16px 80px;}
+    .weight-row{grid-template-columns:1fr;gap:6px;}
+    .weight-value{text-align:left;}
+    .rank-row{grid-template-columns:26px 1fr;grid-template-areas:"pos name" "bar bar" "score score";row-gap:6px;}
+    .rank-pos{grid-area:pos;}
+    .rank-name{grid-area:name;}
+    .bar-track{grid-area:bar;}
+    .rank-score{grid-area:score;text-align:left;}
+    table{min-width:640px;}
+  }
+
+  ::selection{background:var(--accent-soft);color:var(--text);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow"><span class="dot"></span>Compare &amp; Decide · Cloud Infrastructure</div>
+    <h1>Which cloud should you actually build your startup on?</h1>
+    <p class="lede">A live, source-backed comparison of AWS, Google Cloud, Microsoft Azure, and DigitalOcean across the five factors that matter when a startup CTO is choosing infrastructure to scale on. Drag the sliders to match your priorities — the ranking updates instantly.</p>
+    <div class="persona-strip">
+      <span class="chip">Built for: <b>Startup CTOs</b></span>
+      <span class="chip">Decision: <b>which provider to scale on</b></span>
+      <span class="chip">Providers: <b>4</b></span>
+      <span class="chip">Criteria: <b>5</b></span>
+      <span class="chip">Cited sources: <b id="sourceCountChip">—</b></span>
+    </div>
+  </header>
+
+  <!-- WEIGHTS -->
+  <section id="weights-section">
+    <div class="section-head">
+      <h2><span class="num">01</span> Set your priorities</h2>
+      <span class="hint">Weights are normalized automatically — they don't need to add up to 100</span>
+    </div>
+    <div class="weights-panel">
+      <div id="weightRows"></div>
+      <div class="weights-footer">
+        <span id="weightSum">Total weight: —</span>
+        <button class="reset-btn" id="resetBtn" type="button">Reset to equal weights</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RANKING -->
+  <section id="ranking-section">
+    <div class="section-head">
+      <h2><span class="num">02</span> Live ranking</h2>
+      <span class="hint">Composite score, weighted average of the five criteria (0–10)</span>
+    </div>
+    <div class="ranking" id="rankingPanel"></div>
+  </section>
+
+  <!-- DATA TABLE -->
+  <section id="data-section">
+    <div class="section-head">
+      <h2><span class="num">03</span> Underlying data</h2>
+      <span class="hint"><span style="color:var(--estimate)">●</span> Analyst-derived estimate &nbsp;·&nbsp; unmarked = directly sourced figure</span>
+    </div>
+    <div class="table-scroll">
+      <table id="dataTable"></table>
+    </div>
+  </section>
+
+  <!-- SOURCES -->
+  <section id="sources-section">
+    <div class="section-head">
+      <h2><span class="num">04</span> Sources</h2>
+      <span class="hint">Every citation used to build this comparison</span>
+    </div>
+    <div class="sources-panel" id="sourcesPanel"></div>
+  </section>
+
+  <!-- RESEARCH METHODOLOGY -->
+  <section id="research-section">
+    <div class="section-head">
+      <h2><span class="num">05</span> Methodology</h2>
+      <span class="hint">&nbsp;</span>
+    </div>
+    <div class="research-panel">
+      <button class="research-toggle" id="researchToggle" aria-expanded="false">
+        How this was researched, and where sources disagreed
+        <span class="chev">▾</span>
+      </button>
+      <div class="research-body" id="researchBody">
+        <div class="research-body-inner" id="researchContent"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Data snapshot: pricing and infrastructure figures reflect sources accessed July 2026 — cloud pricing and region counts change frequently, verify before purchasing.</span>
+    <span>No external libraries · single-file build</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+
+  /* ============================================================
+     DATA MODEL
+     Every value below is either:
+       - a directly sourced figure (isEstimate:false on the criterion), or
+       - an analyst-derived 0–10 score synthesizing multiple cited,
+         real sources (isEstimate:true on the criterion) — flagged
+         throughout the UI rather than presented as a hard fact.
+     ============================================================ */
+
+  const providers = [
+    {id:'aws',   name:'AWS',           sub:'Amazon Web Services', color:'var(--aws)'},
+    {id:'gcp',   name:'Google Cloud',  sub:'GCP',                 color:'var(--gcp)'},
+    {id:'azure', name:'Microsoft Azure', sub:'Azure',              color:'var(--azure)'},
+    {id:'do',    name:'DigitalOcean',  sub:'DigitalOcean',        color:'var(--do)'}
+  ];
+
+  const criteria = [
+    {
+      id:'cost', label:'Cost', shortLabel:'Cost',
+      desc:'Comparable 4 vCPU / 16GB general-purpose VM, on-demand, monthly',
+      lowerIsBetter:true, isEstimate:false, sourceIds:[1,2,3,4]
+    },
+    {
+      id:'perf', label:'Compute Performance', shortLabel:'Performance',
+      desc:'Independent multi-benchmark CPU throughput & value testing',
+      lowerIsBetter:false, isEstimate:true, sourceIds:[9]
+    },
+    {
+      id:'reach', label:'Global Reach (Regions)', shortLabel:'Global Reach',
+      desc:'Live, customer-available data center regions worldwide',
+      lowerIsBetter:false, isEstimate:false, sourceIds:[5,6,7,8]
+    },
+    {
+      id:'support', label:'Support Quality', shortLabel:'Support',
+      desc:'Response-time commitments, resolution-time guarantees, pricing clarity',
+      lowerIsBetter:false, isEstimate:true, sourceIds:[10,11,12]
+    },
+    {
+      id:'scaling', label:'Ease of Scaling', shortLabel:'Ease of Scaling',
+      desc:'Autoscaling maturity, managed PaaS depth, operational simplicity',
+      lowerIsBetter:false, isEstimate:true, sourceIds:[13,14]
+    }
+  ];
+
+  const data = {
+    aws: {
+      cost:    {score:8.1, raw:'$121.47/mo on-demand ($0.1664/hr) — EC2 t3.xlarge, 4 vCPU / 16GB, us-east-1'},
+      perf:    {score:8.5, raw:'Fastest raw throughput of all providers tested (Turin-based C8a leads every multi-thread benchmark) — but the worst on-demand performance-per-dollar of the "big three"'},
+      reach:   {score:5.6, raw:'39 launched regions / 123 Availability Zones (snapshot, mid-2026)'},
+      support: {score:6.5, raw:'Business plan: greater of $100/mo or 10% of first $10k spend (then 7%); <24h general response, <30 min for business-critical issues, <15 min on Enterprise'},
+      scaling: {score:8.0, raw:'EC2 Auto Scaling Groups: manual, scheduled, and metric-based automatic policies; Elastic Beanstalk offers a fully managed, quick-deploy path — mature but configuration-heavy'}
+    },
+    gcp: {
+      cost:    {score:10.0, raw:'$97.84/mo on-demand ($0.134/hr) — Compute Engine e2-standard-4, 4 vCPU / 16GB, us-central1'},
+      perf:    {score:8.2, raw:'Best price-to-performance among the big three; in-house Axion ARM chips lead all ARM competitors, and Turin-based n4d/c4d instances offer AWS-rivaling single-thread speed at a lower price'},
+      reach:   {score:6.0, raw:'42 regions / 127 Availability Zones (snapshot, early-to-mid 2026)'},
+      support: {score:5.5, raw:'Percentage-of-spend pricing (3–10% of monthly cloud bill); Enhanced tier starts near $500/mo; 1hr response on P1 issues (Enhanced) down to 15 min (Premium), but no guaranteed resolution-time SLA at any tier'},
+      scaling: {score:7.6, raw:'Managed Instance Groups + App Engine autoscaling; strong reputation for handling traffic spikes with less manual tuning than EC2 ASGs'}
+    },
+    azure: {
+      cost:    {score:7.0, raw:'$140.16/mo on-demand ($0.192/hr) — Standard D4s v5, 4 vCPU / 16GB, eastus'},
+      perf:    {score:6.5, raw:'In-house Cobalt 100 ARM chip is competitive and even leads some spot-instance value charts, but Azure\'s newest AMD Turin / Intel Granite Rapids silicon was still in limited/closed preview at time of testing, trailing AWS and GCP on raw top-end performance'},
+      reach:   {score:10.0, raw:'70+ regions worldwide — the most of any provider compared (official Microsoft figure, updated 29 Jun 2026)'},
+      support: {score:6.0, raw:'Business-tier support pricing starts near $100/mo, structurally similar to AWS\'s tiered model; comparatively less granular public documentation on guaranteed response times than AWS or GCP'},
+      scaling: {score:7.4, raw:'Virtual Machine Scale Sets (VMSS) + App Service autoscaling, tied into Azure Load Balancer; solid metric-based automation, broadly comparable to GCP'}
+    },
+    do: {
+      cost:    {score:7.2, raw:'$136/mo — General Purpose Droplet (g-4vcpu-16gb), 4 vCPU / 16GB, flat rate across regions'},
+      perf:    {score:3.8, raw:'Lags the other three in independent 2026 benchmarking — fleet still runs older Intel Broadwell / Cascade Lake / AMD Rome silicon with noted over-subscription; still reasonable value at the low end, just not fast'},
+      reach:   {score:1.7, raw:'12 regions / 15 datacenters worldwide (official, last verified 15 Jul 2026) — far smaller footprint than the hyperscalers'},
+      support: {score:8.5, raw:'Flat, predictable pricing ($24/mo Premium, $250/mo Business) regardless of spend; free ticket support for all customers with <1hr typical response for urgent issues; published resolution-time targets (48h/16h/4h/2h by tier) — a rarity among the four'},
+      scaling: {score:5.5, raw:'App Platform (PaaS) offers automatic scaling; raw Droplets are manual-scale only with one-click resize — simplest UX of the four, but the least automated at the infrastructure layer'}
+    }
+  };
+
+  const sources = [
+    {id:1, title:'Amazon EC2 On-Demand Pricing', org:'Amazon Web Services (official)', date:'accessed Jul 2026', url:'https://aws.amazon.com/ec2/pricing/on-demand/', tag:'Cost'},
+    {id:2, title:'t3.xlarge pricing & specs', org:'economize.cloud', date:'updated 19 Jul 2026', url:'https://www.economize.cloud/resources/aws/pricing/ec2/t3.xlarge/', tag:'Cost'},
+    {id:3, title:'e2-standard-4 pricing & specs', org:'economize.cloud / Holori', date:'May–Jul 2026', url:'https://www.economize.cloud/resources/gcp/pricing/compute-engine/e2-standard-4/', tag:'Cost'},
+    {id:4, title:'Standard D4s v5 pricing & specs', org:'Holori / Vantage Instances', date:'20 Jul 2026', url:'https://calculator.holori.com/azure/vm/standard-d4s-v5', tag:'Cost'},
+    {id:5, title:'DigitalOcean VPS Hosting Plans & Pricing', org:'DigitalOcean (official)', date:'accessed Jul 2026', url:'https://www.digitalocean.com/solutions/vps-hosting', tag:'Cost / Reach'},
+    {id:6, title:'AWS Global Infrastructure — Regions & AZs', org:'Amazon Web Services (official)', date:'accessed Jul 2026', url:'https://aws.amazon.com/about-aws/global-infrastructure/regions_az/', tag:'Global Reach'},
+    {id:7, title:'Cloud Regions and Availability Zones Explained (2026)', org:'TechJack Solutions', date:'snapshot 17 Jun 2026', url:'https://techjacksolutions.com/cloud-tools/foundations/cloud-regions-zones-data-residency/', tag:'Global Reach'},
+    {id:8, title:'Google Cloud Regions and Zones', org:'ProsperOps', date:'updated Apr 2026', url:'https://www.prosperops.com/blog/google-cloud-regions/', tag:'Global Reach'},
+    {id:9, title:'What are Azure regions?', org:'Microsoft Learn (official)', date:'updated 29 Jun 2026', url:'https://learn.microsoft.com/en-us/azure/reliability/regions-overview', tag:'Global Reach'},
+    {id:10, title:'Regional Availability', org:'DigitalOcean Documentation (official)', date:'last verified 15 Jul 2026', url:'https://docs.digitalocean.com/platform/regional-availability/', tag:'Global Reach'},
+    {id:11, title:'Cloud VM benchmarks 2026: performance / price', org:'Dimitrios Kechagias, independent researcher', date:'27 Feb 2026', url:'https://dev.to/dkechag/cloud-vm-benchmarks-2026-performance-price-1i1m', tag:'Performance'},
+    {id:12, title:'AWS Support Response Times Decoded for Developers', org:'DigitalOcean resource articles', date:'accessed Jul 2026', url:'https://www.digitalocean.com/resources/articles/aws-support-response-time', tag:'Support'},
+    {id:13, title:'How DigitalOcean\'s support plans compare to AWS Support', org:'DigitalOcean resource articles', date:'accessed Jul 2026', url:'https://www.digitalocean.com/resources/articles/aws-support-compared-to-digitalocean', tag:'Support'},
+    {id:14, title:'Google Cloud Support: 2026 Plans and Pricing', org:'DigitalOcean resource articles', date:'accessed Jul 2026', url:'https://www.digitalocean.com/resources/articles/google-cloud-support', tag:'Support'},
+    {id:15, title:'AWS vs Azure vs GCP 2026: Same App, 3 Bills', org:'TECHSY', date:'13 Jun 2026', url:'https://techsy.io/en/blog/aws-vs-azure-vs-google-cloud', tag:'Support'},
+    {id:16, title:'8 Microsoft Azure App Service Alternatives', org:'DigitalOcean resource articles', date:'accessed Jul 2026', url:'https://www.digitalocean.com/resources/articles/azure-app-service-alternatives', tag:'Ease of Scaling'},
+    {id:17, title:'AWS Elastic Beanstalk vs DigitalOcean', org:'StackShare', date:'accessed Jul 2026', url:'https://stackshare.io/stackups/aws-elastic-beanstalk-vs-digitalocean', tag:'Ease of Scaling'},
+    {id:18, title:'AWS EC2 vs Azure VMs vs GCP Compute Engine: Autoscaling', org:'Sedai', date:'17 Jun 2026', url:'https://sedai.io/blog/aws-ec2-vs-azure-public-cloud-vms-vs-gcp-compute-engine-comparison', tag:'Ease of Scaling'}
+  ];
+
+  // remap the placeholder sourceIds in criteria to the real, fuller set above
+  criteria.find(c=>c.id==='cost').sourceIds = [1,2,3,4,5];
+  criteria.find(c=>c.id==='perf').sourceIds = [11];
+  criteria.find(c=>c.id==='reach').sourceIds = [6,7,8,9,10];
+  criteria.find(c=>c.id==='support').sourceIds = [12,13,14,15];
+  criteria.find(c=>c.id==='scaling').sourceIds = [16,17,18];
+
+  const weights = {cost:20, perf:20, reach:20, support:20, scaling:20};
+
+  /* ============================================================
+     RENDER: weight sliders
+     ============================================================ */
+  const weightRows = document.getElementById('weightRows');
+  criteria.forEach(c=>{
+    const row = document.createElement('div');
+    row.className = 'weight-row';
+    row.innerHTML = `
+      <div class="weight-label">
+        <span>${c.label}</span>
+        <span class="desc">${c.desc}</span>
+      </div>
+      <input type="range" min="0" max="100" step="5" value="${weights[c.id]}" id="slider-${c.id}" aria-label="${c.label} weight">
+      <div class="weight-value" id="value-${c.id}">${weights[c.id]}%</div>
+    `;
+    weightRows.appendChild(row);
+  });
+
+  criteria.forEach(c=>{
+    document.getElementById(`slider-${c.id}`).addEventListener('input', (e)=>{
+      weights[c.id] = parseInt(e.target.value,10);
+      document.getElementById(`value-${c.id}`).textContent = weights[c.id] + '%';
+      renderAll();
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', ()=>{
+    criteria.forEach(c=>{
+      weights[c.id] = 20;
+      document.getElementById(`slider-${c.id}`).value = 20;
+      document.getElementById(`value-${c.id}`).textContent = '20%';
+    });
+    renderAll();
+  });
+
+  /* ============================================================
+     COMPUTE + RENDER: ranking
+     ============================================================ */
+  function computeComposite(){
+    const sum = Object.values(weights).reduce((a,b)=>a+b,0);
+    if(sum <= 0) return null;
+    const results = providers.map(p=>{
+      let total = 0;
+      criteria.forEach(c=>{
+        const w = weights[c.id] / sum;
+        total += w * data[p.id][c.id].score;
+      });
+      return {provider:p, composite: total};
+    });
+    results.sort((a,b)=>b.composite - a.composite);
+    return results;
+  }
+
+  function renderRanking(){
+    const panel = document.getElementById('rankingPanel');
+    const results = computeComposite();
+
+    if(!results){
+      panel.innerHTML = `
+        <div class="empty-state">
+          <div class="glyph">⌀</div>
+          <p>All priorities are set to zero.</p>
+          <p class="sub">Raise at least one slider above to generate a ranking.</p>
+        </div>`;
+      return;
+    }
+
+    panel.innerHTML = '';
+    results.forEach((r, i)=>{
+      const row = document.createElement('div');
+      row.className = 'rank-row' + (i===0 ? ' top' : '');
+      const pct = (r.composite/10*100).toFixed(1);
+      row.innerHTML = `
+        <div class="rank-pos">${i+1}</div>
+        <div class="rank-name">
+          <span class="n">${r.provider.name}</span>
+          <span class="s">${r.provider.sub}</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${r.provider.color};"></div></div>
+        <div class="rank-score">${r.composite.toFixed(2)}<span class="of10"> / 10</span></div>
+      `;
+      panel.appendChild(row);
+    });
+  }
+
+  function renderSkeleton(){
+    const panel = document.getElementById('rankingPanel');
+    panel.innerHTML = '';
+    for(let i=0;i<4;i++){
+      const row = document.createElement('div');
+      row.className = 'skeleton-row';
+      row.innerHTML = `
+        <div class="skel" style="height:20px;"></div>
+        <div class="skel" style="height:28px;"></div>
+        <div class="skel" style="height:10px;"></div>
+        <div class="skel" style="height:20px;"></div>
+      `;
+      panel.appendChild(row);
+    }
+  }
+
+  /* ============================================================
+     RENDER: data table
+     ============================================================ */
+  function renderTable(){
+    const table = document.getElementById('dataTable');
+    let thead = '<thead><tr><th>Criterion</th>';
+    providers.forEach(p=>{
+      thead += `<th class="provider-col"><div class="provider-th"><span class="swatch" style="background:${p.color}"></span>${p.name}</div></th>`;
+    });
+    thead += '</tr></thead>';
+
+    let tbody = '<tbody>';
+    criteria.forEach(c=>{
+      tbody += '<tr>';
+      tbody += `<td class="criterion-cell">${c.shortLabel}${c.isEstimate ? '<span class="est-tag">estimate</span>' : ''}</td>`;
+      providers.forEach(p=>{
+        const d = data[p.id][c.id];
+        tbody += `<td><div class="cell-score">${d.score.toFixed(1)}/10</div><div class="cell-raw">${d.raw}</div></td>`;
+      });
+      tbody += '</tr>';
+    });
+    tbody += '</tbody>';
+
+    table.innerHTML = thead + tbody;
+  }
+
+  /* ============================================================
+     RENDER: sources
+     ============================================================ */
+  function renderSources(){
+    const panel = document.getElementById('sourcesPanel');
+    panel.innerHTML = '';
+    sources.forEach(s=>{
+      const item = document.createElement('div');
+      item.className = 'source-item';
+      item.innerHTML = `
+        <div class="source-idx">[${s.id}]</div>
+        <div>
+          <div class="stitle">${s.title}</div>
+          <div class="smeta">${s.org} · ${s.date}</div>
+          <div><span class="stag">${s.tag}</span></div>
+          <div style="margin-top:6px;"><a href="${s.url}" target="_blank" rel="noopener">${s.url}</a></div>
+        </div>
+      `;
+      panel.appendChild(item);
+    });
+    document.getElementById('sourceCountChip').textContent = sources.length;
+  }
+
+  /* ============================================================
+     RESEARCH METHODOLOGY PANEL
+     ============================================================ */
+  function renderResearch(){
+    const el = document.getElementById('researchContent');
+    el.innerHTML = `
+      <h4>What's a sourced fact vs. an estimate</h4>
+      <p><b>Cost</b> and <b>Global Reach</b> are built directly from provider pricing pages and official infrastructure documentation — the dollar figures and region counts are quoted or directly derived from those pages, not modeled.</p>
+      <p><b>Compute Performance</b>, <b>Support Quality</b>, and <b>Ease of Scaling</b> are harder to reduce to one clean public number, since no single official source scores all four providers consistently. For these three, this tool converts findings from multiple cited, real sources into a 0–10 analyst score. Those scores are marked <span class="stag" style="margin:0;">estimate</span> throughout the table above — treat them as an informed synthesis, not a vendor-published metric.</p>
+
+      <h4>Where sources disagreed, and how it was resolved</h4>
+      <div class="conflict-box">
+        <b>AWS region counts</b> ranged from 33 to 39 depending on the publish date of the source, because AWS added several regions during 2026. This tool used the most recent same-methodology snapshot (17 Jun 2026) rather than averaging across dates, for consistency with how the GCP and Azure figures were sourced.
+      </div>
+      <div class="conflict-box">
+        <b>GCP region counts</b> similarly ranged from 40–49 across sources of different ages and definitions (some included "planned" regions). This tool used the 42-region figure from the most recent, clearly-labeled "live regions" source rather than roadmap totals.
+      </div>
+      <div class="conflict-box">
+        <b>DigitalOcean "regions" vs. "datacenters"</b> are used inconsistently across third-party write-ups (13–20 datacenters depending on the count of legacy sites). This tool used DigitalOcean's own official Regional Availability documentation, which explicitly separates the two: 15 datacenters across 12 regions, current as of the source's own last-verified date.
+      </div>
+      <div class="conflict-box">
+        <b>Compute performance</b> is where vendor marketing is least reliable, since each provider highlights its own best-case chip. This tool instead relied on a single independent, methodologically transparent annual benchmark that tests the same workloads across 44 VM types on all four providers side-by-side, rather than mixing incompatible vendor-reported numbers.
+      </div>
+      <div class="conflict-box">
+        <b>Support cost structures aren't directly comparable</b> — AWS and GCP price support as a percentage of monthly cloud spend, while Azure and DigitalOcean lean more on flat tiers. Rather than forcing these into a single misleading dollar figure, this tool scored "Support Quality" qualitatively on response-time commitments, resolution-time guarantees, and pricing predictability, and flagged it as an estimate.
+      </div>
+
+      <h4>How the weighting works</h4>
+      <p>Each criterion's slider (0–100) is normalized against the sum of all five sliders, so relative priority is what matters, not the absolute numbers. The composite score is a weighted average of the five 0–10 criterion scores. Setting every slider to zero clears the ranking rather than showing a misleading default order.</p>
+
+      <h4>Caveats</h4>
+      <p>Cloud pricing, region counts, and support terms change frequently — the figures here are a snapshot as of the cited access dates in mid-2026. This comparison also intentionally holds instance size constant (roughly 4 vCPU / 16GB) for cost comparability; real workloads should be sized and quoted individually before a final purchasing decision.</p>
+    `;
+  }
+
+  const toggleBtn = document.getElementById('researchToggle');
+  const researchBody = document.getElementById('researchBody');
+  toggleBtn.addEventListener('click', ()=>{
+    const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+    toggleBtn.setAttribute('aria-expanded', String(!expanded));
+    if(!expanded){
+      researchBody.style.maxHeight = researchBody.scrollHeight + 'px';
+    } else {
+      researchBody.style.maxHeight = '0';
+    }
+  });
+
+  /* ============================================================
+     WEIGHT SUM DISPLAY
+     ============================================================ */
+  function renderWeightSum(){
+    const sum = Object.values(weights).reduce((a,b)=>a+b,0);
+    document.getElementById('weightSum').textContent =
+      sum === 0 ? 'Total weight: 0 (ranking paused)' : `Total weight: ${sum} → normalized to 100%`;
+  }
+
+  function renderAll(){
+    renderWeightSum();
+    renderRanking();
+  }
+
+  /* ============================================================
+     INIT — simulate a brief loading state for the ranking panel
+     to demonstrate graceful loading handling, then render for real.
+     ============================================================ */
+  try{
+    renderSkeleton();
+    renderTable();
+    renderSources();
+    renderResearch();
+    renderWeightSum();
+    setTimeout(()=>{
+      try{
+        renderRanking();
+      }catch(err){
+        document.getElementById('rankingPanel').innerHTML =
+          '<div class="empty-state"><div class="glyph">!</div><p>Something went wrong rendering the ranking.</p><p class="sub">Try resetting weights above.</p></div>';
+        console.error(err);
+      }
+    }, 420);
+  }catch(err){
+    console.error('Initialization error', err);
+    document.body.innerHTML = '<div style="padding:60px;font-family:sans-serif;color:#E9EDF2;background:#0F1319;">Something went wrong loading this comparison tool. Please refresh the page.</div>';
+  }
+
+})();
+</script>
+</body>
+</html>
